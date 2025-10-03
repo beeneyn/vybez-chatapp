@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Vybez</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 20px; }
+        .endpoint { border: 1px solid #dee2e6; border-radius: .5rem; margin-bottom: 1.5rem; }
+        .endpoint-header { background-color: #f8f9fa; padding: 1rem; border-bottom: 1px solid #dee2e6; }
+        .endpoint-body { padding: 1rem; }
+        .method { font-weight: bold; padding: .25rem .5rem; border-radius: .25rem; }
+        .method-post { background-color: #198754; color: white; }
+        .method-get { background-color: #0d6efd; color: white; }
+        code { background-color: #e9ecef; padding: .2em .4em; border-radius: 3px; }
+        pre { background-color: #212529; color: #f8f9fa; padding: 1rem; border-radius: .25rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-4">API Documentation</h1>
+            <p class="lead">How to interact with the Vybez API and real-time services.</p>
+            <a href="/">Back to Home</a>
+            <hr class="my-4">
+        </div>
+
+        <h2>RESTful API (HTTP)</h2>
+        <p>These are the standard HTTP endpoints for user management and profiles.</p>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method method-post">POST</span> <code>/signup</code>
+            </div>
+            <div class="endpoint-body">
+                <p>Creates a new user account.</p>
+                <strong>Request Body:</strong>
+                <pre><code>{
+    "username": "new_user",
+    "password": "a_password",
+    "chat_color": "#ff00ff"
+}</code></pre>
+                <strong>Responses:</strong>
+                <ul>
+                    <li><code>201 Created</code>: User created successfully.</li>
+                    <li><code>409 Conflict</code>: Username already exists.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method method-post">POST</span> <code>/login</code>
+            </div>
+            <div class="endpoint-body">
+                <p>Authenticates a user and starts a session.</p>
+                <strong>Request Body:</strong>
+                <pre><code>{
+    "username": "existing_user",
+    "password": "their_password"
+}</code></pre>
+                <strong>Responses:</strong>
+                <ul>
+                    <li><code>200 OK</code>: Login successful.</li>
+                    <li><code>401 Unauthorized</code>: Invalid credentials.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method method-post">POST</span> <code>/logout</code>
+            </div>
+            <div class="endpoint-body">
+                <p>Destroys the current user session.</p>
+                <strong>Request Body:</strong> None
+            </div>
+        </div>
+        
+        <div class="endpoint">
+            <div class="endpoint-header">
+                <span class="method method-get">GET</span> <code>/check-session</code>
+            </div>
+            <div class="endpoint-body">
+                <p>Checks if the current browser has a valid session.</p>
+                <strong>Response Body (Logged In):</strong>
+                <pre><code>{
+    "loggedIn": true,
+    "user": { "username": "test", "color": "#ff0000", ... }
+}</code></pre>
+                <strong>Response Body (Logged Out):</strong>
+                <pre><code>{ "loggedIn": false }</code></pre>
+            </div>
+        </div>
+
+        <h2 class="mt-5">Real-Time API (Socket.IO)</h2>
+        <p>These are the events used for real-time communication after a user is authenticated on the <code>/chat</code> page.</p>
+
+        <h4 class="mt-4">Events Emitted by the Client (to the Server)</h4>
+        <div class="endpoint">
+            <div class="endpoint-header"><code>switchRoom</code></div>
+            <div class="endpoint-body">
+                <p>Tells the server to move the user to a different chat room.</p>
+                <strong>Payload:</strong> <code>"roomName"</code> (string), e.g., <code>"#tech"</code>
+            </div>
+        </div>
+        <div class="endpoint">
+            <div class="endpoint-header"><code>chatMessage</code></div>
+            <div class="endpoint-body">
+                <p>Sends a new public message to the current room.</p>
+                <strong>Payload:</strong>
+                <pre><code>{ "text": "Hello everyone!" }</code></pre>
+            </div>
+        </div>
+        
+        <h4 class="mt-4">Events Emitted by the Server (to the Client)</h4>
+        <div class="endpoint">
+            <div class="endpoint-header"><code>loadHistory</code></div>
+            <div class="endpoint-body">
+                <p>Sent to a client when they join a room, containing recent messages for that room.</p>
+                <strong>Payload:</strong>
+                <pre><code>{
+    "room": "#general",
+    "messages": [ { "user": "...", "text": "...", ... } ]
+}</code></pre>
+            </div>
+        </div>
+        <div class="endpoint">
+            <div class="endpoint-header"><code>chatMessage</code></div>
+            <div class="endpoint-body">
+                <p>Broadcasts a new public message to all clients in a room.</p>
+                <strong>Payload:</strong>
+                <pre><code>{
+    "user": "test_user",
+    "text": "Hello everyone!",
+    "color": "#ff0000",
+    "timestamp": "2025-10-02T22:44:00.000Z"
+}</code></pre>
+            </div>
+        </div>
+        <div class="endpoint">
+            <div class="endpoint-header"><code>updateUserList</code></div>
+            <div class="endpoint-body">
+                <p>Broadcasts the updated list of all online users whenever someone joins or leaves.</p>
+                <strong>Payload:</strong> Array of user objects, e.g., <code>[ { "username": "...", "color": "..." }, ... ]</code>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

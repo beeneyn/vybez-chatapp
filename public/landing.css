@@ -1,0 +1,74 @@
+html, body {
+    margin: 0;
+    /* Removed padding-top here as the hero section now manages its own spacing */
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #23272A; /* Default text color */
+}
+
+/* Remove old logo styles */
+#logo-container, #app-logo {
+    display: none;
+}
+
+/* New: Sticky Header Styles */
+.sticky-top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: 07fefe; /* Use primary brand color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#nav-app-logo {
+    height: auto;
+    max-width: 120px; /* Smaller logo size for the nav bar */
+    filter: none;
+}
+
+
+.hero {
+    min-height: 80vh;
+    background-color: #07fefe;
+    background-image: linear-gradient(180deg, rgba(35,39,42,0) 0%, #fe02fd 100%);
+    /* Adjust padding to account for the sticky nav, though sticky-top handles it mostly */
+    padding: 2rem; 
+}
+
+h1.display-3 {
+    text-transform: uppercase;
+    font-weight: 800 !important;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero .lead {
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.btn-light {
+    border-radius: 28px;
+    padding: 14px 32px;
+}
+
+.features-section .card-title {
+    font-weight: bold;
+}
+
+.feature-spotlight {
+    padding: 6rem 0;
+}
+
+/* New: Animation Placeholder Style */
+.animation-placeholder {
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 3px dashed #ddd;
+    /* If you replace this with a GIF/Video, you can remove this style */
+}
+
+/* ... rest of the existing CSS ... */
