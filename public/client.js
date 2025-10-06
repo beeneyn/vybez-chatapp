@@ -236,9 +236,13 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Login response status:', response.status);
             if (response.ok) { 
                 console.log('Login successful, redirecting to /chat');
-                if (typeof closeAuthModal === 'function') closeAuthModal();
-                setTimeout(() => { window.location.replace('/chat'); }, 100);
-            } else{ 
+                const authModal = document.getElementById('authModal');
+                if (authModal) authModal.style.display = 'none';
+                setTimeout(() => {
+                    console.log('Executing redirect now...');
+                    window.location.href = '/chat';
+                }, 250);
+            } else { 
                 const data = await response.json(); 
                 console.error('Login failed:', data.message);
                 statusEl.textContent = data.message || 'Login failed.'; 

@@ -46,10 +46,40 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 app.get('/', (req, res) => { if (req.session.user) res.redirect('/chat'); else res.sendFile(path.join(__dirname, 'public', 'landing.html')); });
-app.get('/chat', (req, res) => { if (!req.session.user) res.redirect('/'); else res.sendFile(path.join(__dirname, 'public', 'chat.html')); });
+app.get('/chat', (req, res) => { 
+    console.log('GET /chat - Session:', req.session.user ? 'exists' : 'missing');
+    console.log('GET /chat - Session ID:', req.sessionID);
+    console.log('GET /chat - Cookies:', req.headers.cookie);
+    if (!req.session.user) {
+        console.log('No session user, redirecting to /');
+        res.redirect('/');
+    } else {
+        console.log('Session user found, serving chat.html');
+        res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+    }
+});
 
 app.post('/signup', (req, res) => { const { username, password, chat_color } = req.body; db.addUser(username, password, chat_color, (err) => { if (err) { if (err.code === 'SQLITE_CONSTRAINT') return res.status(409).json({ message: 'Username already exists.' }); return res.status(500).json({ message: 'Server error.' }); } res.status(201).json({ message: 'User created!' }); }); });
-app.post('/login', (req, res) => { const { username, password } = req.body; db.findUser(username, (err, user) => { if (err || !user) return res.status(401).json({ message: 'Invalid credentials.' }); db.verifyPassword(password, user, (err, isValid) => { if (err || !isValid) return res.status(401).json({ message: 'Invalid credentials.' }); req.session.user = { id: user.id, username: user.username, color: user.chat_color, bio: user.bio, status: user.status, avatar: user.avatar_url, role: user.role }; req.session.save((saveErr) => { if (saveErr) return res.status(500).json({ message: 'Error saving session.' }); res.status(200).json({ message: 'Login successful!', user: req.session.user }); }); }); }); });
+app.post('/login', (req, res) => { 
+    const { username, password } = req.body; 
+    db.findUser(username, (err, user) => { 
+        if (err || !user) return res.status(401).json({ message: 'Invalid credentials.' }); 
+        db.verifyPassword(password, user, (err, isValid) => { 
+            if (err || !isValid) return res.status(401).json({ message: 'Invalid credentials.' }); 
+            req.session.user = { id: user.id, username: user.username, color: user.chat_color, bio: user.bio, status: user.status, avatar: user.avatar_url, role: user.role }; 
+            req.session.save((saveErr) => { 
+                if (saveErr) {
+                    console.error('Session save error:', saveErr);
+                    return res.status(500).json({ message: 'Error saving session.' });
+                }
+                console.log('Login successful for:', username);
+                console.log('Session ID:', req.sessionID);
+                console.log('Session saved:', req.session.user);
+                res.status(200).json({ message: 'Login successful!', user: req.session.user }); 
+            }); 
+        }); 
+    }); 
+});
 app.post('/logout', (req, res) => { req.session.destroy(err => { if (err) return res.status(500).json({ message: 'Logout failed.' }); res.clearCookie('connect.sid'); res.status(200).json({ message: 'Logout successful.' }); }); });
 app.get('/check-session', (req, res) => { if (req.session.user) res.status(200).json({ loggedIn: true, user: req.session.user }); else res.status(200).json({ loggedIn: false }); });
 
