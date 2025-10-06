@@ -68,6 +68,26 @@ const initializeDatabase = async () => {
             )
         `);
         
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS rooms (
+                id SERIAL PRIMARY KEY,
+                name TEXT UNIQUE NOT NULL,
+                created_by TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_default BOOLEAN DEFAULT FALSE
+            )
+        `);
+        
+        const defaultRooms = ['#general', '#tech', '#random'];
+        for (const room of defaultRooms) {
+            await client.query(
+                `INSERT INTO rooms (name, created_by, is_default) 
+                 VALUES ($1, 'system', TRUE) 
+                 ON CONFLICT (name) DO NOTHING`,
+                [room]
+            );
+        }
+        
         console.log('Connected to PostgreSQL database and tables initialized.');
     } catch (err) {
         console.error('Error initializing database:', err);
