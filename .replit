@@ -34,13 +34,16 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 34045
-externalPort = 3002
-
-[[ports]]
 localPort = 40395
 externalPort = 3000
+
+[[ports]]
+localPort = 46259
+externalPort = 3001
 
 [deployment]
 deploymentTarget = "vm"
 run = ["node", "server.js"]
+
+[objectStorage]
+defaultBucketID = "replit-objstore-3cb6c369-1cb2-46a1-a2e5-05546f2b1d4e"

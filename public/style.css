@@ -74,3 +74,28 @@ body {
 .form-control, .form-select { background-color: var(--background-primary); color: var(--text-normal); border-color: var(--border-color); }
 .form-control:focus { background-color: var(--background-primary); color: var(--text-normal); border-color: var(--brand-experiment); box-shadow: 0 0 0 0.25rem rgba(var(--brand-experiment), 0.25); }
 body[data-theme='dark'] .form-label, body[data-theme='dark'] h6 { color: var(--text-normal); }
+
+/* Modal Styles for Tailwind */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--modal-background);
+    color: var(--modal-text);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}

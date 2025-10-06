@@ -41,6 +41,13 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
     - Updated all queries to use PostgreSQL syntax and parameterized queries
     - Changed session storage from SQLite to file-based store
     - Improved concurrency handling and production readiness
+  - **Migrated from Bootstrap to Tailwind CSS v4**
+    - Converted entire UI from Bootstrap 5 to Tailwind CSS v4
+    - Installed @tailwindcss/cli for production-ready CSS builds
+    - Created build pipeline with npm scripts for CSS compilation
+    - Removed Bootstrap and Alpine.js dependencies
+    - Implemented custom modal system with vanilla JavaScript
+    - Eliminated CDN warnings for production readiness
 
 ## Tech Stack
 - **Backend:** Node.js, Express.js
@@ -48,7 +55,8 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 - **Database:** PostgreSQL (Replit managed Neon database)
 - **Session Management:** express-session with file-based store
 - **Authentication:** bcrypt for password hashing
-- **Frontend:** Bootstrap 5, vanilla JavaScript
+- **Frontend:** Tailwind CSS v4, vanilla JavaScript
+- **CSS Build:** @tailwindcss/cli with npm build pipeline
 
 ## Project Architecture
 
