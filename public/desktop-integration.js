@@ -110,11 +110,11 @@ if (isDesktopApp) {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #5b2bff, #ff3f8f, #1ed5ff);
             color: white;
             padding: 16px 24px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(91, 43, 255, 0.3);
             z-index: 99999;
             max-width: 350px;
         `;

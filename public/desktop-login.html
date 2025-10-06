@@ -7,25 +7,27 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="landing.css">
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         .auth-container {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(91, 43, 255, 0.4);
             overflow: hidden;
             max-width: 450px;
             width: 90%;
             margin: 20px;
         }
         .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -41,8 +43,8 @@
             border-bottom: 3px solid transparent;
         }
         .tab-button.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+            color: #5b2bff;
+            border-bottom-color: #5b2bff;
         }
         .form-container {
             display: none;
@@ -55,7 +57,7 @@
 <body>
 
     <div class="auth-container">
-        <div class="text-center py-8 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+        <div class="text-center py-8 px-6 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white">
             <div class="flex items-center justify-center mb-3">
                 <img src="favicon.png" alt="Vybez Logo" class="h-16 w-16">
             </div>
@@ -79,7 +81,7 @@
                         Username
                     </label>
                     <input 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
                         id="login-username" 
                         type="text" 
                         placeholder="Enter your username"
@@ -92,7 +94,7 @@
                         Password
                     </label>
                     <input 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
                         id="login-password" 
                         type="password" 
                         placeholder="Enter your password"
@@ -102,7 +104,7 @@
                 </div>
                 <div id="login-error" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"></div>
                 <button 
-                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg transform hover:scale-105"
+                    class="w-full bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold py-3 px-4 rounded-lg hover:shadow-xl transition-all shadow-lg transform hover:scale-105"
                     type="submit"
                 >
                     <i class="fas fa-sign-in-alt mr-2"></i>Login
@@ -115,7 +117,7 @@
                         Username
                     </label>
                     <input 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
                         id="signup-username" 
                         type="text" 
                         placeholder="Choose a username"
@@ -128,7 +130,7 @@
                         Password
                     </label>
                     <input 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
                         id="signup-password" 
                         type="password" 
                         placeholder="Create a password"
@@ -144,13 +146,13 @@
                         class="w-full h-12 px-2 border border-gray-300 rounded-lg cursor-pointer" 
                         id="signup-color" 
                         type="color" 
-                        value="#667eea"
+                        value="#5b2bff"
                     >
                     <p class="text-xs text-gray-500 mt-1">Choose your chat message color</p>
                 </div>
                 <div id="signup-error" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"></div>
                 <button 
-                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg transform hover:scale-105"
+                    class="w-full bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold py-3 px-4 rounded-lg hover:shadow-xl transition-all shadow-lg transform hover:scale-105"
                     type="submit"
                 >
                     <i class="fas fa-user-plus mr-2"></i>Create Account
