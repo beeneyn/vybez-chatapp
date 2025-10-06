@@ -1,16 +1,26 @@
 {
   "name": "vybez-chatapp",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "Vybez - Real-time chat application",
+  "author": "Vybez Team",
+  "main": "electron.js",
   "scripts": {
     "start": "npm run build:css && node server.js",
-    "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/tailwind.css --minify"
+    "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/tailwind.css --minify",
+    "electron": "NODE_ENV=development electron .",
+    "electron-dev": "NODE_ENV=development electron . --inspect",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.14",
     "autoprefixer": "^10.4.21",
     "bcrypt": "^5.1.1",
+    "electron": "^38.2.1",
+    "electron-builder": "^26.0.12",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "multer": "^2.0.2",
