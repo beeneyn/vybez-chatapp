@@ -235,13 +235,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }), credentials: 'same-origin' }); 
             console.log('Login response status:', response.status);
             if (response.ok) { 
-                console.log('Login successful, redirecting to /chat');
                 const authModal = document.getElementById('authModal');
                 if (authModal) authModal.style.display = 'none';
-                setTimeout(() => {
-                    console.log('Executing redirect now...');
-                    window.location.href = '/chat';
-                }, 250);
+                setTimeout(() => { window.location.href = '/chat'; }, 250);
             } else { 
                 const data = await response.json(); 
                 console.error('Login failed:', data.message);
