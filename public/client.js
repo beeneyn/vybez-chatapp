@@ -363,6 +363,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (msg.user !== currentUser) {
                 const audio = new Audio('/notification.mp3');
                 audio.play().catch(e => console.log('Audio play failed:', e));
+                
+                if (window.desktopAPI) {
+                    window.desktopAPI.handleNewMessage({
+                        username: msg.user,
+                        message: msg.text || '',
+                        room: currentRoom
+                    });
+                }
             }
             renderMessage(msg); 
         });
@@ -406,6 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('privateMessage', (pm) => {
             const audio = new Audio('/notification.mp3');
             audio.play().catch(e => console.log('Audio play failed:', e));
+            
+            if (window.desktopAPI) {
+                window.desktopAPI.handleNewPrivateMessage({
+                    from: pm.from,
+                    message: pm.text || ''
+                });
+            }
             
             const pmModal = document.getElementById('privateMessageModal');
             const recipientName = document.getElementById('pm-recipient-name').textContent;
