@@ -88,7 +88,8 @@ io.on('connection', (socket) => {
                 color: msg.chat_color, 
                 timestamp: msg.timestamp,
                 fileUrl: msg.file_url,
-                fileType: msg.file_type
+                fileType: msg.file_type,
+                avatar: msg.avatar_url
             })); 
             socket.emit('loadHistory', { room: defaultRoom, messages: history }); 
         } 
@@ -107,7 +108,8 @@ io.on('connection', (socket) => {
                     color: msg.chat_color, 
                     timestamp: msg.timestamp,
                     fileUrl: msg.file_url,
-                    fileType: msg.file_type
+                    fileType: msg.file_type,
+                    avatar: msg.avatar_url
                 })); 
                 socket.emit('loadHistory', { room: newRoom, messages: history }); 
             } 
@@ -126,7 +128,8 @@ io.on('connection', (socket) => {
                 color: session.user.color, 
                 timestamp: timestamp,
                 fileUrl: msg.fileUrl,
-                fileType: msg.fileType
+                fileType: msg.fileType,
+                avatar: session.user.avatar
             }; 
             io.to(socket.currentRoom).emit('chatMessage', messageToSend); 
         }); 

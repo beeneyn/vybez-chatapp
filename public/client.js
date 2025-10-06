@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
         item.setAttribute('data-message-id', msg.id);
         if (isPrivate) item.classList.add('private-message'); 
         const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
-        item.innerHTML = `<span class="timestamp">[${time}]</span> <strong style="color: ${msg.color || '#000'}">${isPrivate ? `(private from ${msg.from})` : msg.user}:</strong> `;
+        const avatarHtml = msg.avatar ? `<img src="${msg.avatar}" alt="${msg.user}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">` : '<span style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; vertical-align: middle; background-color: #ddd; text-align: center; line-height: 32px; font-size: 14px;">👤</span>';
+        item.innerHTML = `${avatarHtml}<span class="timestamp">[${time}]</span> <strong style="color: ${msg.color || '#000'}">${isPrivate ? `(private from ${msg.from})` : msg.user}:</strong> `;
         
         if (msg.text) {
             item.appendChild(document.createTextNode(msg.text));
@@ -208,7 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         color: msg.chat_color,
                         timestamp: msg.timestamp,
                         fileUrl: msg.file_url,
-                        fileType: msg.file_type
+                        fileType: msg.file_type,
+                        avatar: msg.avatar_url
                     });
                 });
             }
@@ -323,11 +325,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (user.username === currentUser) return; 
                 const item = document.createElement('li'); 
                 item.classList.add('list-group-item'); 
-                item.textContent = user.username; 
-                item.style.color = user.color;
                 item.style.cursor = 'pointer';
                 item.title = 'Click to send private message';
                 item.onclick = () => openPrivateMessage(user.username);
+                
+                const avatarImg = user.avatar ? `<img src="${user.avatar}" alt="${user.username}" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">` : '<span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; background-color: #ddd; text-align: center; line-height: 24px; font-size: 12px;">👤</span>';
+                item.innerHTML = `${avatarImg}<span style="color: ${user.color};">${user.username}</span>`;
+                
                 onlineUsersList.appendChild(item); 
             }); 
         });
