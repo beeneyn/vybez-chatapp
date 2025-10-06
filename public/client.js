@@ -236,8 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Login response status:', response.status);
             if (response.ok) { 
                 console.log('Login successful, redirecting to /chat');
-                window.location.href = '/chat'; 
-            } else { 
+                if (typeof closeAuthModal === 'function') closeAuthModal();
+                setTimeout(() => { window.location.replace('/chat'); }, 100);
+            } else{ 
                 const data = await response.json(); 
                 console.error('Login failed:', data.message);
                 statusEl.textContent = data.message || 'Login failed.'; 
