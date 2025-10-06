@@ -3,129 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vybez Brand Kit</title>
+    <title>Vybez Brand Kit - Neon Nightlife</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="landing.css">
-    </head>
-<body>
+    <style>
+        .color-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .color-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(91, 43, 255, 0.3);
+        }
+        .color-swatch {
+            height: 200px;
+            border-radius: 1rem 1rem 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .color-swatch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .color-card:hover .color-swatch::before {
+            left: 100%;
+        }
+        .gradient-showcase {
+            height: 300px;
+            border-radius: 2rem;
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .gradient-showcase::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+        .typography-display {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glow-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(91, 43, 255, 0.2);
+        }
+        .copy-btn {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .color-card:hover .copy-btn {
+            opacity: 1;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        .hero-pattern {
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(91, 43, 255, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 63, 143, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(30, 213, 255, 0.2) 0%, transparent 40%);
+        }
+    </style>
+</head>
+<body class="bg-[#0b1220] text-white" style="font-family: 'Inter', sans-serif;">
 
-    <header class="brand-kit-header py-4 bg-primary text-white shadow-sm">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-0">Vybez Brand Kit</h1>
-            <a href="landing.html" class="btn btn-light btn-sm fw-bold">
-                <i class="bi bi-arrow-left"></i> Back to Home
+    <!-- Hero Header -->
+    <header class="relative overflow-hidden py-20 hero-pattern" style="background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);">
+        <div class="container mx-auto px-4 relative z-10">
+            <a href="/" class="inline-block mb-8 text-white hover:opacity-80 transition-opacity">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
             </a>
+            <div class="text-center">
+                <img src="favicon.png" alt="Vybez" class="h-24 w-24 mx-auto mb-6 floating">
+                <h1 class="text-6xl md:text-7xl font-black mb-6" style="font-family: 'Space Grotesk', sans-serif;">
+                    VYBEZ BRAND KIT
+                </h1>
+                <p class="text-2xl mb-4 opacity-90">Neon Nightlife Aesthetic</p>
+                <p class="text-lg opacity-80 max-w-2xl mx-auto">
+                    A modern, vibrant design system that brings energy and life to every pixel
+                </p>
+            </div>
         </div>
     </header>
 
-    <section class="brand-section py-5 bg-white">
-        <div class="container">
-            <h2 class="display-5 fw-bold mb-4 border-bottom pb-2">Logo & Usage</h2>
-            <div class="row align-items-center g-5">
-                <div class="col-md-6">
-                    <p class="lead">Our primary logo is designed for clarity and impact, especially on dark backgrounds. Always ensure a minimum clear space equal to the height of the 'V' around the logo.</p>
-                    <p class="mt-4"><strong>File Formats:</strong> SVG, PNG (transparent), JPG.</p>
-                    <button class="btn btn-outline-primary mt-3">Download Logos (ZIP)</button>
-                </div>
-                <div class="col-md-6 text-center">
-                    <div class="p-5 border rounded bg-light">
-                        <img src="logo.png" alt="Primary Vybez Logo" style="max-width: 200px;">
+    <!-- Color Palette Section -->
+    <section class="py-20 bg-[#0f1a2e]">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl md:text-6xl font-bold mb-4 typography-display" style="font-family: 'Space Grotesk', sans-serif;">
+                    Color Palette
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Our vibrant color system captures the essence of digital nightlife with electric hues and deep foundations
+                </p>
+            </div>
+
+            <!-- Primary Gradient -->
+            <div class="mb-16">
+                <h3 class="text-3xl font-bold mb-6 text-center" style="font-family: 'Space Grotesk', sans-serif;">Primary Gradient</h3>
+                <div class="gradient-showcase relative flex items-center justify-center">
+                    <div class="relative z-10 text-center">
+                        <p class="text-4xl font-bold mb-4">Violet → Magenta → Cyan</p>
+                        <p class="text-lg opacity-90">#5b2bff → #ff3f8f → #1ed5ff</p>
                     </div>
-                    <div class="p-5 mt-3 border rounded" style="background-color: #23272A;">
-                        <img src="logo-white.png" alt="White Vybez Logo" style="max-width: 200px;">
-                        <small class="d-block text-white-50 mt-2">White version on dark background</small>
+                </div>
+            </div>
+
+            <!-- Color Swatches -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Deep Violet -->
+                <div class="color-card bg-white text-gray-900">
+                    <div class="color-swatch" style="background: #5b2bff;"></div>
+                    <div class="p-6">
+                        <h4 class="text-2xl font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Deep Violet</h4>
+                        <p class="text-sm text-gray-600 mb-4">Primary Brand Color</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-lg">#5b2bff</span>
+                                <button onclick="copyColor('#5b2bff')" class="copy-btn px-3 py-1 bg-[#5b2bff] text-white rounded-lg text-sm hover:opacity-80">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500">RGB: 91, 43, 255</p>
+                            <p class="text-sm text-gray-500">HSL: 248°, 100%, 58%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Electric Magenta -->
+                <div class="color-card bg-white text-gray-900">
+                    <div class="color-swatch" style="background: #ff3f8f;"></div>
+                    <div class="p-6">
+                        <h4 class="text-2xl font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Electric Magenta</h4>
+                        <p class="text-sm text-gray-600 mb-4">Vibrant Accent</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-lg">#ff3f8f</span>
+                                <button onclick="copyColor('#ff3f8f')" class="copy-btn px-3 py-1 bg-[#ff3f8f] text-white rounded-lg text-sm hover:opacity-80">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500">RGB: 255, 63, 143</p>
+                            <p class="text-sm text-gray-500">HSL: 335°, 100%, 62%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cyber Cyan -->
+                <div class="color-card bg-white text-gray-900">
+                    <div class="color-swatch" style="background: #1ed5ff;"></div>
+                    <div class="p-6">
+                        <h4 class="text-2xl font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Cyber Cyan</h4>
+                        <p class="text-sm text-gray-600 mb-4">Cool Accent</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-lg">#1ed5ff</span>
+                                <button onclick="copyColor('#1ed5ff')" class="copy-btn px-3 py-1 bg-[#1ed5ff] text-white rounded-lg text-sm hover:opacity-80">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500">RGB: 30, 213, 255</p>
+                            <p class="text-sm text-gray-500">HSL: 191°, 100%, 56%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Midnight Base -->
+                <div class="color-card bg-white text-gray-900">
+                    <div class="color-swatch" style="background: #0b1220;"></div>
+                    <div class="p-6">
+                        <h4 class="text-2xl font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Midnight Base</h4>
+                        <p class="text-sm text-gray-600 mb-4">Dark Foundation</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-lg">#0b1220</span>
+                                <button onclick="copyColor('#0b1220')" class="copy-btn px-3 py-1 bg-[#0b1220] text-white rounded-lg text-sm hover:opacity-80">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500">RGB: 11, 18, 32</p>
+                            <p class="text-sm text-gray-500">HSL: 220°, 49%, 8%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Navy -->
+                <div class="color-card bg-white text-gray-900">
+                    <div class="color-swatch" style="background: #0f1a2e;"></div>
+                    <div class="p-6">
+                        <h4 class="text-2xl font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Deep Navy</h4>
+                        <p class="text-sm text-gray-600 mb-4">Background Secondary</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-lg">#0f1a2e</span>
+                                <button onclick="copyColor('#0f1a2e')" class="copy-btn px-3 py-1 bg-[#0f1a2e] text-white rounded-lg text-sm hover:opacity-80">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500">RGB: 15, 26, 46</p>
+                            <p class="text-sm text-gray-500">HSL: 219°, 51%, 12%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warm Accent -->
+                <div class="color-card bg-white text-gray-900">
+                    <div class="color-swatch" style="background: #f6b73c;"></div>
+                    <div class="p-6">
+                        <h4 class="text-2xl font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Warm Accent</h4>
+                        <p class="text-sm text-gray-600 mb-4">Highlight & CTAs</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-lg">#f6b73c</span>
+                                <button onclick="copyColor('#f6b73c')" class="copy-btn px-3 py-1 bg-[#f6b73c] text-white rounded-lg text-sm hover:opacity-80">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500">RGB: 246, 183, 60</p>
+                            <p class="text-sm text-gray-500">HSL: 40°, 91%, 60%</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="brand-section py-5 bg-light">
-        <div class="container">
-            <h2 class="display-5 fw-bold mb-4 border-bottom pb-2">Color Palette</h2>
-            <p class="lead mb-5">These are the core colors that define the Vybez brand. They should be used consistently across all platforms.</p>
-            
-            <div class="row g-4 text-center">
-                
-                <div class="col-lg-3 col-md-6">
-                    <div class="color-swatch shadow" style="background-color: #404EED;"></div>
-                    <h5 class="mt-3">Primary Blue</h5>
-                    <p class="mb-0">#404EED</p>
-                    <p class="text-muted">RGB: 64, 78, 237</p>
+    <!-- Typography Section -->
+    <section class="py-20 bg-[#0b1220]">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl md:text-6xl font-bold mb-4 typography-display" style="font-family: 'Space Grotesk', sans-serif;">
+                    Typography
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Modern, readable fonts that balance personality with clarity
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 mb-16">
+                <!-- Space Grotesk -->
+                <div class="glow-card rounded-2xl p-8">
+                    <h3 class="text-3xl font-bold mb-6" style="font-family: 'Space Grotesk', sans-serif; color: #5b2bff;">Space Grotesk</h3>
+                    <p class="text-gray-400 mb-8">Display & Headings • 600-700 weight</p>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-7xl font-bold" style="font-family: 'Space Grotesk', sans-serif;">Aa</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-4xl font-bold" style="font-family: 'Space Grotesk', sans-serif;">CHAT WITHOUT LIMITS</p>
+                            <p class="text-2xl font-semibold" style="font-family: 'Space Grotesk', sans-serif;">Real-time messaging redefined</p>
+                        </div>
+                        <div class="pt-6 border-t border-gray-700">
+                            <p class="font-mono text-sm text-gray-500">font-family: 'Space Grotesk', sans-serif;</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="color-swatch shadow" style="background-color: #23272A;"></div>
-                    <h5 class="mt-3">Primary Dark</h5>
-                    <p class="mb-0">#23272A</p>
-                    <p class="text-muted">RGB: 35, 39, 42</p>
+                <!-- Inter -->
+                <div class="glow-card rounded-2xl p-8">
+                    <h3 class="text-3xl font-bold mb-6" style="font-family: 'Inter', sans-serif; color: #ff3f8f;">Inter</h3>
+                    <p class="text-gray-400 mb-8">Body & UI Text • 400-600 weight</p>
+                    <div class="space-y-6">
+                        <div>
+                            <p class="text-7xl font-semibold" style="font-family: 'Inter', sans-serif;">Aa</p>
+                        </div>
+                        <div class="space-y-3">
+                            <p class="text-lg" style="font-family: 'Inter', sans-serif;">
+                                Experience lightning-fast messaging with custom rooms, private DMs, reactions, file sharing, and more.
+                            </p>
+                            <p class="text-base text-gray-400" style="font-family: 'Inter', sans-serif;">
+                                Clean, readable, and optimized for screens of all sizes
+                            </p>
+                        </div>
+                        <div class="pt-6 border-t border-gray-700">
+                            <p class="font-mono text-sm text-gray-500">font-family: 'Inter', sans-serif;</p>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="col-lg-3 col-md-6">
-                    <div class="color-swatch shadow" style="background-color: #57F287;"></div>
-                    <h5 class="mt-3">Accent Green</h5>
-                    <p class="mb-0">#57F287</p>
-                    <p class="text-muted">RGB: 87, 242, 135</p>
-                </div>
+            </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="color-swatch shadow" style="background-color: #F6F6F6; border: 1px solid #ddd;"></div>
-                    <h5 class="mt-3">Light Background</h5>
-                    <p class="mb-0">#F6F6F6</p>
-                    <p class="text-muted">RGB: 246, 246, 246</p>
+            <!-- Typography Scale -->
+            <div class="glow-card rounded-2xl p-8">
+                <h4 class="text-2xl font-bold mb-8" style="font-family: 'Space Grotesk', sans-serif;">Type Scale</h4>
+                <div class="space-y-4">
+                    <div class="flex items-baseline gap-6">
+                        <span class="text-6xl font-bold" style="font-family: 'Space Grotesk', sans-serif;">H1</span>
+                        <span class="text-gray-500">60px / 3.75rem - Bold</span>
+                    </div>
+                    <div class="flex items-baseline gap-6">
+                        <span class="text-5xl font-bold" style="font-family: 'Space Grotesk', sans-serif;">H2</span>
+                        <span class="text-gray-500">48px / 3rem - Bold</span>
+                    </div>
+                    <div class="flex items-baseline gap-6">
+                        <span class="text-4xl font-bold" style="font-family: 'Space Grotesk', sans-serif;">H3</span>
+                        <span class="text-gray-500">36px / 2.25rem - Semibold</span>
+                    </div>
+                    <div class="flex items-baseline gap-6">
+                        <span class="text-2xl font-semibold" style="font-family: 'Space Grotesk', sans-serif;">H4</span>
+                        <span class="text-gray-500">24px / 1.5rem - Semibold</span>
+                    </div>
+                    <div class="flex items-baseline gap-6">
+                        <span class="text-lg" style="font-family: 'Inter', sans-serif;">Body Large</span>
+                        <span class="text-gray-500">18px / 1.125rem - Regular</span>
+                    </div>
+                    <div class="flex items-baseline gap-6">
+                        <span class="text-base" style="font-family: 'Inter', sans-serif;">Body</span>
+                        <span class="text-gray-500">16px / 1rem - Regular</span>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="brand-section py-5 bg-white">
-        <div class="container">
-            <h2 class="display-5 fw-bold mb-4 border-bottom pb-2">Typography</h2>
-            <p class="lead mb-4">We use a modern, sans-serif font stack for readability and a clean feel across the application and marketing materials.</p>
-            
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <h3 class="fw-bold">Headings & Logo: Arial Black (Fallback)</h3>
-                    <p style="font-family: 'Arial Black', Gadget, sans-serif; font-size: 2.5rem; font-weight: 800; color: #404EED;">IMAGINE A PLACE...</p>
-                    <p class="text-muted">Used for the **Logo text**, H1-H6, and prominent calls-to-action.</p>
+    <!-- Logo Section -->
+    <section class="py-20 bg-[#0f1a2e]">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl md:text-6xl font-bold mb-4 typography-display" style="font-family: 'Space Grotesk', sans-serif;">
+                    Logo & Branding
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Our iconic V represents connection, communication, and vibrant energy
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <!-- Light Background -->
+                <div class="glow-card rounded-2xl p-12 bg-white text-center">
+                    <img src="favicon.png" alt="Vybez Logo" class="h-32 w-32 mx-auto mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2" style="font-family: 'Space Grotesk', sans-serif;">On Light</h3>
+                    <p class="text-gray-600">Use primary logo on light backgrounds</p>
                 </div>
-                <div class="col-md-6">
-                    <h3 class="fw-light">Body Text: 'Helvetica Neue', sans-serif</h3>
-                    <p style="font-size: 1.1rem;">This is a sample of the body text used in the chat application and landing page. Readability is paramount for messaging.</p>
-                    <p class="text-muted">Used for paragraphs, feature descriptions, and chat messages.</p>
+
+                <!-- Dark Background -->
+                <div class="rounded-2xl p-12 text-center" style="background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);">
+                    <img src="favicon.png" alt="Vybez Logo" class="h-32 w-32 mx-auto mb-6">
+                    <h3 class="text-2xl font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">On Gradient</h3>
+                    <p class="opacity-90">Logo works beautifully on gradients</p>
+                </div>
+            </div>
+
+            <!-- Logo Guidelines -->
+            <div class="glow-card rounded-2xl p-8">
+                <h4 class="text-2xl font-bold mb-6" style="font-family: 'Space Grotesk', sans-serif;">Usage Guidelines</h4>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h5 class="text-xl font-semibold mb-3 text-green-400"><i class="fas fa-check-circle mr-2"></i> Do</h5>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• Maintain clear space around the logo</li>
+                            <li>• Use on solid backgrounds or subtle gradients</li>
+                            <li>• Keep proportions intact when scaling</li>
+                            <li>• Use provided file formats (SVG, PNG)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 class="text-xl font-semibold mb-3 text-red-400"><i class="fas fa-times-circle mr-2"></i> Don't</h5>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• Stretch or distort the logo</li>
+                            <li>• Place on busy or low-contrast backgrounds</li>
+                            <li>• Change logo colors or add effects</li>
+                            <li>• Use low-resolution or pixelated versions</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer class="bg-dark text-white pt-5 pb-4">
-        <div class="container text-center text-md-start">
-            <div class="row">
-                <div class="col-md-8 col-lg-8 col-xl-8 mx-auto mb-4">
-                    <h6 class="text-uppercase fw-bold">Vybez Chat App</h6>
-                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px"/>
-                    <p>
-                        A full-stack, real-time chat application built from the ground up.
-                    </p>
-                    <p>&copy; 2025 Vybez</p>
-                </div>
-
-                <div class="col-md-4 col-lg-4 col-xl-4 mx-auto mb-4">
-                    <h6 class="text-uppercase fw-bold">Gogobeans Family Tree</h6>
-                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px"/>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="https://dubblebean.com" class="text-white-50" target="_blank" rel="noopener noreferrer">dubblebean.com</a></li>
-                        <li class="mb-2"><a href="https://gogobeans.xyz" class="text-white-50" target="_blank" rel="noopener noreferrer">gogobeans.xyz</a></li>
-                        <li class="mb-2"><a href="https://my-math-homework.gogobeans.space" class="text-white-50" target="_blank" rel="noopener noreferrer">my-math-homework.gogobeans.space</a></li>
-                        <li class="mb-2"><a href="https://www.beeny.site" class="text-white-50" target="_blank" rel="noopener noreferrer">beeny.site</a></li>
-                    </ul>
+    <!-- Download Section -->
+    <section class="py-20 bg-[#0b1220]">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-4xl mx-auto glow-card rounded-2xl p-12">
+                <i class="fas fa-download text-6xl mb-6" style="background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6" style="font-family: 'Space Grotesk', sans-serif;">
+                    Download Brand Assets
+                </h2>
+                <p class="text-xl text-gray-400 mb-8">
+                    Get the complete Vybez brand kit including logos, color palettes, and typography guidelines
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="px-8 py-4 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold text-lg rounded-full hover:shadow-2xl transform hover:scale-105 transition-all">
+                        <i class="fas fa-file-archive mr-2"></i> Download Full Kit (ZIP)
+                    </button>
+                    <a href="/" class="px-8 py-4 border-2 border-white text-white font-bold text-lg rounded-full hover:bg-white hover:text-[#5b2bff] transition-all">
+                        <i class="fas fa-home mr-2"></i> Back to Vybez
+                    </a>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-[#0f1a2e] border-t border-gray-800">
+        <div class="container mx-auto px-4 text-center">
+            <img src="favicon.png" alt="Vybez" class="h-12 w-12 mx-auto mb-4 opacity-50">
+            <p class="text-gray-500 mb-2">&copy; 2025 Vybez Chat App</p>
+            <p class="text-gray-600 text-sm">Built with passion and neon dreams ✨</p>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function copyColor(color) {
+            navigator.clipboard.writeText(color).then(() => {
+                const btn = event.target.closest('button');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
