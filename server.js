@@ -76,36 +76,45 @@ app.get('/private-messages/:username', (req, res) => { if (!req.session.user) re
 
 app.post('/update-profile', (req, res) => { if (!req.session.user) return res.status(401).json({ message: 'Unauthorized' }); const { bio, status, chat_color } = req.body; db.updateUserProfile(req.session.user.username, { bio, status, chat_color }, (err) => { if (err) return res.status(500).json({ message: 'Failed to update profile' }); req.session.user.bio = bio; req.session.user.status = status; req.session.user.color = chat_color; req.session.save((saveErr) => { if (saveErr) return res.status(500).json({ message: 'Error saving session' }); res.status(200).json({ message: 'Profile updated successfully', user: req.session.user }); }); }); });
 
+app.get('/rooms', (req, res) => { if (!req.session.user) return res.status(401).json({ message: 'Unauthorized' }); db.getAllRooms((err, rooms) => { if (err) return res.status(500).json({ message: 'Failed to get rooms' }); res.status(200).json({ rooms }); }); });
+
+app.post('/rooms', (req, res) => { if (!req.session.user) return res.status(401).json({ message: 'Unauthorized' }); const { name } = req.body; if (!name || name.trim() === '') return res.status(400).json({ message: 'Room name is required' }); db.createRoom(name.trim(), req.session.user.username, (err, room) => { if (err) { if (err.message === 'Room already exists') return res.status(409).json({ message: 'Room already exists' }); return res.status(500).json({ message: 'Failed to create room' }); } io.emit('roomCreated', room); res.status(201).json({ message: 'Room created successfully', room }); }); });
+
+app.delete('/rooms/:name', (req, res) => { if (!req.session.user) return res.status(401).json({ message: 'Unauthorized' }); const roomName = req.params.name; db.deleteRoom(roomName, (err) => { if (err) { if (err.message.includes('Cannot delete')) return res.status(403).json({ message: err.message }); return res.status(500).json({ message: 'Failed to delete room' }); } io.emit('roomDeleted', { name: roomName }); res.status(200).json({ message: 'Room deleted successfully' }); }); });
+
 const onlineUsers = new Map();
 const typingUsers = new Map();
-const rooms = ['#general', '#tech', '#random'];
 
 io.on('connection', (socket) => {
     const session = socket.request.session;
     if (!session.user) return socket.disconnect(true);
     
     socket.join(session.user.username);
-    const defaultRoom = rooms[0];
-    socket.join(defaultRoom);
-    socket.currentRoom = defaultRoom;
-    onlineUsers.set(socket.id, session.user);
-    io.emit('updateUserList', Array.from(onlineUsers.values()));
-    socket.emit('roomList', rooms);
     
-    db.getRecentMessages(defaultRoom, (err, messages) => { 
-        if (!err && messages) { 
-            const history = messages.map(msg => ({ 
-                id: msg.id, 
-                user: msg.username, 
-                text: msg.message_text, 
-                color: msg.chat_color, 
-                timestamp: msg.timestamp,
-                fileUrl: msg.file_url,
-                fileType: msg.file_type,
-                avatar: msg.avatar_url
-            })); 
-            socket.emit('loadHistory', { room: defaultRoom, messages: history }); 
-        } 
+    db.getAllRooms((err, rooms) => {
+        const roomList = err ? ['#general'] : rooms.map(r => r.name);
+        const defaultRoom = roomList[0];
+        socket.join(defaultRoom);
+        socket.currentRoom = defaultRoom;
+        onlineUsers.set(socket.id, session.user);
+        io.emit('updateUserList', Array.from(onlineUsers.values()));
+        socket.emit('roomList', roomList);
+        
+        db.getRecentMessages(defaultRoom, (err, messages) => { 
+            if (!err && messages) { 
+                const history = messages.map(msg => ({ 
+                    id: msg.id, 
+                    user: msg.username, 
+                    text: msg.message_text, 
+                    color: msg.chat_color, 
+                    timestamp: msg.timestamp,
+                    fileUrl: msg.file_url,
+                    fileType: msg.file_type,
+                    avatar: msg.avatar_url
+                })); 
+                socket.emit('loadHistory', { room: defaultRoom, messages: history }); 
+            } 
+        });
     });
     
     socket.on('switchRoom', (newRoom) => { 
