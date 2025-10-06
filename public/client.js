@@ -326,6 +326,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         socket.on('chatMessage', (msg) => { 
+            if (msg.user !== currentUser) {
+                const audio = new Audio('/notification.mp3');
+                audio.play().catch(e => console.log('Audio play failed:', e));
+            }
             renderMessage(msg); 
         });
 
