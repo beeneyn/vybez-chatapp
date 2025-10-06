@@ -35,6 +35,8 @@
   "build": {
     "appId": "com.vybez.chat",
     "productName": "Vybez Chat",
+    "npmRebuild": false,
+    "buildDependenciesFromSource": false,
     "files": [
       "electron.js",
       "public/**/*",
