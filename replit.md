@@ -35,7 +35,7 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
   - Added avatar display in chat messages (32x32px circular images)
   - Added avatar display in online users list (24x24px circular images)
   - Updated database queries to JOIN users table for avatar data in message history
-  - Implemented dynamic placeholder avatars using placehold.co with user initials and username-based color generation
+  - Implemented dynamic placeholder avatars using placehold.co with user initials and their signup color
 
 ## Tech Stack
 - **Backend:** Node.js, Express.js

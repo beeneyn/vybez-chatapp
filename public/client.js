@@ -26,31 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else document.getElementById('app-container')?.classList.remove('hidden'); 
     };
 
-    const generateColorFromUsername = (username) => {
-        let hash = 0;
-        for (let i = 0; i < username.length; i++) {
-            hash = username.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        const hue = hash % 360;
-        return `hsl(${hue}, 65%, 75%)`;
-    };
-
-    const rgbToHex = (r, g, b) => {
-        return ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
-    };
-
-    const hslToHex = (h, s, l) => {
-        s /= 100;
-        l /= 100;
-        const k = n => (n + h / 30) % 12;
-        const a = s * Math.min(l, 1 - l);
-        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-        const r = Math.round(255 * f(0));
-        const g = Math.round(255 * f(8));
-        const b = Math.round(255 * f(4));
-        return rgbToHex(r, g, b);
-    };
-
     const renderMessage = (msg, isPrivate = false) => { 
         const chatWindow = document.getElementById('chat-window'); 
         const messageContainer = document.getElementById('message-container'); 
@@ -62,10 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
         const username = isPrivate ? msg.from : msg.user;
         const initials = username.substring(0, 2).toUpperCase();
-        const hslColor = generateColorFromUsername(username);
-        const hue = parseInt(hslColor.match(/\d+/)[0]);
-        const bgColor = hslToHex(hue, 65, 75);
-        const placeholderUrl = `https://placehold.co/256x256/${bgColor}/31343C?font=poppins&text=${initials}`;
+        const userColor = (msg.color || '#EEE').replace('#', '');
+        const placeholderUrl = `https://placehold.co/256x256/${userColor}/31343C?font=poppins&text=${initials}`;
         const avatarUrl = msg.avatar || placeholderUrl;
         const avatarHtml = `<img src="${avatarUrl}" alt="${username}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">`;
         item.innerHTML = `${avatarHtml}<span class="timestamp">[${time}]</span> <strong style="color: ${msg.color || '#000'}">${isPrivate ? `(private from ${msg.from})` : username}:</strong> `;
@@ -362,10 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.onclick = () => openPrivateMessage(user.username);
                 
                 const initials = user.username.substring(0, 2).toUpperCase();
-                const hslColor = generateColorFromUsername(user.username);
-                const hue = parseInt(hslColor.match(/\d+/)[0]);
-                const bgColor = hslToHex(hue, 65, 75);
-                const placeholderUrl = `https://placehold.co/256x256/${bgColor}/31343C?font=poppins&text=${initials}`;
+                const userColor = (user.color || '#EEE').replace('#', '');
+                const placeholderUrl = `https://placehold.co/256x256/${userColor}/31343C?font=poppins&text=${initials}`;
                 const avatarUrl = user.avatar || placeholderUrl;
                 const avatarImg = `<img src="${avatarUrl}" alt="${user.username}" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">`;
                 item.innerHTML = `${avatarImg}<span style="color: ${user.color};">${user.username}</span>`;
