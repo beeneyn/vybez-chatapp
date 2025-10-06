@@ -64,7 +64,6 @@
         "AppImage",
         "deb"
       ],
-      "icon": "public/vybez.svg",
       "category": "Network;InstantMessaging"
     },
     "nsis": {
