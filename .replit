@@ -30,20 +30,8 @@ waitForPort = 5000
 outputType = "webview"
 
 [[ports]]
-localPort = 5000
-externalPort = 80
-
-[[ports]]
-localPort = 40395
-externalPort = 3000
-
-[[ports]]
-localPort = 41977
-externalPort = 3001
-
-[[ports]]
 localPort = 45165
-externalPort = 3002
+externalPort = 80
 
 [deployment]
 deploymentTarget = "vm"
