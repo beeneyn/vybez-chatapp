@@ -39,7 +39,20 @@ const upload = multer({
     }
 });
 
-const sessionMiddleware = session({ store: new FileStore({ path: './sessions', ttl: 86400 }), secret: 'a very secret key to sign the cookie', resave: false, saveUninitialized: false, cookie: { secure: 'auto', httpOnly: true, sameSite: 'lax', maxAge: 86400000 } });
+const sessionMiddleware = session({ 
+    store: new FileStore({ path: './sessions', ttl: 86400 }), 
+    secret: 'a very secret key to sign the cookie', 
+    resave: false, 
+    saveUninitialized: false, 
+    cookie: { 
+        secure: false,
+        httpOnly: true, 
+        sameSite: 'lax', 
+        maxAge: 86400000,
+        path: '/'
+    },
+    name: 'connect.sid'
+});
 app.use(sessionMiddleware);
 io.engine.use(sessionMiddleware);
 app.use(express.static(path.join(__dirname, 'public')));
