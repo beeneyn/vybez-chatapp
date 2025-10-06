@@ -26,11 +26,16 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
-        const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt|mp4|webm/;
-        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = allowedTypes.test(file.mimetype);
-        if (extname && mimetype) cb(null, true);
-        else cb(new Error('Invalid file type'));
+        const allowedMimeTypes = [
+            'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+            'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/plain', 'video/mp4', 'video/webm'
+        ];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(null, false);
+        }
     }
 });
 
@@ -55,6 +60,8 @@ app.post('/upload-avatar', upload.single('avatar'), (req, res) => { if (!req.ses
 app.get('/search-messages', (req, res) => { if (!req.session.user) return res.status(401).json({ message: 'Unauthorized' }); const { room, query } = req.query; if (!room || !query) return res.status(400).json({ message: 'Room and query required' }); db.searchMessages(room, query, (err, messages) => { if (err) return res.status(500).json({ message: 'Search failed' }); res.status(200).json({ messages }); }); });
 
 app.get('/private-messages/:username', (req, res) => { if (!req.session.user) return res.status(401).json({ message: 'Unauthorized' }); const otherUser = req.params.username; db.getPrivateMessages(req.session.user.username, otherUser, (err, messages) => { if (err) return res.status(500).json({ message: 'Failed to get messages' }); res.status(200).json({ messages }); }); });
+
+app.post('/update-profile', (req, res) => { if (!req.session.user) return res.status(401).json({ message: 'Unauthorized' }); const { bio, status, chat_color } = req.body; db.updateUserProfile(req.session.user.username, { bio, status, chat_color }, (err) => { if (err) return res.status(500).json({ message: 'Failed to update profile' }); req.session.user.bio = bio; req.session.user.status = status; req.session.user.color = chat_color; req.session.save((saveErr) => { if (saveErr) return res.status(500).json({ message: 'Error saving session' }); res.status(200).json({ message: 'Profile updated successfully', user: req.session.user }); }); }); });
 
 const onlineUsers = new Map();
 const typingUsers = new Map();

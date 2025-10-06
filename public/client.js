@@ -349,7 +349,20 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('privateMessage', (pm) => {
             const audio = new Audio('/notification.mp3');
             audio.play().catch(e => console.log('Audio play failed:', e));
-            alert(`New private message from ${pm.from}: ${pm.text}`);
+            
+            const pmModal = document.getElementById('privateMessageModal');
+            const recipientName = document.getElementById('pm-recipient-name').textContent;
+            
+            if (pmModal && pmModal.classList.contains('show') && recipientName === pm.from) {
+                const container = document.getElementById('pm-messages-container');
+                const div = document.createElement('div');
+                div.className = 'mb-2';
+                div.innerHTML = `<strong>${pm.from}:</strong> ${pm.text}`;
+                container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
+            } else {
+                alert(`New private message from ${pm.from}: ${pm.text}`);
+            }
         });
 
         socket.on('privateMessageSent', (pm) => {
@@ -423,5 +436,100 @@ document.addEventListener('DOMContentLoaded', () => {
         searchBtn.type = 'button';
         searchBtn.onclick = searchMessages;
         document.querySelector('.card-header .btn-group, .card-header div:last-child')?.prepend(searchBtn);
+
+        const settingsModal = document.getElementById('settingsModal');
+        settingsModal?.addEventListener('show.bs.modal', async () => {
+            try {
+                const response = await fetch('/check-session');
+                const data = await response.json();
+                if (data.loggedIn && data.user) {
+                    document.getElementById('settings-bio').value = data.user.bio || '';
+                    document.getElementById('settings-status').value = data.user.status || '';
+                    document.getElementById('settings-color').value = data.user.color || '#000000';
+                    
+                    const avatarImg = document.getElementById('current-avatar');
+                    const avatarPlaceholder = document.getElementById('avatar-placeholder');
+                    if (data.user.avatar) {
+                        avatarImg.src = data.user.avatar;
+                        avatarImg.style.display = 'block';
+                        avatarPlaceholder.style.display = 'none';
+                    } else {
+                        avatarImg.style.display = 'none';
+                        avatarPlaceholder.style.display = 'flex';
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+            }
+        });
+
+        document.getElementById('avatar-upload')?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('avatar', file);
+            
+            try {
+                const response = await fetch('/upload-avatar', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const avatarImg = document.getElementById('current-avatar');
+                    const avatarPlaceholder = document.getElementById('avatar-placeholder');
+                    avatarImg.src = data.avatarUrl;
+                    avatarImg.style.display = 'block';
+                    avatarPlaceholder.style.display = 'none';
+                    
+                    const msgEl = document.getElementById('settings-message');
+                    msgEl.className = 'alert alert-success';
+                    msgEl.textContent = 'Avatar uploaded successfully!';
+                    msgEl.classList.remove('d-none');
+                    setTimeout(() => msgEl.classList.add('d-none'), 3000);
+                } else {
+                    const error = await response.json();
+                    alert('Avatar upload failed: ' + (error.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Avatar upload error:', error);
+                alert('Failed to upload avatar');
+            }
+        });
+
+        document.getElementById('save-settings-btn')?.addEventListener('click', async () => {
+            const bio = document.getElementById('settings-bio').value;
+            const status = document.getElementById('settings-status').value;
+            const chat_color = document.getElementById('settings-color').value;
+            
+            try {
+                const response = await fetch('/update-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bio, status, chat_color })
+                });
+                
+                const msgEl = document.getElementById('settings-message');
+                if (response.ok) {
+                    msgEl.textContent = 'Settings saved successfully!';
+                    msgEl.className = 'alert alert-success';
+                } else {
+                    const error = await response.json();
+                    msgEl.textContent = 'Failed to save settings: ' + (error.message || 'Unknown error');
+                    msgEl.className = 'alert alert-danger';
+                }
+                msgEl.classList.remove('d-none');
+                setTimeout(() => msgEl.classList.add('d-none'), 3000);
+            } catch (error) {
+                console.error('Save settings error:', error);
+                const msgEl = document.getElementById('settings-message');
+                msgEl.textContent = 'Failed to save settings';
+                msgEl.className = 'alert alert-danger';
+                msgEl.classList.remove('d-none');
+                setTimeout(() => msgEl.classList.add('d-none'), 3000);
+            }
+        });
     }
 });

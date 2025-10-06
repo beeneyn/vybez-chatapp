@@ -25,6 +25,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 id="welcome-message" class="mb-0 fs-5"></h3>
                         <div>
+                            <button id="settings-button" class="btn btn-info btn-sm me-2" title="Settings" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="bi bi-gear"></i></button>
                             <button id="theme-toggle" class="btn btn-secondary btn-sm me-2" title="Toggle Theme"></button>
                             <button id="logout-button" class="btn btn-danger btn-sm">Logout</button>
                         </div>
@@ -51,8 +52,65 @@
         </div>
     </div>
     
-    <div class="modal fade" id="privateMessageModal">...</div>
-    <div class="modal fade" id="profileModal">...</div>
+    <div class="modal fade" id="privateMessageModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Private Message to <span id="pm-recipient-name"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="pm-messages-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="pm-input" class="form-control" placeholder="Type your message...">
+                        <button class="btn btn-primary" id="pm-send-btn">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <img id="current-avatar" src="" alt="Avatar" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover; border: 2px solid #ccc;">
+                        <div id="avatar-placeholder" class="rounded-circle mb-2 d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px; background: #e0e0e0; border: 2px solid #ccc;">
+                            <i class="bi bi-person-fill" style="font-size: 3rem; color: #999;"></i>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="avatar-upload" class="form-label">Upload Profile Picture</label>
+                        <input type="file" class="form-control" id="avatar-upload" accept="image/*">
+                        <div class="form-text">Max size: 10MB. Supported: JPG, PNG, GIF</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="settings-bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="settings-bio" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="settings-status" class="form-label">Status</label>
+                        <input type="text" class="form-control" id="settings-status" placeholder="What's your status?">
+                    </div>
+                    <div class="mb-3">
+                        <label for="settings-color" class="form-label">Chat Color</label>
+                        <input type="color" class="form-control form-control-color" id="settings-color">
+                    </div>
+                    <div id="settings-message" class="alert d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-settings-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
