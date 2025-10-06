@@ -36,12 +36,17 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
   - Added avatar display in online users list (24x24px circular images)
   - Updated database queries to JOIN users table for avatar data in message history
   - Implemented dynamic placeholder avatars using placehold.co with user initials and their signup color
+  - **Migrated from SQLite to PostgreSQL** (Replit managed database)
+    - Complete database rewrite using pg connection pooling
+    - Updated all queries to use PostgreSQL syntax and parameterized queries
+    - Changed session storage from SQLite to file-based store
+    - Improved concurrency handling and production readiness
 
 ## Tech Stack
 - **Backend:** Node.js, Express.js
 - **Real-time Communication:** Socket.IO
-- **Database:** SQLite3 (local file-based)
-- **Session Management:** express-session with SQLite store
+- **Database:** PostgreSQL (Replit managed Neon database)
+- **Session Management:** express-session with file-based store
 - **Authentication:** bcrypt for password hashing
 - **Frontend:** Bootstrap 5, vanilla JavaScript
 
@@ -79,12 +84,14 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 13. **Read Receipts:** Track message read status
 14. **User Roles:** Admin and user permission system
 
-### Database Schema
-- **users table:** id, username, password, chat_color, bio, status, avatar_url, role
-- **messages table:** id, room, username, message_text, chat_color, timestamp, file_url, file_type
-- **reactions table:** id, message_id, username, emoji
-- **private_messages table:** id, from_user, to_user, message_text, timestamp, read
-- **read_receipts table:** id, message_id, username, read_at
+### Database Schema (PostgreSQL)
+- **users table:** id (SERIAL), username, password, chat_color, bio, status, avatar_url, role
+- **messages table:** id (SERIAL), room, username, message_text, chat_color, timestamp, file_url, file_type
+- **reactions table:** id (SERIAL), message_id (FK), username, emoji
+- **private_messages table:** id (SERIAL), from_user, to_user, message_text, timestamp, read
+- **read_receipts table:** id (SERIAL), message_id (FK), username, read_at
+
+All tables use PostgreSQL SERIAL for auto-incrementing IDs and proper CASCADE foreign key constraints.
 
 ## Configuration
 
@@ -107,7 +114,7 @@ npm start
 ## Dependencies
 All dependencies are installed and listed in package.json:
 - express, socket.io - Web server and real-time communication
-- sqlite3, connect-sqlite3 - Database operations
+- pg - PostgreSQL database driver with connection pooling
 - express-session, session-file-store - Session management
 - bcrypt - Password hashing
 - multer - File upload handling (fully integrated)
