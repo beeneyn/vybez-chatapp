@@ -138,43 +138,99 @@
             </div>
 
             <!-- Mac Users Section -->
-            <div class="mb-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden">
-                <div class="absolute top-0 right-0 text-9xl opacity-5">
-                    <i class="fab fa-apple"></i>
+            <div class="mb-12 bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 bg-gray-500 rounded-xl flex items-center justify-center">
+                        <i class="fab fa-apple text-3xl text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold">macOS</h2>
+                        <p class="text-gray-600">Build it yourself</p>
+                    </div>
                 </div>
-                <div class="relative z-10">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-16 h-16 bg-gray-700 rounded-xl flex items-center justify-center opacity-50">
-                            <i class="fab fa-apple text-3xl text-white"></i>
-                        </div>
+                
+                <div class="p-6 bg-blue-50 rounded-xl border-2 border-blue-200 mb-6">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-info-circle text-blue-500 text-xl mt-1"></i>
                         <div>
-                            <h2 class="text-3xl font-bold">macOS</h2>
-                            <p class="text-gray-400">For the "elite" users</p>
+                            <h3 class="text-lg font-bold mb-2">Pre-built Mac installer not available</h3>
+                            <p class="text-gray-700">We don't have access to a Mac to build the installer. However, you can easily build it yourself on your Mac! Follow the guide below.</p>
                         </div>
                     </div>
-                    
-                    <div class="p-6 bg-gray-700 bg-opacity-50 rounded-xl border-2 border-dashed border-gray-600">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-sad-tear text-6xl mb-4 opacity-50"></i>
+                </div>
+
+                <h3 class="text-xl font-bold mb-4">Build Instructions for macOS</h3>
+                
+                <div class="space-y-6">
+                    <div class="pl-4 border-l-4 border-purple-500">
+                        <h4 class="font-bold mb-2">Step 1: Install Prerequisites</h4>
+                        <p class="text-gray-700 mb-2">Make sure you have Node.js installed. Open Terminal and run:</p>
+                        <div class="bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm overflow-x-auto">
+                            node --version<br>
+                            npm --version
                         </div>
-                        <h3 class="text-2xl font-bold mb-4 text-center">Sorry, Mac Users! 🍎</h3>
-                        <p class="text-lg text-gray-300 mb-4 text-center">
-                            No Mac build available because, well... we don't have a Mac. 🤷‍♂️
-                        </p>
-                        <div class="space-y-3 text-gray-400">
-                            <p>💸 <strong>Too expensive:</strong> We'd rather spend that $2000 on literally anything else</p>
-                            <p>🔧 <strong>Can't build without one:</strong> Apple makes sure you need a Mac to build Mac apps (classic Apple move)</p>
-                            <p>😎 <strong>But hey:</strong> You can still use the web version in Safari! It's basically the same thing, right?</p>
-                        </div>
-                        <div class="mt-6 text-center">
-                            <a href="/" class="inline-block px-6 py-3 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition">
-                                Use Web Version Instead
-                            </a>
-                        </div>
-                        <p class="text-sm text-gray-500 text-center mt-4">
-                            (Or you could just... buy a real computer 😏)
-                        </p>
+                        <p class="text-sm text-gray-600 mt-2">If not installed, download from <a href="https://nodejs.org" class="text-blue-600 hover:underline" target="_blank">nodejs.org</a></p>
                     </div>
+
+                    <div class="pl-4 border-l-4 border-purple-500">
+                        <h4 class="font-bold mb-2">Step 2: Clone the Project</h4>
+                        <p class="text-gray-700 mb-2">Download the source code from this Repl or clone from GitHub:</p>
+                        <div class="bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm overflow-x-auto">
+                            # Download as zip from Replit, then extract<br>
+                            cd vybez-chatapp
+                        </div>
+                    </div>
+
+                    <div class="pl-4 border-l-4 border-purple-500">
+                        <h4 class="font-bold mb-2">Step 3: Install Dependencies</h4>
+                        <p class="text-gray-700 mb-2">Install all required packages:</p>
+                        <div class="bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm overflow-x-auto">
+                            npm install
+                        </div>
+                    </div>
+
+                    <div class="pl-4 border-l-4 border-purple-500">
+                        <h4 class="font-bold mb-2">Step 4: Update Server URL</h4>
+                        <p class="text-gray-700 mb-2">Edit <code class="bg-gray-200 px-2 py-1 rounded">electron.js</code> and update line 7:</p>
+                        <div class="bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm overflow-x-auto">
+                            const serverUrl = isDev ? 'http://localhost:5000' : 'https://YOUR_DEPLOYED_URL.replit.app';
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">Replace YOUR_DEPLOYED_URL with your actual Replit deployment URL</p>
+                    </div>
+
+                    <div class="pl-4 border-l-4 border-purple-500">
+                        <h4 class="font-bold mb-2">Step 5: Build the Mac App</h4>
+                        <p class="text-gray-700 mb-2">Run the build command for Mac:</p>
+                        <div class="bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm overflow-x-auto">
+                            npm run dist:mac
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">This will create a .dmg installer and .zip file in the <code class="bg-gray-200 px-1 rounded">dist/</code> folder</p>
+                    </div>
+
+                    <div class="pl-4 border-l-4 border-green-500">
+                        <h4 class="font-bold mb-2 text-green-700">Step 6: Install & Run</h4>
+                        <p class="text-gray-700 mb-2">Find your installer:</p>
+                        <div class="bg-gray-900 text-gray-100 p-3 rounded font-mono text-sm overflow-x-auto">
+                            dist/Vybez Chat-1.0.0.dmg
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">Double-click the .dmg file and drag Vybez to your Applications folder!</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-bold mb-1 text-yellow-800">Note about Code Signing</h4>
+                            <p class="text-sm text-gray-700">The app won't be code-signed unless you have an Apple Developer account ($99/year). When you first open it, you may need to right-click → Open → Open to bypass Gatekeeper.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <a href="/" class="inline-block px-6 py-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition">
+                        Or Use Web Version
+                    </a>
                 </div>
             </div>
 
