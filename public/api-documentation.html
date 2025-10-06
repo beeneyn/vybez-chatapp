@@ -4,148 +4,407 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Documentation - Vybez</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { padding-top: 20px; }
-        .endpoint { border: 1px solid #dee2e6; border-radius: .5rem; margin-bottom: 1.5rem; }
-        .endpoint-header { background-color: #f8f9fa; padding: 1rem; border-bottom: 1px solid #dee2e6; }
-        .endpoint-body { padding: 1rem; }
-        .method { font-weight: bold; padding: .25rem .5rem; border-radius: .25rem; }
-        .method-post { background-color: #198754; color: white; }
-        .method-get { background-color: #0d6efd; color: white; }
-        code { background-color: #e9ecef; padding: .2em .4em; border-radius: 3px; }
-        pre { background-color: #212529; color: #f8f9fa; padding: 1rem; border-radius: .25rem; }
-    </style>
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body>
-    <div class="container">
-        <div class="text-center">
-            <h1 class="display-4">API Documentation</h1>
-            <p class="lead">How to interact with the Vybez API and real-time services.</p>
-            <a href="/">Back to Home</a>
-            <hr class="my-4">
+<body class="bg-gray-100 min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-5xl">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">API Documentation</h1>
+            <p class="text-lg text-gray-600 mb-4">How to interact with the Vybez API and real-time services.</p>
+            <a href="/" class="text-blue-600 hover:text-blue-800 underline">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Home
+            </a>
         </div>
 
-        <h2>RESTful API (HTTP)</h2>
-        <p>These are the standard HTTP endpoints for user management and profiles.</p>
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">RESTful API (HTTP)</h2>
+            <p class="text-gray-600 mb-6">These are the standard HTTP endpoints for user management, rooms, and profiles.</p>
 
-        <div class="endpoint">
-            <div class="endpoint-header">
-                <span class="method method-post">POST</span> <code>/signup</code>
-            </div>
-            <div class="endpoint-body">
-                <p>Creates a new user account.</p>
-                <strong>Request Body:</strong>
-                <pre><code>{
+            <div class="space-y-6">
+                <!-- Authentication Endpoints -->
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
+                        <code class="text-gray-800 font-mono">/signup</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Creates a new user account.</p>
+                        <strong class="text-gray-800">Request Body:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
     "username": "new_user",
     "password": "a_password",
     "chat_color": "#ff00ff"
 }</code></pre>
-                <strong>Responses:</strong>
-                <ul>
-                    <li><code>201 Created</code>: User created successfully.</li>
-                    <li><code>409 Conflict</code>: Username already exists.</li>
-                </ul>
-            </div>
-        </div>
+                        <strong class="text-gray-800 mt-3 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">201 Created</code> - User created successfully.</li>
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">409 Conflict</code> - Username already exists.</li>
+                        </ul>
+                    </div>
+                </div>
 
-        <div class="endpoint">
-            <div class="endpoint-header">
-                <span class="method method-post">POST</span> <code>/login</code>
-            </div>
-            <div class="endpoint-body">
-                <p>Authenticates a user and starts a session.</p>
-                <strong>Request Body:</strong>
-                <pre><code>{
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
+                        <code class="text-gray-800 font-mono">/login</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Authenticates a user and starts a session.</p>
+                        <strong class="text-gray-800">Request Body:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
     "username": "existing_user",
     "password": "their_password"
 }</code></pre>
-                <strong>Responses:</strong>
-                <ul>
-                    <li><code>200 OK</code>: Login successful.</li>
-                    <li><code>401 Unauthorized</code>: Invalid credentials.</li>
-                </ul>
-            </div>
-        </div>
+                        <strong class="text-gray-800 mt-3 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">200 OK</code> - Login successful.</li>
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">401 Unauthorized</code> - Invalid credentials.</li>
+                        </ul>
+                    </div>
+                </div>
 
-        <div class="endpoint">
-            <div class="endpoint-header">
-                <span class="method method-post">POST</span> <code>/logout</code>
-            </div>
-            <div class="endpoint-body">
-                <p>Destroys the current user session.</p>
-                <strong>Request Body:</strong> None
-            </div>
-        </div>
-        
-        <div class="endpoint">
-            <div class="endpoint-header">
-                <span class="method method-get">GET</span> <code>/check-session</code>
-            </div>
-            <div class="endpoint-body">
-                <p>Checks if the current browser has a valid session.</p>
-                <strong>Response Body (Logged In):</strong>
-                <pre><code>{
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
+                        <code class="text-gray-800 font-mono">/logout</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Destroys the current user session.</p>
+                        <strong class="text-gray-800">Request Body:</strong> None
+                    </div>
+                </div>
+                
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded">GET</span>
+                        <code class="text-gray-800 font-mono">/check-session</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Checks if the current browser has a valid session.</p>
+                        <strong class="text-gray-800">Response Body (Logged In):</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
     "loggedIn": true,
     "user": { "username": "test", "color": "#ff0000", ... }
 }</code></pre>
-                <strong>Response Body (Logged Out):</strong>
-                <pre><code>{ "loggedIn": false }</code></pre>
-            </div>
-        </div>
+                        <strong class="text-gray-800 mt-3 block">Response Body (Logged Out):</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ "loggedIn": false }</code></pre>
+                    </div>
+                </div>
 
-        <h2 class="mt-5">Real-Time API (Socket.IO)</h2>
-        <p>These are the events used for real-time communication after a user is authenticated on the <code>/chat</code> page.</p>
+                <!-- Room Management Endpoints -->
+                <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">Room Management</h3>
 
-        <h4 class="mt-4">Events Emitted by the Client (to the Server)</h4>
-        <div class="endpoint">
-            <div class="endpoint-header"><code>switchRoom</code></div>
-            <div class="endpoint-body">
-                <p>Tells the server to move the user to a different chat room.</p>
-                <strong>Payload:</strong> <code>"roomName"</code> (string), e.g., <code>"#tech"</code>
-            </div>
-        </div>
-        <div class="endpoint">
-            <div class="endpoint-header"><code>chatMessage</code></div>
-            <div class="endpoint-body">
-                <p>Sends a new public message to the current room.</p>
-                <strong>Payload:</strong>
-                <pre><code>{ "text": "Hello everyone!" }</code></pre>
-            </div>
-        </div>
-        
-        <h4 class="mt-4">Events Emitted by the Server (to the Client)</h4>
-        <div class="endpoint">
-            <div class="endpoint-header"><code>loadHistory</code></div>
-            <div class="endpoint-body">
-                <p>Sent to a client when they join a room, containing recent messages for that room.</p>
-                <strong>Payload:</strong>
-                <pre><code>{
-    "room": "#general",
-    "messages": [ { "user": "...", "text": "...", ... } ]
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded">GET</span>
+                        <code class="text-gray-800 font-mono">/rooms</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Retrieves all available chat rooms (default and custom).</p>
+                        <strong class="text-gray-800">Authorization:</strong> Requires active session
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+    "rooms": [
+        {
+            "id": 1,
+            "name": "#general",
+            "created_by": "system",
+            "created_at": "2025-10-06T...",
+            "is_default": true
+        },
+        {
+            "id": 4,
+            "name": "#gaming",
+            "created_by": "john_doe",
+            "created_at": "2025-10-06T...",
+            "is_default": false
+        }
+    ]
 }</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
+                        <code class="text-gray-800 font-mono">/rooms</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Creates a new custom chat room.</p>
+                        <strong class="text-gray-800">Authorization:</strong> Requires active session
+                        <strong class="text-gray-800 block mt-3">Request Body:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+    "name": "gaming"
+}</code></pre>
+                        <p class="text-gray-600 text-sm mt-2"><em>Note: The # symbol is added automatically if not provided.</em></p>
+                        <strong class="text-gray-800 mt-3 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">201 Created</code> - Room created successfully. Broadcasts <code>roomCreated</code> event to all clients.</li>
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">409 Conflict</code> - Room already exists.</li>
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">400 Bad Request</code> - Room name is required.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded">DELETE</span>
+                        <code class="text-gray-800 font-mono">/rooms/:name</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Deletes a custom chat room. Default rooms (#general, #tech, #random) cannot be deleted.</p>
+                        <strong class="text-gray-800">Authorization:</strong> Requires active session
+                        <strong class="text-gray-800 block mt-3">Example:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>DELETE /rooms/%23gaming</code></pre>
+                        <strong class="text-gray-800 mt-3 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">200 OK</code> - Room deleted successfully. Broadcasts <code>roomDeleted</code> event to all clients.</li>
+                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">403 Forbidden</code> - Cannot delete default room.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- File Upload & Profile Endpoints -->
+                <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">File Upload & Profile</h3>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
+                        <code class="text-gray-800 font-mono">/upload-file</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Uploads a file for sharing in chat (max 10MB).</p>
+                        <strong class="text-gray-800">Content-Type:</strong> multipart/form-data
+                        <p class="text-gray-600 text-sm mt-2">Supported types: images, PDFs, documents, videos</p>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
+                        <code class="text-gray-800 font-mono">/update-profile</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Updates user profile information (bio, status, chat color).</p>
+                        <strong class="text-gray-800">Request Body:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+    "bio": "Coffee enthusiast",
+    "status": "Available",
+    "chat_color": "#3b82f6"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded">GET</span>
+                        <code class="text-gray-800 font-mono">/private-messages/:username</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Retrieves private message history with a specific user.</p>
+                        <strong class="text-gray-800">Authorization:</strong> Requires active session
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="endpoint">
-            <div class="endpoint-header"><code>chatMessage</code></div>
-            <div class="endpoint-body">
-                <p>Broadcasts a new public message to all clients in a room.</p>
-                <strong>Payload:</strong>
-                <pre><code>{
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Real-Time API (Socket.IO)</h2>
+            <p class="text-gray-600 mb-6">These are the events used for real-time communication after a user is authenticated on the <code class="bg-gray-200 px-2 py-1 rounded text-sm">/chat</code> page.</p>
+
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Events Emitted by the Client</h3>
+            <div class="space-y-4">
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">switchRoom</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-2">Tells the server to move the user to a different chat room.</p>
+                        <strong class="text-gray-800">Payload:</strong> <code class="bg-gray-200 px-2 py-1 rounded text-sm">"roomName"</code> (string), e.g., <code class="bg-gray-200 px-2 py-1 rounded text-sm">"#tech"</code>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">chatMessage</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Sends a new public message to the current room.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ 
+    "text": "Hello everyone!",
+    "fileUrl": "/uploads/...",  // optional
+    "fileType": "image/jpeg"    // optional
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">typing</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-2">Indicates user is typing or stopped typing.</p>
+                        <strong class="text-gray-800">Payload:</strong> <code class="bg-gray-200 px-2 py-1 rounded text-sm">true</code> (typing) or <code class="bg-gray-200 px-2 py-1 rounded text-sm">false</code> (stopped)
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">privateMessage</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Sends a private message to another user.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ 
+    "to": "recipient_username",
+    "text": "Hey there!"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">addReaction</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Adds an emoji reaction to a message.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ 
+    "messageId": 123,
+    "emoji": "👍"
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">Events Emitted by the Server</h3>
+            <div class="space-y-4">
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">roomList</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Sent to a client when they connect, containing all available rooms.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>["#general", "#tech", "#random", "#gaming"]</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">loadHistory</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Sent to a client when they join a room, containing recent messages.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+    "room": "#general",
+    "messages": [
+        { 
+            "user": "...", 
+            "text": "...", 
+            "color": "#...",
+            "timestamp": "...",
+            "avatar": "..."
+        }
+    ]
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">chatMessage</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Broadcasts a new public message to all clients in a room.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
     "user": "test_user",
     "text": "Hello everyone!",
     "color": "#ff0000",
-    "timestamp": "2025-10-02T22:44:00.000Z"
+    "timestamp": "2025-10-06T...",
+    "avatar": "/uploads/..."
 }</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">updateUserList</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Broadcasts the updated list of all online users.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>[
+    { "username": "...", "color": "#...", "avatar": "..." },
+    ...
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">typingUsers</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Broadcasts which users are currently typing in the current room.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>["user1", "user2"]</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">roomCreated</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Broadcasted when a new custom room is created.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+    "id": 5,
+    "name": "#gaming",
+    "created_by": "john_doe",
+    "created_at": "2025-10-06T...",
+    "is_default": false
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">roomDeleted</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Broadcasted when a custom room is deleted.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ "name": "#gaming" }</code></pre>
+                    </div>
+                </div>
+
+                <div class="border border-gray-300 rounded-lg overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
+                        <code class="text-gray-800 font-mono font-semibold">reactionsUpdate</code>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 mb-3">Sent when reactions are updated for a message.</p>
+                        <strong class="text-gray-800">Payload:</strong>
+                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+    "messageId": 123,
+    "reactions": [
+        { "emoji": "👍", "username": "alice" },
+        { "emoji": "❤️", "username": "bob" }
+    ]
+}</code></pre>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="endpoint">
-            <div class="endpoint-header"><code>updateUserList</code></div>
-            <div class="endpoint-body">
-                <p>Broadcasts the updated list of all online users whenever someone joins or leaves.</p>
-                <strong>Payload:</strong> Array of user objects, e.g., <code>[ { "username": "...", "color": "..." }, ... ]</code>
-            </div>
-        </div>
+
+        <footer class="text-center text-gray-600 mt-8 py-4">
+            <p>&copy; 2025 Vybez Chat. Built with Node.js, Express, Socket.IO, and PostgreSQL.</p>
+        </footer>
     </div>
 </body>
 </html>
