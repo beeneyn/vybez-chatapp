@@ -15,7 +15,7 @@ const store = new Store({
     defaults: {
         alwaysOnTop: false,
         autoLaunch: false,
-        windowBounds: { width: 1400, height: 900 }
+        windowBounds: { x: undefined, y: undefined, width: 1400, height: 900 }
     }
 });
 
@@ -129,7 +129,7 @@ function toggleAlwaysOnTop() {
 function createWindow() {
     const savedBounds = store.get('windowBounds');
     
-    mainWindow = new BrowserWindow({
+    const windowOptions = {
         width: savedBounds.width,
         height: savedBounds.height,
         minWidth: 1000,
@@ -144,7 +144,14 @@ function createWindow() {
         title: 'Vybez Chat',
         backgroundColor: '#f3f4f6',
         show: false
-    });
+    };
+    
+    if (savedBounds.x !== undefined && savedBounds.y !== undefined) {
+        windowOptions.x = savedBounds.x;
+        windowOptions.y = savedBounds.y;
+    }
+    
+    mainWindow = new BrowserWindow(windowOptions);
 
     const alwaysOnTop = store.get('alwaysOnTop');
     mainWindow.setAlwaysOnTop(alwaysOnTop);
@@ -250,12 +257,20 @@ function createWindow() {
         mainWindow = null;
     });
 
-    mainWindow.on('resize', () => {
-        if (mainWindow && !mainWindow.isMaximized()) {
+    const saveBounds = () => {
+        if (mainWindow && !mainWindow.isMaximized() && !mainWindow.isMinimized()) {
             const bounds = mainWindow.getBounds();
-            store.set('windowBounds', { width: bounds.width, height: bounds.height });
+            store.set('windowBounds', { 
+                x: bounds.x, 
+                y: bounds.y, 
+                width: bounds.width, 
+                height: bounds.height 
+            });
         }
-    });
+    };
+
+    mainWindow.on('resize', saveBounds);
+    mainWindow.on('move', saveBounds);
 
     mainWindow.webContents.on('did-fail-load', () => {
         if (mainWindow && mainWindow.webContents) {
@@ -280,6 +295,7 @@ function setupAutoUpdater() {
         if (mainWindow && mainWindow.webContents) {
             mainWindow.webContents.send('update-available', info);
         }
+        autoUpdater.downloadUpdate();
     });
 
     autoUpdater.on('update-downloaded', (info) => {
@@ -357,7 +373,8 @@ ipcMain.on('set-badge-count', (event, count) => {
     if (process.platform === 'win32' && mainWindow) {
         if (count > 0) {
             const iconPath = path.join(__dirname, 'build', 'icon.png');
-            mainWindow.setOverlayIcon(iconPath, `${count} unread messages`);
+            const overlayIcon = nativeImage.createFromPath(iconPath);
+            mainWindow.setOverlayIcon(overlayIcon, `${count} unread messages`);
         } else {
             mainWindow.setOverlayIcon(null, '');
         }

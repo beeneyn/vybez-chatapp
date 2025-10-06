@@ -57,13 +57,30 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
     - Implemented room deletion with trash icon for custom rooms (default rooms cannot be deleted)
     - Added real-time room updates via Socket.IO (roomCreated, roomDeleted events)
     - Auto-redirects users to #general if their current room is deleted
-  - **Created Electron Desktop Client**
-    - Installed Electron and electron-builder packages
-    - Created electron.js main process file
+  - **Created Electron Desktop Client with Advanced Features**
+    - Installed Electron, electron-builder, auto-launch, electron-updater, and electron-store packages
+    - Created electron.js main process with comprehensive desktop integration
     - Desktop client connects to deployed web server (multi-user experience preserved)
     - Added build scripts for Windows (NSIS/portable), Mac (DMG/zip), and Linux (AppImage/deb)
     - Configured electron-builder with proper app metadata and icons
     - Desktop users join the same chatrooms as web users
+    - **Desktop-Specific Features:**
+      - 🔔 Desktop notifications for new messages and private messages
+      - 📊 System tray integration with context menu (minimize to tray, always on top, auto-launch, quit)
+      - 🔢 Badge counts on app icon (unread message counter)
+      - ⌨️ Global keyboard shortcut (Ctrl+Shift+V to show/hide window)
+      - 📌 Always-on-top window option (toggle via File menu or tray)
+      - 🌙 Native dark mode detection (follows system theme)
+      - 🌐 Offline detection with visual banner
+      - 🔄 Auto-updater for automatic app updates (electron-updater)
+      - 🚀 Auto-launch on startup option (configurable via tray menu)
+      - 📂 Native file picker for better file upload UX
+      - 💾 Window bounds persistence (remembers size/position)
+      - 🔒 Secure IPC communication via preload script (contextBridge)
+    - Created preload.js for secure Electron API exposure to renderer
+    - Created desktop-integration.js for web-to-desktop feature bridging
+    - Integrated Socket.IO events with desktop notifications
+    - Added Downloads page at /downloads.html with Windows/Linux installers and Mac build guide
 
 ## Tech Stack
 - **Backend:** Node.js, Express.js
@@ -73,24 +90,29 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 - **Authentication:** bcrypt for password hashing
 - **Frontend:** Tailwind CSS v4, vanilla JavaScript
 - **CSS Build:** @tailwindcss/cli with npm build pipeline
-- **Desktop Client:** Electron with electron-builder for cross-platform packaging
+- **Desktop Client:** Electron with electron-builder, auto-launch, electron-updater, electron-store
+  - Full desktop integration: notifications, tray, badges, shortcuts, auto-updates
 
 ## Project Architecture
 
 ### File Structure
 ```
-├── server.js           # Main server file with Express and Socket.IO setup
-├── database.js         # PostgreSQL database operations and schema
-├── electron.js         # Electron main process for desktop client
-├── package.json        # Project dependencies and Electron build config
-├── public/            # Static frontend files
-│   ├── landing.html   # Landing/login page
-│   ├── chat.html      # Main chat interface
-│   ├── client.js      # Client-side Socket.IO logic
-│   ├── style.css      # Chat interface styles
-│   ├── landing.css    # Landing page styles
-│   └── [other assets] # Images, videos, documentation pages
-└── sessions/          # File-based session storage
+├── server.js                    # Main server file with Express and Socket.IO setup
+├── database.js                  # PostgreSQL database operations and schema
+├── electron.js                  # Electron main process for desktop client
+├── preload.js                   # Electron preload script for secure IPC
+├── package.json                 # Project dependencies and Electron build config
+├── public/                      # Static frontend files
+│   ├── landing.html             # Landing/login page
+│   ├── chat.html                # Main chat interface
+│   ├── client.js                # Client-side Socket.IO logic
+│   ├── desktop-integration.js   # Desktop feature integration layer
+│   ├── downloads.html           # Desktop client downloads page
+│   ├── style.css                # Chat interface styles
+│   ├── landing.css              # Landing page styles
+│   └── [other assets]           # Images, videos, documentation pages
+├── sessions/                    # File-based session storage
+└── build/                       # Build resources (icon.png for all platforms)
 ```
 
 ### Key Features
