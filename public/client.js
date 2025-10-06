@@ -158,9 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const openPrivateMessage = async (username) => {
-        const modal = new bootstrap.Modal(document.getElementById('privateMessageModal'));
+        window.openModal('privateMessageModal');
         document.getElementById('pm-recipient-name').textContent = username;
-        document.getElementById('pm-messages-container').innerHTML = '<p class="text-muted">Loading...</p>';
+        document.getElementById('pm-messages-container').innerHTML = '<p class="text-gray-500">Loading...</p>';
         
         try {
             const response = await fetch(`/private-messages/${username}`);
@@ -178,8 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Failed to load private messages:', error);
         }
-        
-        modal.show();
         
         const sendBtn = document.getElementById('pm-send-btn');
         const input = document.getElementById('pm-input');
