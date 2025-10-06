@@ -1,0 +1,31 @@
+
+> vybez-chatapp@1.0.0 dist
+> electron-builder
+
+  • electron-builder  version=26.0.12 os=6.2.16
+  • loaded configuration  file=package.json ("build" field)
+  • writing effective config  file=dist/builder-effective-config.yaml
+  • skipped dependencies rebuild  reason=npmRebuild is set to false
+  • packaging       platform=linux arch=x64 electron=38.2.1 appOutDir=dist/linux-unpacked
+  • building        target=AppImage arch=x64 file=dist/Vybez Chat-1.0.0.AppImage
+  • building        target=deb arch=x64 file=dist/vybez-chatapp_1.0.0_amd64.deb
+  • adding autoupdate files for: deb. (Beta feature)  resourceDir=dist/linux-unpacked/resources
+  ⨯ Please specify author 'email' in the application package.json
+
+See https://docs.npmjs.com/files/package.json#people-fields-author-contributors
+
+It is required to set Linux .deb package maintainer. Or you can set maintainer in the custom linux options.
+(see https://www.electron.build/linux).
+  failedTask=build stackTrace=Error: Please specify author 'email' in the application package.json
+                                                                                                                                                                                                                                                                                                            See https://docs.npmjs.com/files/package.json#people-fields-author-contributors
+                                                                                                                                                                                                                                                                                                            It is required to set Linux .deb package maintainer. Or you can set maintainer in the custom linux options.
+(see https://www.electron.build/linux).
+                                                                                                                                                                                                                                                                                                                at FpmTarget.computeFpmMetaInfoOptions (/home/runner/workspace/node_modules/app-builder-lib/src/targets/FpmTarget.ts:100:13)
+    at FpmTarget.build (/home/runner/workspace/node_modules/app-builder-lib/src/targets/FpmTarget.ts:176:25)
+    at /home/runner/workspace/node_modules/app-builder-lib/src/platformPackager.ts:193:11
+    at async Promise.all (index 0)
+    at AsyncTaskManager.awaitTasks (/home/runner/workspace/node_modules/builder-util/src/asyncTaskManager.ts:65:25)
+    at Packager.doBuild (/home/runner/workspace/node_modules/app-builder-lib/src/packager.ts:507:5)
+    at executeFinally (/home/runner/workspace/node_modules/builder-util/src/promise.ts:12:14)
+    at Packager.build (/home/runner/workspace/node_modules/app-builder-lib/src/packager.ts:425:31)
+    at executeFinally (/home/runner/workspace/node_modules/builder-util/src/promise.ts:12:14)
