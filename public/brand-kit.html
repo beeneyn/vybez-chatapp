@@ -89,12 +89,59 @@
                 radial-gradient(circle at 80% 80%, rgba(255, 63, 143, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 40% 20%, rgba(30, 213, 255, 0.2) 0%, transparent 40%);
         }
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(rgba(91, 43, 255, 0.1) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(91, 43, 255, 0.1) 1px, transparent 1px);
+        }
+        .grid-bg-cyan {
+            background-size: 40px 40px;
+            background-image: linear-gradient(rgba(30, 213, 255, 0.08) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(30, 213, 255, 0.08) 1px, transparent 1px);
+        }
+        .grid-bg-magenta {
+            background-size: 40px 40px;
+            background-image: linear-gradient(rgba(255, 63, 143, 0.08) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 63, 143, 0.08) 1px, transparent 1px);
+        }
+        @keyframes grid-fade {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        .animated-grid {
+            animation: grid-fade 8s ease-in-out infinite;
+        }
+        .dot-pattern {
+            background-image: radial-gradient(circle, rgba(91, 43, 255, 0.15) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
     </style>
 </head>
 <body class="bg-[#0b1220] text-white" style="font-family: 'Inter', sans-serif;">
 
+    <!-- SVG Definitions for Grid Effects -->
+    <svg class="absolute" width="0" height="0">
+        <defs>
+            <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(91, 43, 255, 0.1)" stroke-width="1"/>
+            </pattern>
+            <pattern id="dot-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="10" cy="10" r="1" fill="rgba(91, 43, 255, 0.2)"/>
+            </pattern>
+            <linearGradient id="grid-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#5b2bff;stop-opacity:0.2" />
+                <stop offset="50%" style="stop-color:#ff3f8f;stop-opacity:0.2" />
+                <stop offset="100%" style="stop-color:#1ed5ff;stop-opacity:0.2" />
+            </linearGradient>
+        </defs>
+    </svg>
+
     <!-- Hero Header -->
     <header class="relative overflow-hidden py-20 hero-pattern" style="background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);">
+        <!-- Animated Grid Overlay -->
+        <div class="absolute inset-0 grid-bg animated-grid opacity-30"></div>
+        <div class="absolute inset-0 dot-pattern opacity-20"></div>
+        
         <div class="container mx-auto px-4 relative z-10">
             <a href="/" class="inline-block mb-8 text-white hover:opacity-80 transition-opacity">
                 <i class="fas fa-arrow-left mr-2"></i> Back to Home
@@ -113,8 +160,12 @@
     </header>
 
     <!-- Color Palette Section -->
-    <section class="py-20 bg-[#0f1a2e]">
-        <div class="container mx-auto px-4">
+    <section class="py-20 bg-[#0f1a2e] relative overflow-hidden">
+        <!-- Grid Background -->
+        <div class="absolute inset-0 grid-bg-cyan opacity-40"></div>
+        <div class="absolute inset-0" style="background: radial-gradient(circle at 50% 50%, transparent 0%, #0f1a2e 100%);"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-16">
                 <h2 class="text-5xl md:text-6xl font-bold mb-4 typography-display" style="font-family: 'Space Grotesk', sans-serif;">
                     Color Palette
@@ -255,8 +306,12 @@
     </section>
 
     <!-- Typography Section -->
-    <section class="py-20 bg-[#0b1220]">
-        <div class="container mx-auto px-4">
+    <section class="py-20 bg-[#0b1220] relative overflow-hidden">
+        <!-- Grid Background -->
+        <div class="absolute inset-0 grid-bg animated-grid opacity-30"></div>
+        <div class="absolute inset-0" style="background: radial-gradient(circle at 30% 50%, transparent 0%, #0b1220 70%);"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-16">
                 <h2 class="text-5xl md:text-6xl font-bold mb-4 typography-display" style="font-family: 'Space Grotesk', sans-serif;">
                     Typography
@@ -342,8 +397,13 @@
     </section>
 
     <!-- Logo Section -->
-    <section class="py-20 bg-[#0f1a2e]">
-        <div class="container mx-auto px-4">
+    <section class="py-20 bg-[#0f1a2e] relative overflow-hidden">
+        <!-- Grid Background -->
+        <div class="absolute inset-0 grid-bg-magenta opacity-40"></div>
+        <div class="absolute inset-0 dot-pattern opacity-20"></div>
+        <div class="absolute inset-0" style="background: radial-gradient(circle at 70% 50%, transparent 0%, #0f1a2e 80%);"></div>
+        
+        <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-16">
                 <h2 class="text-5xl md:text-6xl font-bold mb-4 typography-display" style="font-family: 'Space Grotesk', sans-serif;">
                     Logo & Branding
@@ -397,8 +457,12 @@
     </section>
 
     <!-- Download Section -->
-    <section class="py-20 bg-[#0b1220]">
-        <div class="container mx-auto px-4 text-center">
+    <section class="py-20 bg-[#0b1220] relative overflow-hidden">
+        <!-- Grid Background with Gradient -->
+        <div class="absolute inset-0 grid-bg animated-grid opacity-40"></div>
+        <div class="absolute inset-0" style="background: radial-gradient(circle at 50% 50%, rgba(91, 43, 255, 0.1) 0%, #0b1220 60%);"></div>
+        
+        <div class="container mx-auto px-4 text-center relative z-10">
             <div class="max-w-4xl mx-auto glow-card rounded-2xl p-12">
                 <i class="fas fa-download text-6xl mb-6" style="background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
                 <h2 class="text-4xl md:text-5xl font-bold mb-6" style="font-family: 'Space Grotesk', sans-serif;">
