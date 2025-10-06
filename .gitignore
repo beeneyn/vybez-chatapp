@@ -10,6 +10,12 @@ yarn-error.log
 # Session files
 sessions/
 
+# Electron builds
+dist/
+
+# Compiled CSS
+public/tailwind.css
+
 # OS generated files
 .DS_Store
 Thumbs.db
