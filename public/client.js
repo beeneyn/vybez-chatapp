@@ -229,9 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusEl = document.getElementById('login-status'); 
         statusEl.textContent = ''; 
         try { 
-            console.log('Attempting login for:', username);
-            const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }), credentials: 'same-origin' }); 
-            console.log('Login response status:', response.status);
+            const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }), credentials: 'same-origin' });
             if (response.ok) { 
                 const authModal = document.getElementById('authModal');
                 if (authModal) authModal.style.display = 'none';
@@ -425,20 +423,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         socket.on('privateMessageSent', (pm) => {
-            console.log('Private message sent:', pm);
         });
 
         socket.on('readReceiptUpdate', ({ messageId, receipts }) => {
-            console.log('Read receipts updated:', messageId, receipts);
         });
         
         socket.on('roomCreated', (room) => {
-            console.log('New room created:', room);
             renderRoomList();
         });
         
         socket.on('roomDeleted', ({ name }) => {
-            console.log('Room deleted:', name);
             renderRoomList();
             if (currentRoom === name) {
                 socket.emit('switchRoom', '#general');
