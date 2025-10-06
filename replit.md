@@ -31,6 +31,7 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
   - Implemented complete settings modal with avatar upload, bio, status, and color editing
   - Added /update-profile endpoint for persisting user profile changes
   - Fixed private messaging real-time delivery (messages now appear instantly in open conversations)
+  - Fixed private messaging modal to use custom modal system instead of Bootstrap
   - Improved error handling and user feedback throughout the app
   - Added avatar display in chat messages (32x32px circular images)
   - Added avatar display in online users list (24x24px circular images)
@@ -48,6 +49,14 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
     - Removed Bootstrap and Alpine.js dependencies
     - Implemented custom modal system with vanilla JavaScript
     - Eliminated CDN warnings for production readiness
+  - **Implemented Custom Rooms Feature**
+    - Added rooms table to PostgreSQL database with default and custom room support
+    - Created room management endpoints (GET /rooms, POST /rooms, DELETE /rooms/:name)
+    - Updated server to load rooms dynamically from database instead of hardcoded array
+    - Added UI button and modal for creating new rooms
+    - Implemented room deletion with trash icon for custom rooms (default rooms cannot be deleted)
+    - Added real-time room updates via Socket.IO (roomCreated, roomDeleted events)
+    - Auto-redirects users to #general if their current room is deleted
 
 ## Tech Stack
 - **Backend:** Node.js, Express.js
@@ -78,9 +87,9 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 
 ### Key Features
 1. **User Authentication:** Secure signup/login with bcrypt password hashing
-2. **Multiple Chat Rooms:** Pre-configured rooms (#general, #tech, #random)
+2. **Custom Chat Rooms:** Users can create and delete custom rooms beyond the default rooms (#general, #tech, #random)
 3. **Real-time Messaging:** Socket.IO for instant message delivery
-4. **Message History:** Persisted in SQLite, loaded on room join
+4. **Message History:** Persisted in PostgreSQL, loaded on room join
 5. **Online Users:** Real-time list of connected users
 6. **User Profiles:** Custom chat colors, bio, status, and avatars
 7. **Session Persistence:** Server-side sessions with SQLite storage
@@ -98,6 +107,7 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 - **reactions table:** id (SERIAL), message_id (FK), username, emoji
 - **private_messages table:** id (SERIAL), from_user, to_user, message_text, timestamp, read
 - **read_receipts table:** id (SERIAL), message_id (FK), username, read_at
+- **rooms table:** id (SERIAL), name (UNIQUE), created_by, created_at, is_default
 
 All tables use PostgreSQL SERIAL for auto-incrementing IDs and proper CASCADE foreign key constraints.
 
