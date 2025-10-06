@@ -9,6 +9,10 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 
 ## Recent Changes
 - **2025-10-06:** Complete brand refresh - "Neon Nightlife" aesthetic
+  - **New Brand Identity:**
+    - Brand slogan updated to "BREAK FREE" (from "CHAT WITHOUT LIMITS")
+    - Logo updated to upscaled version with enhanced quality
+    - All pages now display new branding consistently
   - **New Brand Colors:**
     - Midnight base: #0b1220
     - Deep violet: #5b2bff (primary brand color)
@@ -26,6 +30,7 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
     - Applied modern glassmorphism and gradient effects
     - Ensured brand consistency across landing, downloads, desktop-login, and chat pages
     - Updated desktop notification banners with new gradient
+    - Added Tailwind-style grid patterns to brand-kit.html (animated grids, dot patterns, multi-layer depth effects)
   - **Technical Implementation:**
     - All changes use CSS variables for maintainability
     - Chat interface automatically inherits new colors (no hardcoded values)
