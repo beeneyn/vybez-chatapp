@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Vybez Desktop - Windows & Linux</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .download-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .download-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md py-4 sticky top-0 z-50">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-3">
+                <img src="favicon.png" alt="Vybez Logo" class="h-10 w-10">
+                <span class="text-2xl font-bold gradient-text">Vybez</span>
+            </a>
+            <a href="/" class="text-gray-700 hover:text-purple-600 font-medium">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="py-16 bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 text-white text-center">
+        <div class="container mx-auto px-4">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4">Download Vybez Desktop</h1>
+            <p class="text-xl md:text-2xl mb-2">Chat on your desktop, no browser needed</p>
+            <p class="text-lg opacity-90">Available for Windows and Linux</p>
+        </div>
+    </section>
+
+    <!-- Downloads Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-4 max-w-5xl">
+            
+            <!-- Windows -->
+            <div class="mb-12 bg-white rounded-2xl shadow-xl p-8 download-card">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center">
+                        <i class="fab fa-windows text-3xl text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold">Windows</h2>
+                        <p class="text-gray-600">Windows 10 and later</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <a href="/dist/Vybez Chat Setup 1.0.0.exe" download class="block p-6 border-2 border-blue-500 rounded-xl hover:bg-blue-50 transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">Windows Installer</h3>
+                            <i class="fas fa-download text-blue-500 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-600 mb-2">Full installer with desktop shortcuts</p>
+                        <p class="text-sm text-gray-500">Recommended for most users</p>
+                        <div class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg text-center font-bold">
+                            Download .exe
+                        </div>
+                    </a>
+                    
+                    <a href="/dist/Vybez Chat 1.0.0.exe" download class="block p-6 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">Portable Version</h3>
+                            <i class="fas fa-briefcase text-gray-500 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-600 mb-2">No installation required</p>
+                        <p class="text-sm text-gray-500">Run directly from USB or any folder</p>
+                        <div class="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg text-center font-bold">
+                            Download Portable
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Linux -->
+            <div class="mb-12 bg-white rounded-2xl shadow-xl p-8 download-card">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center">
+                        <i class="fab fa-linux text-3xl text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold">Linux</h2>
+                        <p class="text-gray-600">All distributions</p>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <a href="/dist/Vybez Chat-1.0.0.AppImage" download class="block p-6 border-2 border-orange-500 rounded-xl hover:bg-orange-50 transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">AppImage</h3>
+                            <i class="fas fa-download text-orange-500 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-600 mb-2">Universal Linux package</p>
+                        <p class="text-sm text-gray-500">Works on all distros • Just make executable and run</p>
+                        <div class="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg text-center font-bold">
+                            Download AppImage
+                        </div>
+                    </a>
+                    
+                    <a href="/dist/vybez-chatapp_1.0.0_amd64.deb" download class="block p-6 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">Debian Package</h3>
+                            <i class="fas fa-box text-gray-500 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-600 mb-2">For Ubuntu/Debian users</p>
+                        <p class="text-sm text-gray-500">Installs system-wide with dpkg</p>
+                        <div class="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg text-center font-bold">
+                            Download .deb
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="mt-6 p-4 bg-gray-100 rounded-lg">
+                    <p class="text-sm text-gray-700">
+                        <strong>Installation:</strong> 
+                        AppImage: <code class="bg-gray-200 px-2 py-1 rounded">chmod +x Vybez*.AppImage && ./Vybez*.AppImage</code><br>
+                        Debian: <code class="bg-gray-200 px-2 py-1 rounded">sudo dpkg -i vybez-chatapp_1.0.0_amd64.deb</code>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Mac Users Section -->
+            <div class="mb-12 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 text-9xl opacity-5">
+                    <i class="fab fa-apple"></i>
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-gray-700 rounded-xl flex items-center justify-center opacity-50">
+                            <i class="fab fa-apple text-3xl text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-bold">macOS</h2>
+                            <p class="text-gray-400">For the "elite" users</p>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-gray-700 bg-opacity-50 rounded-xl border-2 border-dashed border-gray-600">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-sad-tear text-6xl mb-4 opacity-50"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-center">Sorry, Mac Users! 🍎</h3>
+                        <p class="text-lg text-gray-300 mb-4 text-center">
+                            No Mac build available because, well... we don't have a Mac. 🤷‍♂️
+                        </p>
+                        <div class="space-y-3 text-gray-400">
+                            <p>💸 <strong>Too expensive:</strong> We'd rather spend that $2000 on literally anything else</p>
+                            <p>🔧 <strong>Can't build without one:</strong> Apple makes sure you need a Mac to build Mac apps (classic Apple move)</p>
+                            <p>😎 <strong>But hey:</strong> You can still use the web version in Safari! It's basically the same thing, right?</p>
+                        </div>
+                        <div class="mt-6 text-center">
+                            <a href="/" class="inline-block px-6 py-3 bg-white text-gray-900 font-bold rounded-lg hover:bg-gray-100 transition">
+                                Use Web Version Instead
+                            </a>
+                        </div>
+                        <p class="text-sm text-gray-500 text-center mt-4">
+                            (Or you could just... buy a real computer 😏)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-3xl font-bold mb-6 text-center">Desktop App Features</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-check-circle text-green-500 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-bold mb-1">Native Desktop Experience</h4>
+                            <p class="text-gray-600">Runs as a standalone app with taskbar icon and notifications</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-check-circle text-green-500 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-bold mb-1">Always Connected</h4>
+                            <p class="text-gray-600">Stays running in the background for instant notifications</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-check-circle text-green-500 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-bold mb-1">Same Features as Web</h4>
+                            <p class="text-gray-600">All features work identically - chat with web users seamlessly</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-check-circle text-green-500 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-bold mb-1">No Browser Required</h4>
+                            <p class="text-gray-600">Dedicated app means no more lost tabs or closed windows</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-check-circle text-green-500 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-bold mb-1">Lightweight & Fast</h4>
+                            <p class="text-gray-600">Built with Electron for maximum performance</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-check-circle text-green-500 text-xl mt-1"></i>
+                        <div>
+                            <h4 class="font-bold mb-1">Auto-Updates</h4>
+                            <p class="text-gray-600">Always get the latest features automatically</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Requirements -->
+            <div class="mt-12 bg-gray-100 rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">System Requirements</h3>
+                <div class="grid md:grid-cols-2 gap-6 text-sm">
+                    <div>
+                        <h4 class="font-bold mb-2"><i class="fab fa-windows mr-2 text-blue-500"></i>Windows</h4>
+                        <ul class="space-y-1 text-gray-700">
+                            <li>• Windows 10 or later</li>
+                            <li>• 64-bit processor</li>
+                            <li>• 200MB free disk space</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-2"><i class="fab fa-linux mr-2 text-orange-500"></i>Linux</h4>
+                        <ul class="space-y-1 text-gray-700">
+                            <li>• Any modern distribution</li>
+                            <li>• 64-bit system (x64)</li>
+                            <li>• 200MB free disk space</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400">&copy; 2025 Vybez - Made with ❤️ by Beeny</p>
+            <p class="text-sm text-gray-500 mt-2">
+                <a href="/" class="hover:text-white">Home</a> • 
+                <a href="about.html" class="hover:text-white">About</a> • 
+                <a href="privacy.html" class="hover:text-white">Privacy</a> • 
+                <a href="terms.html" class="hover:text-white">Terms</a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
