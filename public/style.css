@@ -1,42 +1,69 @@
 /* --- Core Theme & Variables --- */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
 :root {
+    /* Brand Colors - Neon Nightlife Theme */
+    --brand-midnight: #0b1220;
+    --brand-violet: #5b2bff;
+    --brand-magenta: #ff3f8f;
+    --brand-cyan: #1ed5ff;
+    --brand-accent: #f6b73c;
+    
     /* Light Mode (Default) */
     --background-primary: #ffffff;
     --background-secondary: #f5f6f7;
-    --background-tertiary: #e3e5e8;
-    --header-primary: #060607;
-    --text-normal: #2e3338;
-    --text-muted: #5c5e66;
-    --interactive-normal: #4e5058;
-    --interactive-hover: #060607;
-    --brand-experiment: #5865f2;
-    --border-color: #e3e5e8;
+    --background-tertiary: #e9ecf5;
+    --header-primary: #0b1220;
+    --text-normal: #1f2a3d;
+    --text-muted: #5c6878;
+    --interactive-normal: #4e5563;
+    --interactive-hover: #0b1220;
+    --brand-experiment: #5b2bff;
+    --border-color: #e9ecf5;
     --modal-background: #fff;
-    --modal-text: #000;
-    --chat-hover: #f2f3f5;
+    --modal-text: #1f2a3d;
+    --chat-hover: #f5f7fa;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+    --gradient-subtle: linear-gradient(135deg, #5b2bff15 0%, #ff3f8f15 100%);
+    
+    /* Typography */
+    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body[data-theme='dark'] {
-    /* Dark Mode */
-    --background-primary: #2b2d31;
-    --background-secondary: #1e1f22;
-    --background-tertiary: #383a40;
+    /* Dark Mode - Enhanced Neon */
+    --background-primary: #0f1a2e;
+    --background-secondary: #0b1220;
+    --background-tertiary: #1f2a3d;
     --header-primary: #ffffff;
-    --text-normal: #dbdee1;
-    --text-muted: #949ba4;
-    --interactive-normal: #b5bac1;
-    --interactive-hover: #dbdee1;
-    --brand-experiment: #5865f2;
-    --border-color: #3f4147;
-    --modal-background: #2b2d31;
-    --modal-text: #fff;
-    --chat-hover: #35373c;
+    --text-normal: #e9ecf5;
+    --text-muted: #8b94a3;
+    --interactive-normal: #b5bcc7;
+    --interactive-hover: #e9ecf5;
+    --brand-experiment: #5b2bff;
+    --border-color: #1f2a3d;
+    --modal-background: #0f1a2e;
+    --modal-text: #e9ecf5;
+    --chat-hover: #1a2537;
+    
+    /* Enhanced gradients for dark mode */
+    --gradient-primary: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+    --gradient-subtle: linear-gradient(135deg, #5b2bff25 0%, #ff3f8f25 100%);
 }
 
 /* --- Layout & Global Styles --- */
 body {
     background-color: var(--background-secondary);
     color: var(--text-normal);
+    font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
 }
 #app-container.hidden { display: none !important; }
 #app-container { height: 100%; }

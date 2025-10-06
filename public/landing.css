@@ -1,8 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    /* Brand Colors - Neon Nightlife Theme */
+    --brand-midnight: #0b1220;
+    --brand-violet: #5b2bff;
+    --brand-magenta: #ff3f8f;
+    --brand-cyan: #1ed5ff;
+    --brand-accent: #f6b73c;
+    --text-primary: #0b1220;
+    --text-secondary: #1f2a3d;
+    
+    /* Typography */
+    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 html, body {
     margin: 0;
-    /* Removed padding-top here as the hero section now manages its own spacing */
-    font-family: 'Helvetica Neue', sans-serif;
-    color: #23272A; /* Default text color */
+    font-family: var(--font-body);
+    color: var(--text-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
 }
 
 /* Remove old logo styles */
@@ -17,8 +37,8 @@ html, body {
     z-index: 1030;
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
-    background-color: 07fefe; /* Use primary brand color */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(90deg, var(--brand-violet) 0%, var(--brand-magenta) 100%);
+    box-shadow: 0 4px 12px rgba(91, 43, 255, 0.15);
 }
 
 #nav-app-logo {
@@ -30,26 +50,59 @@ html, body {
 
 .hero {
     min-height: 80vh;
-    background-color: #07fefe;
-    background-image: linear-gradient(180deg, rgba(35,39,42,0) 0%, #fe02fd 100%);
-    /* Adjust padding to account for the sticky nav, though sticky-top handles it mostly */
-    padding: 2rem; 
+    background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+    position: relative;
+    padding: 2rem;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(30, 213, 255, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 63, 143, 0.2) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 h1.display-3 {
+    font-family: var(--font-display);
     text-transform: uppercase;
-    font-weight: 800 !important;
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
 }
 
 .hero .lead {
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-body);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
 }
 
 .btn-light {
     border-radius: 28px;
     padding: 14px 32px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    background: white;
+    color: var(--brand-violet);
+    border: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    background: white;
+    color: var(--brand-magenta);
 }
 
 .features-section .card-title {
@@ -72,9 +125,16 @@ h1.display-3 {
 }
 
 /* ... rest of the existing CSS ... */
-/* Tailwind Hero Gradient */
+/* Brand Gradients */
 .hero-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--brand-violet) 0%, var(--brand-magenta) 50%, var(--brand-cyan) 100%);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--brand-violet) 0%, var(--brand-magenta) 50%, var(--brand-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* Modal Styles for Auth Modal */
