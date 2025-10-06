@@ -19,8 +19,6 @@
     "@tailwindcss/cli": "^4.1.14",
     "autoprefixer": "^10.4.21",
     "bcrypt": "^5.1.1",
-    "electron": "^38.2.1",
-    "electron-builder": "^26.0.12",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "multer": "^2.0.2",
@@ -29,6 +27,10 @@
     "session-file-store": "^1.5.0",
     "socket.io": "^4.7.2",
     "tailwindcss": "^4.1.14"
+  },
+  "devDependencies": {
+    "electron": "^38.2.1",
+    "electron-builder": "^26.0.12"
   },
   "build": {
     "appId": "com.vybez.chat",
