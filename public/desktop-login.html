@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vybez - Login</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 450px;
+            width: 90%;
+            margin: 20px;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .tab-button {
+            padding: 12px 32px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .form-container {
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="text-center py-8 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+            <div class="flex items-center justify-center mb-3">
+                <img src="favicon.png" alt="Vybez Logo" class="h-16 w-16">
+            </div>
+            <h1 class="text-3xl font-bold mb-2">Welcome to Vybez</h1>
+            <p class="text-purple-100">Real-time chat, right on your desktop</p>
+        </div>
+
+        <div class="flex border-b">
+            <button class="tab-button active flex-1" id="login-tab" onclick="switchTab('login')">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </button>
+            <button class="tab-button flex-1" id="signup-tab" onclick="switchTab('signup')">
+                <i class="fas fa-user-plus mr-2"></i>Sign Up
+            </button>
+        </div>
+
+        <div class="p-8">
+            <form id="login-form" class="form-container active">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="login-username">
+                        Username
+                    </label>
+                    <input 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                        id="login-username" 
+                        type="text" 
+                        placeholder="Enter your username"
+                        required
+                        autocomplete="username"
+                    >
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="login-password">
+                        Password
+                    </label>
+                    <input 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                        id="login-password" 
+                        type="password" 
+                        placeholder="Enter your password"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+                <div id="login-error" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"></div>
+                <button 
+                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg transform hover:scale-105"
+                    type="submit"
+                >
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+            </form>
+
+            <form id="signup-form" class="form-container">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-username">
+                        Username
+                    </label>
+                    <input 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                        id="signup-username" 
+                        type="text" 
+                        placeholder="Choose a username"
+                        required
+                        autocomplete="username"
+                    >
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-password">
+                        Password
+                    </label>
+                    <input 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                        id="signup-password" 
+                        type="password" 
+                        placeholder="Create a password"
+                        required
+                        autocomplete="new-password"
+                    >
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-color">
+                        Chat Color
+                    </label>
+                    <input 
+                        class="w-full h-12 px-2 border border-gray-300 rounded-lg cursor-pointer" 
+                        id="signup-color" 
+                        type="color" 
+                        value="#667eea"
+                    >
+                    <p class="text-xs text-gray-500 mt-1">Choose your chat message color</p>
+                </div>
+                <div id="signup-error" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"></div>
+                <button 
+                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg transform hover:scale-105"
+                    type="submit"
+                >
+                    <i class="fas fa-user-plus mr-2"></i>Create Account
+                </button>
+            </form>
+        </div>
+
+        <div class="px-8 py-4 bg-gray-50 text-center text-sm text-gray-600">
+            <i class="fas fa-desktop mr-1"></i> Desktop App v1.0.0
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const loginTab = document.getElementById('login-tab');
+            const signupTab = document.getElementById('signup-tab');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+            } else {
+                signupTab.classList.add('active');
+                loginTab.classList.remove('active');
+                signupForm.classList.add('active');
+                loginForm.classList.remove('active');
+            }
+        }
+
+        const handleLogin = async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    window.location.href = '/chat';
+                } else {
+                    errorDiv.textContent = data.message || 'Login failed';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        };
+
+        const handleSignup = async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+            const chatColor = document.getElementById('signup-color').value;
+            const errorDiv = document.getElementById('signup-error');
+
+            try {
+                const res = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, chatColor })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    window.location.href = '/chat';
+                } else {
+                    errorDiv.textContent = data.message || 'Signup failed';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        };
+
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+        document.getElementById('signup-form').addEventListener('submit', handleSignup);
+
+        document.getElementById('login-username').focus();
+    </script>
+
+</body>
+</html>

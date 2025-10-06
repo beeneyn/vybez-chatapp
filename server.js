@@ -59,6 +59,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 app.get('/', (req, res) => { if (req.session.user) res.redirect('/chat'); else res.sendFile(path.join(__dirname, 'public', 'landing.html')); });
+app.get('/desktop-login', (req, res) => { if (req.session.user) res.redirect('/chat'); else res.sendFile(path.join(__dirname, 'public', 'desktop-login.html')); });
 app.get('/chat', (req, res) => { if (!req.session.user) res.redirect('/'); else res.sendFile(path.join(__dirname, 'public', 'chat.html')); });
 
 app.post('/signup', (req, res) => { const { username, password, chat_color } = req.body; db.addUser(username, password, chat_color, (err) => { if (err) { if (err.code === 'SQLITE_CONSTRAINT') return res.status(409).json({ message: 'Username already exists.' }); return res.status(500).json({ message: 'Server error.' }); } res.status(201).json({ message: 'User created!' }); }); });

@@ -9,7 +9,8 @@ let tray;
 let isQuitting = false;
 
 const isDev = process.env.NODE_ENV === 'development';
-const serverUrl = isDev ? 'http://localhost:5000' : 'https://YOUR_DEPLOYED_URL.replit.app';
+const baseUrl = isDev ? 'http://localhost:5000' : 'https://YOUR_DEPLOYED_URL.replit.app';
+const serverUrl = `${baseUrl}/desktop-login`;
 
 const store = new Store({
     defaults: {
