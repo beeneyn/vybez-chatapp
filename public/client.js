@@ -231,14 +231,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusEl = document.getElementById('login-status'); 
         statusEl.textContent = ''; 
         try { 
+            console.log('Attempting login for:', username);
             const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) }); 
+            console.log('Login response status:', response.status);
             if (response.ok) { 
+                console.log('Login successful, redirecting to /chat');
                 window.location.href = '/chat'; 
             } else { 
                 const data = await response.json(); 
+                console.error('Login failed:', data.message);
                 statusEl.textContent = data.message || 'Login failed.'; 
             } 
         } catch (error) { 
+            console.error('Login error:', error);
             statusEl.textContent = 'An error occurred.'; 
         } 
     };
