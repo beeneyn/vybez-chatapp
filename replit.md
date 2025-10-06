@@ -57,6 +57,13 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
     - Implemented room deletion with trash icon for custom rooms (default rooms cannot be deleted)
     - Added real-time room updates via Socket.IO (roomCreated, roomDeleted events)
     - Auto-redirects users to #general if their current room is deleted
+  - **Created Electron Desktop Client**
+    - Installed Electron and electron-builder packages
+    - Created electron.js main process file
+    - Desktop client connects to deployed web server (multi-user experience preserved)
+    - Added build scripts for Windows (NSIS/portable), Mac (DMG/zip), and Linux (AppImage/deb)
+    - Configured electron-builder with proper app metadata and icons
+    - Desktop users join the same chatrooms as web users
 
 ## Tech Stack
 - **Backend:** Node.js, Express.js
@@ -66,14 +73,16 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 - **Authentication:** bcrypt for password hashing
 - **Frontend:** Tailwind CSS v4, vanilla JavaScript
 - **CSS Build:** @tailwindcss/cli with npm build pipeline
+- **Desktop Client:** Electron with electron-builder for cross-platform packaging
 
 ## Project Architecture
 
 ### File Structure
 ```
 ├── server.js           # Main server file with Express and Socket.IO setup
-├── database.js         # SQLite database operations and schema
-├── package.json        # Project dependencies
+├── database.js         # PostgreSQL database operations and schema
+├── electron.js         # Electron main process for desktop client
+├── package.json        # Project dependencies and Electron build config
 ├── public/            # Static frontend files
 │   ├── landing.html   # Landing/login page
 │   ├── chat.html      # Main chat interface
@@ -81,8 +90,7 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 │   ├── style.css      # Chat interface styles
 │   ├── landing.css    # Landing page styles
 │   └── [other assets] # Images, videos, documentation pages
-├── chat.db            # SQLite database for users and messages
-└── sessions.db        # SQLite database for sessions
+└── sessions/          # File-based session storage
 ```
 
 ### Key Features
@@ -124,10 +132,32 @@ All tables use PostgreSQL SERIAL for auto-incrementing IDs and proper CASCADE fo
 - **Reason for VM:** Application maintains WebSocket connections and session state in memory
 
 ## How to Run
+
+### Web Application
 The application runs automatically via the configured workflow. To manually start:
 ```bash
 npm start
 ```
+
+### Desktop Client (Development)
+To run the Electron desktop client locally:
+```bash
+npm run electron
+```
+**Note:** Update the `serverUrl` in `electron.js` to your deployed Replit URL before building for production.
+
+### Building Desktop Installers
+Build desktop apps for distribution:
+```bash
+# Build for all platforms
+npm run dist
+
+# Build for specific platform
+npm run dist:win     # Windows (NSIS installer + portable)
+npm run dist:mac     # macOS (DMG + zip)
+npm run dist:linux   # Linux (AppImage + deb)
+```
+Output files will be in the `dist/` directory.
 
 ## Dependencies
 All dependencies are installed and listed in package.json:
