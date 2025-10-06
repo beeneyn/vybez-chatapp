@@ -13,9 +13,18 @@ A modern, real-time chat application built with Node.js and Socket.IO. Vybez pro
 
 ### 👤 User Features
 - **Custom Profiles** - Personalize your chat color, bio, and status
+- **User Avatars** - Upload and display custom profile pictures
 - **Online Users List** - See who's currently active in real-time
-- **Private Messaging** - Direct message other users (UI ready)
+- **Private Messaging** - Send direct messages to other users with notification sounds
 - **Theme Toggle** - Switch between light and dark modes
+
+### ✨ Advanced Features
+- **Message Reactions** - React to messages with emojis (👍, ❤️, 😂, 😮, 😢, 🎉, 🔥, 👏)
+- **Typing Indicators** - See when other users are typing in real-time
+- **File & Image Sharing** - Upload and share files up to 10MB with automatic image preview
+- **Message Search** - Search through message history in any room
+- **Read Receipts** - Track who has read your messages
+- **User Roles** - Admin and user role system for permissions management
 
 ### 🔒 Security
 - Password hashing with bcrypt
@@ -100,6 +109,8 @@ vybez-chatapp/
 - `chat_color` - Hex color code for messages
 - `bio` - User biography
 - `status` - Current status text
+- `avatar_url` - Profile picture URL
+- `role` - User role (admin/user)
 
 ### Messages Table
 - `id` - Primary key
@@ -108,12 +119,28 @@ vybez-chatapp/
 - `message_text` - Message content
 - `chat_color` - Sender's color
 - `timestamp` - Message timestamp
+- `file_url` - Attached file URL (optional)
+- `file_type` - MIME type of attached file
 
 ### Reactions Table
 - `id` - Primary key
 - `message_id` - Foreign key to messages
 - `username` - User who reacted
 - `emoji` - Reaction emoji
+
+### Private Messages Table
+- `id` - Primary key
+- `from_user` - Sender username
+- `to_user` - Recipient username
+- `message_text` - Message content
+- `timestamp` - Message timestamp
+- `read` - Read status (0/1)
+
+### Read Receipts Table
+- `id` - Primary key
+- `message_id` - Foreign key to messages
+- `username` - User who read the message
+- `read_at` - Timestamp when read
 
 ## How It Works
 
@@ -143,11 +170,22 @@ vybez-chatapp/
 - `POST /logout` - End user session
 - `GET /check-session` - Verify active session
 
+### File & Avatar Management
+- `POST /upload-file` - Upload file attachment (max 10MB)
+- `POST /upload-avatar` - Upload user avatar image
+- `GET /search-messages` - Search messages in a room
+- `GET /private-messages/:username` - Get private message history
+
 ### Socket Events
 - `connection` - Client connects to server
 - `switchRoom` - Change chat room
-- `chatMessage` - Send/receive messages
+- `chatMessage` - Send/receive messages (supports text and files)
 - `updateUserList` - Sync online users
+- `typing` - Send/receive typing indicators
+- `addReaction` - Add emoji reaction to message
+- `removeReaction` - Remove emoji reaction
+- `privateMessage` - Send private message to user
+- `markAsRead` - Mark message as read
 - `disconnect` - Client disconnects
 
 ## Development
@@ -175,16 +213,31 @@ This application is configured for deployment on platforms like Replit, Heroku, 
 - Binds to `0.0.0.0` for cloud environments
 - Environment-aware port configuration
 
-## Future Enhancements
+## Recent Updates
 
-- [ ] File/image sharing with Multer
-- [ ] Message reactions (schema ready)
-- [ ] User avatars
-- [ ] Private messaging completion
-- [ ] User roles and permissions
-- [ ] Message search functionality
-- [ ] Typing indicators
-- [ ] Read receipts
+All planned features have been successfully implemented! ✅
+
+### Completed Features
+- ✅ File/image sharing with Multer
+- ✅ Message reactions with emoji picker
+- ✅ User avatars with upload
+- ✅ Private messaging with notifications
+- ✅ User roles and permissions system
+- ✅ Message search functionality
+- ✅ Real-time typing indicators
+- ✅ Read receipts tracking
+
+### How to Use New Features
+
+**React to Messages**: Click the 😊 button next to any message to open the emoji picker and select a reaction.
+
+**Upload Files**: Click the paperclip 📎 button in the message input area to upload files or images.
+
+**Send Private Messages**: Click on any username in the online users list to open a private chat.
+
+**Search Messages**: Click the search 🔍 button in the chat header and enter your search query.
+
+**Upload Avatar**: Access your profile settings to upload a custom avatar image.
 
 ## Learning Outcomes
 
