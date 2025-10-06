@@ -308,20 +308,58 @@ document.addEventListener('DOMContentLoaded', () => {
             messages.forEach(msg => renderMessage(msg)); 
         });
 
-        socket.on('roomList', (rooms) => { 
-            if (!roomList) return; 
-            roomList.innerHTML = ''; 
-            rooms.forEach(room => { 
-                const item = document.createElement('li'); 
-                item.classList.add('list-group-item'); 
-                item.textContent = room; 
-                if (room === currentRoom) item.classList.add('active'); 
-                item.addEventListener('click', () => { 
-                    if (room !== currentRoom) socket.emit('switchRoom', room); 
-                }); 
-                roomList.appendChild(item); 
-            }); 
-        });
+        const renderRoomList = async () => {
+            if (!roomList) return;
+            try {
+                const response = await fetch('/rooms');
+                if (!response.ok) return;
+                const data = await response.json();
+                roomList.innerHTML = '';
+                data.rooms.forEach(room => {
+                    const item = document.createElement('li');
+                    item.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-gray-100', 'flex', 'justify-between', 'items-center');
+                    if (room.name === currentRoom) item.classList.add('bg-blue-100');
+                    
+                    const roomName = document.createElement('span');
+                    roomName.textContent = room.name;
+                    roomName.classList.add('flex-1');
+                    roomName.addEventListener('click', () => {
+                        if (room.name !== currentRoom) socket.emit('switchRoom', room.name);
+                    });
+                    
+                    item.appendChild(roomName);
+                    
+                    if (!room.is_default) {
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                        deleteBtn.classList.add('text-red-500', 'hover:text-red-700', 'text-xs', 'px-2');
+                        deleteBtn.title = 'Delete room';
+                        deleteBtn.onclick = async (e) => {
+                            e.stopPropagation();
+                            if (confirm(`Delete room ${room.name}?`)) {
+                                const res = await fetch(`/rooms/${encodeURIComponent(room.name)}`, { method: 'DELETE' });
+                                if (res.ok) {
+                                    renderRoomList();
+                                    if (currentRoom === room.name) {
+                                        socket.emit('switchRoom', '#general');
+                                    }
+                                } else {
+                                    const err = await res.json();
+                                    alert(err.message || 'Failed to delete room');
+                                }
+                            }
+                        };
+                        item.appendChild(deleteBtn);
+                    }
+                    
+                    roomList.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Failed to load rooms:', error);
+            }
+        };
+        
+        socket.on('roomList', renderRoomList);
 
         socket.on('chatMessage', (msg) => { 
             if (msg.user !== currentUser) {
@@ -393,6 +431,19 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('readReceiptUpdate', ({ messageId, receipts }) => {
             console.log('Read receipts updated:', messageId, receipts);
         });
+        
+        socket.on('roomCreated', (room) => {
+            console.log('New room created:', room);
+            renderRoomList();
+        });
+        
+        socket.on('roomDeleted', ({ name }) => {
+            console.log('Room deleted:', name);
+            renderRoomList();
+            if (currentRoom === name) {
+                socket.emit('switchRoom', '#general');
+            }
+        });
     };
 
     if (window.location.pathname === '/') {
@@ -403,6 +454,48 @@ document.addEventListener('DOMContentLoaded', () => {
         checkSession();
         
         document.getElementById('logout-button')?.addEventListener('click', handleLogout);
+        
+        document.getElementById('create-room-confirm-btn')?.addEventListener('click', async () => {
+            const roomNameInput = document.getElementById('room-name-input');
+            const messageDiv = document.getElementById('create-room-message');
+            const roomName = roomNameInput.value.trim();
+            
+            if (!roomName) {
+                messageDiv.textContent = 'Please enter a room name';
+                messageDiv.className = 'text-sm mb-3 text-red-600';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/rooms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: roomName })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.textContent = 'Room created successfully!';
+                    messageDiv.className = 'text-sm mb-3 text-green-600';
+                    messageDiv.classList.remove('hidden');
+                    roomNameInput.value = '';
+                    setTimeout(() => {
+                        window.closeModal('createRoomModal');
+                        messageDiv.classList.add('hidden');
+                    }, 1000);
+                } else {
+                    messageDiv.textContent = data.message || 'Failed to create room';
+                    messageDiv.className = 'text-sm mb-3 text-red-600';
+                    messageDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Error creating room';
+                messageDiv.className = 'text-sm mb-3 text-red-600';
+                messageDiv.classList.remove('hidden');
+            }
+        });
         
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
