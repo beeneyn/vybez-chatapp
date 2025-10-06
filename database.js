@@ -341,6 +341,47 @@ const updateUserRole = async (username, role, callback) => {
     }
 };
 
+const createRoom = async (name, created_by, callback) => {
+    try {
+        if (!name.startsWith('#')) {
+            name = '#' + name;
+        }
+        const result = await pool.query(
+            'INSERT INTO rooms (name, created_by) VALUES ($1, $2) RETURNING id, name, created_by, created_at',
+            [name, created_by]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        if (err.code === '23505') {
+            callback(new Error('Room already exists'));
+        } else {
+            callback(err);
+        }
+    }
+};
+
+const getAllRooms = async (callback) => {
+    try {
+        const result = await pool.query('SELECT * FROM rooms ORDER BY is_default DESC, created_at ASC');
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const deleteRoom = async (name, callback) => {
+    try {
+        const result = await pool.query('DELETE FROM rooms WHERE name = $1 AND is_default = FALSE RETURNING name', [name]);
+        if (result.rows.length === 0) {
+            callback(new Error('Cannot delete default room or room does not exist'));
+        } else {
+            callback(null);
+        }
+    } catch (err) {
+        callback(err);
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -362,5 +403,8 @@ module.exports = {
     getReadReceipts,
     updateUserAvatar,
     updateUserRole,
+    createRoom,
+    getAllRooms,
+    deleteRoom,
     pool
 };
