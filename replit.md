@@ -26,6 +26,13 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
   - Created uploads directory for file storage
   - Updated database schema with new tables and columns
 
+- **2025-10-06:** Bug fixes and improvements
+  - Fixed file upload MIME type validation (changed from regex to explicit array check)
+  - Implemented complete settings modal with avatar upload, bio, status, and color editing
+  - Added /update-profile endpoint for persisting user profile changes
+  - Fixed private messaging real-time delivery (messages now appear instantly in open conversations)
+  - Improved error handling and user feedback throughout the app
+
 ## Tech Stack
 - **Backend:** Node.js, Express.js
 - **Real-time Communication:** Socket.IO
