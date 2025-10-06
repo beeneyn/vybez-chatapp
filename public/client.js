@@ -35,8 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
         item.setAttribute('data-message-id', msg.id);
         if (isPrivate) item.classList.add('private-message'); 
         const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
-        const avatarHtml = msg.avatar ? `<img src="${msg.avatar}" alt="${msg.user}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">` : '<span style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; vertical-align: middle; background-color: #ddd; text-align: center; line-height: 32px; font-size: 14px;">👤</span>';
-        item.innerHTML = `${avatarHtml}<span class="timestamp">[${time}]</span> <strong style="color: ${msg.color || '#000'}">${isPrivate ? `(private from ${msg.from})` : msg.user}:</strong> `;
+        const username = isPrivate ? msg.from : msg.user;
+        const initials = username.substring(0, 2).toUpperCase();
+        const placeholderUrl = `https://placehold.co/256x256/EEE/31343C?font=poppins&text=${initials}`;
+        const avatarUrl = msg.avatar || placeholderUrl;
+        const avatarHtml = `<img src="${avatarUrl}" alt="${username}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">`;
+        item.innerHTML = `${avatarHtml}<span class="timestamp">[${time}]</span> <strong style="color: ${msg.color || '#000'}">${isPrivate ? `(private from ${msg.from})` : username}:</strong> `;
         
         if (msg.text) {
             item.appendChild(document.createTextNode(msg.text));
@@ -329,7 +333,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.title = 'Click to send private message';
                 item.onclick = () => openPrivateMessage(user.username);
                 
-                const avatarImg = user.avatar ? `<img src="${user.avatar}" alt="${user.username}" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">` : '<span style="display: inline-block; width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; background-color: #ddd; text-align: center; line-height: 24px; font-size: 12px;">👤</span>';
+                const initials = user.username.substring(0, 2).toUpperCase();
+                const placeholderUrl = `https://placehold.co/256x256/EEE/31343C?font=poppins&text=${initials}`;
+                const avatarUrl = user.avatar || placeholderUrl;
+                const avatarImg = `<img src="${avatarUrl}" alt="${user.username}" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">`;
                 item.innerHTML = `${avatarImg}<span style="color: ${user.color};">${user.username}</span>`;
                 
                 onlineUsersList.appendChild(item); 
