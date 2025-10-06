@@ -33,6 +33,10 @@ outputType = "webview"
 localPort = 5000
 externalPort = 80
 
+[[ports]]
+localPort = 40395
+externalPort = 3000
+
 [deployment]
 deploymentTarget = "vm"
 run = ["node", "server.js"]
