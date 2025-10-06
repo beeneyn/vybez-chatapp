@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusEl.textContent = ''; 
         try { 
             console.log('Attempting login for:', username);
-            const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) }); 
+            const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }), credentials: 'same-origin' }); 
             console.log('Login response status:', response.status);
             if (response.ok) { 
                 console.log('Login successful, redirecting to /chat');
