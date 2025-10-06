@@ -7,9 +7,10 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="landing.css">
     <style>
         .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -19,7 +20,7 @@
         }
         .download-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(91, 43, 255, 0.2);
         }
     </style>
 </head>
@@ -32,14 +33,14 @@
                 <img src="favicon.png" alt="Vybez Logo" class="h-10 w-10">
                 <span class="text-2xl font-bold gradient-text">Vybez</span>
             </a>
-            <a href="/" class="text-gray-700 hover:text-purple-600 font-medium">
+            <a href="/" class="text-gray-700 hover:text-[#5b2bff] font-medium transition-colors">
                 <i class="fas fa-arrow-left mr-2"></i> Back to Home
             </a>
         </div>
     </nav>
 
     <!-- Hero -->
-    <section class="py-16 bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 text-white text-center">
+    <section class="py-16 bg-gradient-to-br from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white text-center">
         <div class="container mx-auto px-4">
             <h1 class="text-5xl md:text-6xl font-bold mb-4">Download Vybez Desktop</h1>
             <p class="text-xl md:text-2xl mb-2">Chat on your desktop, no browser needed</p>
