@@ -7,8 +7,8 @@
   "scripts": {
     "start": "npm run build:css && node server.js",
     "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/tailwind.css --minify",
-    "electron": "NODE_ENV=development electron .",
-    "electron-dev": "NODE_ENV=development electron . --inspect",
+    "electron": "cross-env NODE_ENV=development electron .",
+    "electron-dev": "cross-env NODE_ENV=development electron . --inspect",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:win": "electron-builder --win",
@@ -20,6 +20,7 @@
     "auto-launch": "^5.0.6",
     "autoprefixer": "^10.4.21",
     "bcrypt": "^5.1.1",
+    "cross-env": "^10.1.0",
     "electron-store": "^11.0.2",
     "electron-updater": "^6.6.2",
     "express": "^4.18.2",
