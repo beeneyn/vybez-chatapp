@@ -12,7 +12,8 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:win": "electron-builder --win",
-    "dist:mac": "electron-builder --mac",
+    "dist:mac": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac",
+    "dist:mac-unsigned": "electron-builder --mac -c.mac.identity=null",
     "dist:linux": "electron-builder --linux"
   },
   "dependencies": {
