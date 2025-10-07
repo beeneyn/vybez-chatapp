@@ -1,0 +1,72 @@
+Run samuelmeuli/action-electron-builder@v1
+
+Will run NPM commands in directory "."
+
+Installing dependencies using NPM…
+
+removed 1 package, and audited 613 packages in 2s
+
+95 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+Running the build script…
+
+Building the Electron app…
+  • electron-builder  version=26.0.12 os=24.6.0
+  • artifacts will be published if draft release exists  reason=CI detected
+  • loaded configuration  file=package.json ("build" field)
+  ⨯ Cannot find module 'dmg-license'
+Require stack:
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/dmg-builder/out/dmgLicense.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/dmg-builder/out/dmg.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/dmg-builder/out/dmgUtil.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/app-builder-lib/out/macPackager.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/app-builder-lib/out/index.js
+/Users/runner/work/_actions/samuelmeuli/action-electron-builder/v1/index.js:144
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/electron-builder/out/builder.js
+				throw err;
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/electron-builder/out/cli/cli.js
+				^
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/electron-builder/cli.js  failedTask=build stackTrace=Error: Cannot find module 'dmg-license'
+
+Require stack:
+Error: Command failed: npx --no-install electron-builder --mac  
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/dmg-builder/out/dmgLicense.js
+    at genericNodeError (node:internal/errors:984:15)
+    at wrappedFn (node:internal/errors:538:14)
+    at checkExecSyncError (node:child_process:891:11)
+    at execSync (node:child_process:963:15)
+    at run (/Users/runner/work/_actions/samuelmeuli/action-electron-builder/v1/index.js:21:27)
+    at runAction (/Users/runner/work/_actions/samuelmeuli/action-electron-builder/v1/index.js:132:4)
+    at Object.<anonymous> (/Users/runner/work/_actions/samuelmeuli/action-electron-builder/v1/index.js:150:1)
+    at Module._compile (node:internal/modules/cjs/loader:1529:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1613:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32) {
+  status: 1,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 10550,
+  stdout: null,
+  stderr: null
+}
+
+Node.js v20.19.4
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/dmg-builder/out/dmg.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/dmg-builder/out/dmgUtil.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/app-builder-lib/out/macPackager.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/app-builder-lib/out/index.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/electron-builder/out/builder.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/electron-builder/out/cli/cli.js
+- /Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/electron-builder/cli.js
+    at Function.Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
+    at Function.Module._load (node:internal/modules/cjs/loader:1038:27)
+    at Module.require (node:internal/modules/cjs/loader:1289:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/Users/runner/work/vybez-chatapp/vybez-chatapp/node_modules/dmg-builder/src/dmgLicense.ts:4:1)
+    at Module._compile (node:internal/modules/cjs/loader:1521:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1091:12)
+    at Module.require (node:internal/modules/cjs/loader:1289:19)
