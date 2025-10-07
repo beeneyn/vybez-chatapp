@@ -103,15 +103,16 @@
                 Experience lightning-fast messaging with custom rooms, private DMs, reactions, file sharing, and more.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button onclick="openAuthModal()" class="px-10 py-4 bg-white text-[#5b2bff] font-bold text-lg rounded-full hover:bg-gray-100 shadow-2xl transform hover:scale-105 transition-all flex items-center gap-2">
-                    <i class="fas fa-rocket"></i> Get Started Free
-                </button>
-                <a href="#features" class="px-10 py-4 border-2 border-white text-white font-bold text-lg rounded-full hover:bg-white hover:text-[#5b2bff] transition-all">
-                    Explore Features
+                <a id="os-download-btn" href="downloads.html" class="px-10 py-4 bg-white text-[#5b2bff] font-bold text-lg rounded-full hover:bg-gray-100 shadow-2xl transform hover:scale-105 transition-all flex items-center gap-2">
+                    <i id="os-icon" class="fab fa-windows"></i> 
+                    <span id="os-text">Download for Windows</span>
                 </a>
+                <button onclick="openAuthModal()" class="px-10 py-4 border-2 border-white text-white font-bold text-lg rounded-full hover:bg-white hover:text-[#5b2bff] transition-all">
+                    Sign In on Web
+                </button>
             </div>
             <div class="mt-12 text-sm opacity-80">
-                <p><i class="fas fa-check-circle mr-2"></i> No credit card required</p>
+                <p id="download-subtext"><i class="fas fa-desktop mr-2"></i> Windows 10 and later</p>
             </div>
         </div>
     </header>
@@ -431,6 +432,38 @@
                 }
             });
         });
+
+        // OS Detection for download button
+        function detectOS() {
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            const platform = window.navigator.platform.toLowerCase();
+            
+            const osIcon = document.getElementById('os-icon');
+            const osText = document.getElementById('os-text');
+            const downloadSubtext = document.getElementById('download-subtext');
+            const downloadBtn = document.getElementById('os-download-btn');
+
+            if (platform.includes('mac') || userAgent.includes('mac')) {
+                osIcon.className = 'fab fa-apple';
+                osText.textContent = 'Download for Mac';
+                downloadSubtext.innerHTML = '<i class="fas fa-desktop mr-2"></i> macOS 10.15 and later';
+                downloadBtn.href = '/dist/Vybez Chat-1.0.0.dmg';
+            } else if (platform.includes('linux') || userAgent.includes('linux')) {
+                osIcon.className = 'fab fa-linux';
+                osText.textContent = 'Download for Linux';
+                downloadSubtext.innerHTML = '<i class="fas fa-desktop mr-2"></i> Linux (x64) - AppImage';
+                downloadBtn.href = '/dist/Vybez Chat-1.0.0.AppImage';
+            } else {
+                // Default to Windows
+                osIcon.className = 'fab fa-windows';
+                osText.textContent = 'Download for Windows';
+                downloadSubtext.innerHTML = '<i class="fas fa-desktop mr-2"></i> Windows 10 and later';
+                downloadBtn.href = '/dist/Vybez Chat Setup 1.0.0.exe';
+            }
+        }
+
+        // Run OS detection on page load
+        detectOS();
     </script>
 </body>
 </html>
