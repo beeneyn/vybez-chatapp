@@ -5,106 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Documentation - Vybez</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="tailwind.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="landing.css">
 </head>
-<body class="bg-gray-100 min-h-screen py-8">
-    <div class="container mx-auto px-4 max-w-5xl">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">API Documentation</h1>
-            <p class="text-lg text-gray-600 mb-4">How to interact with the Vybez API and real-time services.</p>
-            <a href="/" class="text-blue-600 hover:text-blue-800 underline">
-                <i class="fas fa-arrow-left mr-1"></i> Back to Home
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md py-4 sticky top-0 z-50 backdrop-blur-sm bg-opacity-95">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="landing.html" class="flex items-center space-x-3">
+                <img src="favicon.png" alt="Vybez Logo" class="h-10 w-10">
+                <span class="text-2xl font-bold gradient-text">Vybez</span>
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="landing.html#features" class="text-gray-700 hover:text-[#5b2bff] font-medium transition-colors">Features</a>
+                <a href="landing.html#technology" class="text-gray-700 hover:text-[#ff3f8f] font-medium transition-colors">Technology</a>
+                <a href="downloads.html" class="text-gray-700 hover:text-[#1ed5ff] font-medium transition-colors">Downloads</a>
+                <a href="api-documentation.html" class="text-gray-700 hover:text-[#5b2bff] font-medium transition-colors">API Docs</a>
+                <a href="about.html" class="text-gray-700 hover:text-[#ff3f8f] font-medium transition-colors">About</a>
+            </div>
+            <a href="landing.html" class="px-6 py-2 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold rounded-lg hover:shadow-xl shadow-lg transform hover:scale-105 transition-all">
+                Launch Chat
             </a>
         </div>
+    </nav>
 
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">RESTful API (HTTP)</h2>
-            <p class="text-gray-600 mb-6">These are the standard HTTP endpoints for user management, rooms, and profiles.</p>
+    <!-- Header -->
+    <div class="hero-bg text-white py-20 text-center">
+        <div class="container mx-auto px-4">
+            <h1 class="text-5xl md:text-6xl font-black mb-4">API Documentation</h1>
+            <p class="text-xl md:text-2xl opacity-90 font-light">
+                How to interact with the Vybez API and real-time services.
+            </p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-12 max-w-6xl">
+        <!-- RESTful API Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-4 gradient-text">RESTful API (HTTP)</h2>
+            <p class="text-gray-600 mb-8 text-lg">These are the standard HTTP endpoints for user management, rooms, and profiles.</p>
 
             <div class="space-y-6">
                 <!-- Authentication Endpoints -->
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
-                        <code class="text-gray-800 font-mono">/signup</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#ff3f8f]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded-lg">POST</span>
+                        <code class="text-gray-800 font-mono font-semibold">/signup</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Creates a new user account.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Creates a new user account.</p>
                         <strong class="text-gray-800">Request Body:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "username": "new_user",
     "password": "a_password",
     "chat_color": "#ff00ff"
 }</code></pre>
-                        <strong class="text-gray-800 mt-3 block">Responses:</strong>
-                        <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">201 Created</code> - User created successfully.</li>
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">409 Conflict</code> - Username already exists.</li>
+                        <strong class="text-gray-800 mt-4 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">201 Created</code> - User created successfully.</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">409 Conflict</code> - Username already exists.</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
-                        <code class="text-gray-800 font-mono">/login</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#ff3f8f]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded-lg">POST</span>
+                        <code class="text-gray-800 font-mono font-semibold">/login</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Authenticates a user and starts a session.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Authenticates a user and starts a session.</p>
                         <strong class="text-gray-800">Request Body:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "username": "existing_user",
     "password": "their_password"
 }</code></pre>
-                        <strong class="text-gray-800 mt-3 block">Responses:</strong>
-                        <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">200 OK</code> - Login successful.</li>
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">401 Unauthorized</code> - Invalid credentials.</li>
+                        <strong class="text-gray-800 mt-4 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">200 OK</code> - Login successful.</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">401 Unauthorized</code> - Invalid credentials.</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
-                        <code class="text-gray-800 font-mono">/logout</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#ff3f8f]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded-lg">POST</span>
+                        <code class="text-gray-800 font-mono font-semibold">/logout</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Destroys the current user session.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-2">Destroys the current user session.</p>
                         <strong class="text-gray-800">Request Body:</strong> None
                     </div>
                 </div>
                 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded">GET</span>
-                        <code class="text-gray-800 font-mono">/check-session</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#1ed5ff]/10 to-[#5b2bff]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-lg">GET</span>
+                        <code class="text-gray-800 font-mono font-semibold">/check-session</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Checks if the current browser has a valid session.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Checks if the current browser has a valid session.</p>
                         <strong class="text-gray-800">Response Body (Logged In):</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "loggedIn": true,
     "user": { "username": "test", "color": "#ff0000", ... }
 }</code></pre>
-                        <strong class="text-gray-800 mt-3 block">Response Body (Logged Out):</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ "loggedIn": false }</code></pre>
+                        <strong class="text-gray-800 mt-4 block">Response Body (Logged Out):</strong>
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{ "loggedIn": false }</code></pre>
                     </div>
                 </div>
 
                 <!-- Room Management Endpoints -->
-                <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">Room Management</h3>
+                <h3 class="text-2xl font-bold mt-10 mb-6 gradient-text">Room Management</h3>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded">GET</span>
-                        <code class="text-gray-800 font-mono">/rooms</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#1ed5ff]/10 to-[#5b2bff]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-lg">GET</span>
+                        <code class="text-gray-800 font-mono font-semibold">/rooms</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Retrieves all available chat rooms (default and custom).</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Retrieves all available chat rooms (default and custom).</p>
                         <strong class="text-gray-800">Authorization:</strong> Requires active session
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "rooms": [
         {
             "id": 1,
@@ -125,70 +153,70 @@
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
-                        <code class="text-gray-800 font-mono">/rooms</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#ff3f8f]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded-lg">POST</span>
+                        <code class="text-gray-800 font-mono font-semibold">/rooms</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Creates a new custom chat room.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Creates a new custom chat room.</p>
                         <strong class="text-gray-800">Authorization:</strong> Requires active session
-                        <strong class="text-gray-800 block mt-3">Request Body:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <strong class="text-gray-800 block mt-4">Request Body:</strong>
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "name": "gaming"
 }</code></pre>
-                        <p class="text-gray-600 text-sm mt-2"><em>Note: The # symbol is added automatically if not provided.</em></p>
-                        <strong class="text-gray-800 mt-3 block">Responses:</strong>
-                        <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">201 Created</code> - Room created successfully. Broadcasts <code>roomCreated</code> event to all clients.</li>
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">409 Conflict</code> - Room already exists.</li>
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">400 Bad Request</code> - Room name is required.</li>
+                        <p class="text-gray-600 text-sm mt-3"><em>Note: The # symbol is added automatically if not provided.</em></p>
+                        <strong class="text-gray-800 mt-4 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">201 Created</code> - Room created successfully. Broadcasts <code>roomCreated</code> event to all clients.</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">409 Conflict</code> - Room already exists.</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">400 Bad Request</code> - Room name is required.</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded">DELETE</span>
-                        <code class="text-gray-800 font-mono">/rooms/:name</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#ff3f8f]/20 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-lg">DELETE</span>
+                        <code class="text-gray-800 font-mono font-semibold">/rooms/:name</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Deletes a custom chat room. Default rooms (#general, #tech, #random) cannot be deleted.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Deletes a custom chat room. Default rooms (#general, #tech, #random) cannot be deleted.</p>
                         <strong class="text-gray-800">Authorization:</strong> Requires active session
-                        <strong class="text-gray-800 block mt-3">Example:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>DELETE /rooms/%23gaming</code></pre>
-                        <strong class="text-gray-800 mt-3 block">Responses:</strong>
-                        <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">200 OK</code> - Room deleted successfully. Broadcasts <code>roomDeleted</code> event to all clients.</li>
-                            <li><code class="bg-gray-200 px-2 py-1 rounded text-sm">403 Forbidden</code> - Cannot delete default room.</li>
+                        <strong class="text-gray-800 block mt-4">Example:</strong>
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>DELETE /rooms/%23gaming</code></pre>
+                        <strong class="text-gray-800 mt-4 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">200 OK</code> - Room deleted successfully. Broadcasts <code>roomDeleted</code> event to all clients.</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">403 Forbidden</code> - Cannot delete default room.</li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- File Upload & Profile Endpoints -->
-                <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">File Upload & Profile</h3>
+                <h3 class="text-2xl font-bold mt-10 mb-6 gradient-text">File Upload & Profile</h3>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
-                        <code class="text-gray-800 font-mono">/upload-file</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#ff3f8f]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded-lg">POST</span>
+                        <code class="text-gray-800 font-mono font-semibold">/upload-file</code>
                     </div>
-                    <div class="p-4">
+                    <div class="p-6">
                         <p class="text-gray-700 mb-3">Uploads a file for sharing in chat (max 10MB).</p>
                         <strong class="text-gray-800">Content-Type:</strong> multipart/form-data
                         <p class="text-gray-600 text-sm mt-2">Supported types: images, PDFs, documents, videos</p>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded">POST</span>
-                        <code class="text-gray-800 font-mono">/update-profile</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#ff3f8f]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-green-600 text-white text-sm font-semibold rounded-lg">POST</span>
+                        <code class="text-gray-800 font-mono font-semibold">/update-profile</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Updates user profile information (bio, status, chat color).</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Updates user profile information (bio, status, chat color).</p>
                         <strong class="text-gray-800">Request Body:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "bio": "Coffee enthusiast",
     "status": "Available",
     "chat_color": "#3b82f6"
@@ -196,43 +224,44 @@
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300 flex items-center gap-3">
-                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded">GET</span>
-                        <code class="text-gray-800 font-mono">/private-messages/:username</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#1ed5ff]/10 to-[#5b2bff]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-lg">GET</span>
+                        <code class="text-gray-800 font-mono font-semibold">/private-messages/:username</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Retrieves private message history with a specific user.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-2">Retrieves private message history with a specific user.</p>
                         <strong class="text-gray-800">Authorization:</strong> Requires active session
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Real-Time API (Socket.IO)</h2>
-            <p class="text-gray-600 mb-6">These are the events used for real-time communication after a user is authenticated on the <code class="bg-gray-200 px-2 py-1 rounded text-sm">/chat</code> page.</p>
+        <!-- Socket.IO API Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-4 gradient-text">Real-Time API (Socket.IO)</h2>
+            <p class="text-gray-600 mb-8 text-lg">These are the events used for real-time communication after a user is authenticated on the <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">/chat</code> page.</p>
 
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Events Emitted by the Client</h3>
-            <div class="space-y-4">
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">switchRoom</code>
+            <h3 class="text-2xl font-bold mb-6 gradient-text">Events Emitted by the Client</h3>
+            <div class="space-y-4 mb-12">
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">switchRoom</code>
                     </div>
-                    <div class="p-4">
+                    <div class="p-6">
                         <p class="text-gray-700 mb-2">Tells the server to move the user to a different chat room.</p>
-                        <strong class="text-gray-800">Payload:</strong> <code class="bg-gray-200 px-2 py-1 rounded text-sm">"roomName"</code> (string), e.g., <code class="bg-gray-200 px-2 py-1 rounded text-sm">"#tech"</code>
+                        <strong class="text-gray-800">Payload:</strong> <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">"roomName"</code> (string), e.g., <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">"#tech"</code>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">chatMessage</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">chatMessage</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Sends a new public message to the current room.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Sends a new public message to the current room.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ 
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{ 
     "text": "Hello everyone!",
     "fileUrl": "/uploads/...",  // optional
     "fileType": "image/jpeg"    // optional
@@ -240,38 +269,38 @@
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">typing</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">typing</code>
                     </div>
-                    <div class="p-4">
+                    <div class="p-6">
                         <p class="text-gray-700 mb-2">Indicates user is typing or stopped typing.</p>
-                        <strong class="text-gray-800">Payload:</strong> <code class="bg-gray-200 px-2 py-1 rounded text-sm">true</code> (typing) or <code class="bg-gray-200 px-2 py-1 rounded text-sm">false</code> (stopped)
+                        <strong class="text-gray-800">Payload:</strong> <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">true</code> (typing) or <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">false</code> (stopped)
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">privateMessage</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">privateMessage</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Sends a private message to another user.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Sends a private message to another user.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ 
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{ 
     "to": "recipient_username",
     "text": "Hey there!"
 }</code></pre>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">addReaction</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#5b2bff]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">addReaction</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Adds an emoji reaction to a message.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Adds an emoji reaction to a message.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ 
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{ 
     "messageId": 123,
     "emoji": "👍"
 }</code></pre>
@@ -279,27 +308,27 @@
                 </div>
             </div>
 
-            <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">Events Emitted by the Server</h3>
+            <h3 class="text-2xl font-bold mb-6 gradient-text">Events Emitted by the Server</h3>
             <div class="space-y-4">
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">roomList</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">roomList</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Sent to a client when they connect, containing all available rooms.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Sent to a client when they connect, containing all available rooms.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>["#general", "#tech", "#random", "#gaming"]</code></pre>
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>["#general", "#tech", "#random", "#gaming"]</code></pre>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">loadHistory</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">loadHistory</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Sent to a client when they join a room, containing recent messages.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Sent to a client when they join a room, containing recent messages.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "room": "#general",
     "messages": [
         { 
@@ -314,14 +343,14 @@
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">chatMessage</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">chatMessage</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Broadcasts a new public message to all clients in a room.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Broadcasts a new public message to all clients in a room.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "user": "test_user",
     "text": "Hello everyone!",
     "color": "#ff0000",
@@ -331,39 +360,39 @@
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">updateUserList</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">updateUserList</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Broadcasts the updated list of all online users.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Broadcasts the updated list of all online users.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>[
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>[
     { "username": "...", "color": "#...", "avatar": "..." },
     ...
 ]</code></pre>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">typingUsers</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">typingUsers</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Broadcasts which users are currently typing in the current room.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Broadcasts which users are currently typing in the current room.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>["user1", "user2"]</code></pre>
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>["user1", "user2"]</code></pre>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">roomCreated</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">roomCreated</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Broadcasted when a new custom room is created.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Broadcasted when a new custom room is created.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "id": 5,
     "name": "#gaming",
     "created_by": "john_doe",
@@ -373,25 +402,25 @@
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">roomDeleted</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">roomDeleted</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Broadcasted when a custom room is deleted.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Broadcasted when a custom room is deleted.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{ "name": "#gaming" }</code></pre>
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{ "name": "#gaming" }</code></pre>
                     </div>
                 </div>
 
-                <div class="border border-gray-300 rounded-lg overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-300">
-                        <code class="text-gray-800 font-mono font-semibold">reactionsUpdate</code>
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#ff3f8f]/10 to-[#1ed5ff]/10 px-6 py-4 border-b border-gray-200">
+                        <code class="text-gray-800 font-mono font-bold text-lg">reactionsUpdate</code>
                     </div>
-                    <div class="p-4">
-                        <p class="text-gray-700 mb-3">Sent when reactions are updated for a message.</p>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Sent when reactions are updated for a message.</p>
                         <strong class="text-gray-800">Payload:</strong>
-                        <pre class="bg-gray-900 text-gray-100 p-3 rounded mt-2 overflow-x-auto"><code>{
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
     "messageId": 123,
     "reactions": [
         { "emoji": "👍", "username": "alice" },
@@ -402,10 +431,15 @@
                 </div>
             </div>
         </div>
-
-        <footer class="text-center text-gray-600 mt-8 py-4">
-            <p>&copy; 2025 Vybez Chat. Built with Node.js, Express, Socket.IO, and PostgreSQL.</p>
-        </footer>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#0b1220] text-white pt-12 pb-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400">&copy; 2025 Vybez Chat. Built with Node.js, Express, Socket.IO, and PostgreSQL.</p>
+            <p class="text-gray-500 text-sm mt-2">BREAK INTO THE VYBE</p>
+        </div>
+    </footer>
+
 </body>
 </html>

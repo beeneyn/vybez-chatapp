@@ -48,7 +48,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 
-.hero {
+.hero, .hero-bg {
     min-height: 80vh;
     background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
     position: relative;
