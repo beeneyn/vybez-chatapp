@@ -41,7 +41,7 @@ const upload = multer({
 
 const sessionMiddleware = session({ 
     store: new FileStore({ path: './sessions', ttl: 86400 }), 
-    secret: 'a very secret key to sign the cookie', 
+    secret: process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex'), 
     resave: false, 
     saveUninitialized: false, 
     cookie: { 
