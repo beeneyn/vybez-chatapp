@@ -55,7 +55,13 @@ const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 io.engine.use(sessionMiddleware);
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        }
+    }
+}));
 app.use(express.json());
 
 app.get('/', (req, res) => { if (req.session.user) res.redirect('/chat'); else res.sendFile(path.join(__dirname, 'public', 'landing.html')); });
