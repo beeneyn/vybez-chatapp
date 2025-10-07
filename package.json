@@ -22,7 +22,7 @@
     "autoprefixer": "^10.4.21",
     "bcrypt": "^5.1.1",
     "cross-env": "^10.1.0",
-    "electron-store": "^11.0.2",
+    "electron-store": "^8.2.0",
     "electron-updater": "^6.6.2",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
