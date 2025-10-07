@@ -61,6 +61,25 @@ body {
     font-family: var(--font-body);
 }
 
+/* Brand gradient buttons */
+.btn-brand-gradient {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-brand-gradient:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(91, 43, 255, 0.3);
+}
+
+/* Brand accent highlights */
+.brand-accent-border {
+    border-left: 3px solid var(--brand-violet);
+}
+
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     font-weight: 600;
@@ -75,9 +94,17 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--border-color);
 }
 .card-header, .card-footer {
-    background-color: var(--background-secondary);
+    background: var(--gradient-subtle);
     border-color: var(--border-color);
     color: var(--header-primary);
+}
+
+/* Header with brand gradient border */
+.chat-header {
+    border-bottom: 2px solid transparent;
+    background-image: var(--gradient-subtle), linear-gradient(var(--background-secondary), var(--background-secondary));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
 }
 #chat-window, .list-group-flush {
     overflow-y: auto;
@@ -120,14 +147,20 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--interactive-hover); 
 }
 .list-group-item.active { 
-    background-color: var(--brand-experiment); 
+    background: var(--gradient-primary);
     color: white; 
-    border-color: var(--brand-experiment);
+    border-color: transparent;
     font-weight: 600;
+    box-shadow: 0 4px 12px rgba(91, 43, 255, 0.2);
 }
 #message-input { background-color: var(--background-tertiary); color: var(--text-primary); border-color: var(--border-color); }
 #message-input::placeholder { color: var(--text-muted); }
-#message-input:focus { background-color: var(--background-tertiary); color: var(--text-primary); border-color: var(--brand-experiment); box-shadow: none; }
+#message-input:focus { 
+    background-color: var(--background-tertiary); 
+    color: var(--text-primary); 
+    border-color: var(--brand-violet); 
+    box-shadow: 0 0 0 3px rgba(91, 43, 255, 0.1);
+}
 .modal-content { background-color: var(--modal-background); color: var(--modal-text); }
 .modal-header { border-bottom-color: var(--border-color); }
 .modal-footer { border-top-color: var(--border-color); }
@@ -207,7 +240,8 @@ body[data-theme='dark'] .form-label, body[data-theme='dark'] h6 { color: var(--t
 }
 
 #chat-window::-webkit-scrollbar-thumb {
-    background: var(--background-tertiary);
+    background: var(--gradient-primary);
+    border-radius: 10px;
     border-radius: 4px;
 }
 

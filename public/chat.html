@@ -16,9 +16,9 @@
 
             <div class="w-1/6 flex flex-col">
                 <div class="bg-white rounded-lg shadow">
-                    <div class="px-4 py-3 font-bold border-b flex justify-between items-center">
+                    <div class="px-4 py-3 font-bold border-b flex justify-between items-center chat-header">
                         <span>Rooms</span>
-                        <button id="create-room-btn" class="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded" onclick="window.openModal('createRoomModal')" title="Create Room">
+                        <button id="create-room-btn" class="px-2 py-1 btn-brand-gradient text-white text-xs rounded" onclick="window.openModal('createRoomModal')" title="Create Room">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -28,10 +28,10 @@
 
             <div class="flex-1 flex flex-col">
                 <div class="bg-white rounded-lg shadow flex flex-col h-full">
-                    <div class="px-4 py-3 border-b flex justify-between items-center">
+                    <div class="px-4 py-3 border-b flex justify-between items-center chat-header">
                         <h3 id="welcome-message" class="text-lg font-semibold"></h3>
                         <div class="flex gap-2">
-                            <button id="settings-button" class="px-3 py-1 bg-cyan-500 hover:bg-cyan-600 text-white text-sm rounded" title="Settings" onclick="window.openModal('settingsModal')">
+                            <button id="settings-button" class="px-3 py-1 btn-brand-gradient text-white text-sm rounded" title="Settings" onclick="window.openModal('settingsModal')">
                                 <i class="fas fa-gear"></i>
                             </button>
                             <button id="theme-toggle" class="px-3 py-1 bg-gray-500 hover:bg-gray-600 text-white text-sm rounded" title="Toggle Theme"></button>
@@ -45,7 +45,9 @@
                         <div id="typing-indicator" class="text-gray-500 text-sm mb-2"></div>
                         <form id="message-form" class="flex gap-2">
                             <input type="text" id="message-input" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type a message..." required autocomplete="off">
-                            <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded" type="submit">Send</button>
+                            <button class="px-4 py-2 btn-brand-gradient text-white rounded font-semibold" type="submit">
+                                <i class="fas fa-paper-plane mr-1"></i> Send
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -53,7 +55,7 @@
 
             <div class="w-1/5 flex flex-col">
                 <div class="bg-white rounded-lg shadow">
-                    <div class="px-4 py-3 font-bold border-b">Online Users</div>
+                    <div class="px-4 py-3 font-bold border-b chat-header">Online Users</div>
                     <ul id="online-users-list" class="divide-y"></ul>
                 </div>
             </div>
@@ -72,7 +74,7 @@
             </div>
             <div class="flex gap-2">
                 <input type="text" id="pm-input" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message...">
-                <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded" id="pm-send-btn">Send</button>
+                <button class="px-4 py-2 btn-brand-gradient text-white rounded font-semibold" id="pm-send-btn">Send</button>
             </div>
         </div>
     </div>
@@ -111,7 +113,7 @@
             <div id="settings-message" class="alert hidden"></div>
             <div class="flex gap-2 justify-end mt-4">
                 <button type="button" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded" onclick="window.closeModal('settingsModal')">Close</button>
-                <button type="button" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded" id="save-settings-btn">Save Changes</button>
+                <button type="button" class="px-4 py-2 btn-brand-gradient text-white rounded font-semibold" id="save-settings-btn">Save Changes</button>
             </div>
         </div>
     </div>
@@ -132,7 +134,7 @@
             <div id="create-room-message" class="text-sm mb-3 hidden"></div>
             <div class="flex gap-2 justify-end">
                 <button type="button" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded" onclick="window.closeModal('createRoomModal')">Cancel</button>
-                <button type="button" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded" id="create-room-confirm-btn">Create</button>
+                <button type="button" class="px-4 py-2 btn-brand-gradient text-white rounded font-semibold" id="create-room-confirm-btn">Create</button>
             </div>
         </div>
     </div>
