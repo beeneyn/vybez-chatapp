@@ -121,6 +121,43 @@
                     </div>
                 </div>
 
+                <!-- Health & Monitoring -->
+                <h3 class="text-2xl font-bold mt-10 mb-6 gradient-text">Health & Monitoring</h3>
+                
+                <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="bg-gradient-to-r from-[#1ed5ff]/10 to-[#5b2bff]/10 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+                        <span class="px-3 py-1 bg-blue-600 text-white text-sm font-semibold rounded-lg">GET</span>
+                        <code class="text-gray-800 font-mono font-semibold">/health</code>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">Server health check endpoint for monitoring and uptime verification.</p>
+                        <strong class="text-gray-800">Response Body (Healthy):</strong>
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
+    "status": "OK",
+    "uptime": 14.977,
+    "timestamp": "2025-10-13T23:19:05.476Z",
+    "database": "connected"
+}</code></pre>
+                        <strong class="text-gray-800 mt-4 block">Response Body (Database Error):</strong>
+                        <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
+    "status": "ERROR",
+    "uptime": 245.621,
+    "timestamp": "2025-10-13T23:25:30.123Z",
+    "database": "disconnected"
+}</code></pre>
+                        <strong class="text-gray-800 mt-4 block">Responses:</strong>
+                        <ul class="list-disc list-inside text-gray-700 mt-3 space-y-2">
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">200 OK</code> - Server and database are healthy.</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">503 Service Unavailable</code> - Database connection error.</li>
+                        </ul>
+                        <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                            <p class="text-sm text-gray-700">
+                                <strong>💡 Use Case:</strong> Configure monitoring services (UptimeRobot, Google Cloud Monitoring, etc.) to ping this endpoint every 5-10 minutes to verify server availability.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Room Management Endpoints -->
                 <h3 class="text-2xl font-bold mt-10 mb-6 gradient-text">Room Management</h3>
 
