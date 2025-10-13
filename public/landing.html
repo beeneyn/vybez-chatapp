@@ -159,77 +159,125 @@
         </div>
     </section>
 
-    <!-- Features Grid -->
+    <!-- Features Grid - Bento Style -->
     <section id="features" class="py-20 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-bold mb-4">Powerful Features Built In</h2>
                 <p class="text-xl text-gray-600">Everything you need for seamless communication</p>
             </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="p-8 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center mb-6">
-                        <i class="fas fa-comments text-3xl text-white"></i>
+            
+            <!-- Bento Grid Layout -->
+            <div class="grid md:grid-cols-6 gap-6 max-w-7xl mx-auto">
+                
+                <!-- Featured Large Card - Custom Rooms (spans 2x2) -->
+                <div class="md:col-span-3 md:row-span-2 p-10 bg-gradient-to-br from-[#5b2bff] to-[#8b5bff] text-white rounded-3xl card-hover relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
+                    <div class="relative z-10">
+                        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mb-6">
+                            <i class="fas fa-comments text-5xl text-white"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4">Custom Rooms</h3>
+                        <p class="text-lg leading-relaxed opacity-90 mb-6">Create unlimited custom chat rooms for different topics. Organize conversations and keep discussions focused with your own personalized spaces.</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-sm">Unlimited Rooms</span>
+                            <span class="px-4 py-2 bg-white bg-opacity-20 rounded-full text-sm">Easy Management</span>
+                        </div>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">Custom Rooms</h3>
-                    <p class="text-gray-700 leading-relaxed">Create unlimited custom chat rooms for different topics. Organize conversations and keep discussions focused.</p>
                 </div>
-                <div class="p-8 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-green-500 rounded-xl flex items-center justify-center mb-6">
+
+                <!-- Private Messaging -->
+                <div class="md:col-span-3 p-8 bg-gradient-to-br from-green-50 to-green-100 rounded-3xl card-hover">
+                    <div class="w-16 h-16 bg-green-500 rounded-xl flex items-center justify-center mb-4">
                         <i class="fas fa-lock text-3xl text-white"></i>
                     </div>
                     <h3 class="text-2xl font-bold mb-3">Private Messaging</h3>
-                    <p class="text-gray-700 leading-relaxed">Click any user to start a secure, encrypted one-on-one private conversation instantly.</p>
+                    <p class="text-gray-700">Secure one-on-one conversations</p>
                 </div>
-                <div class="p-8 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-purple-500 rounded-xl flex items-center justify-center mb-6">
+
+                <!-- Custom Profiles -->
+                <div class="md:col-span-2 p-8 bg-gradient-to-br from-purple-50 to-purple-100 rounded-3xl card-hover">
+                    <div class="w-16 h-16 bg-purple-500 rounded-xl flex items-center justify-center mb-4">
                         <i class="fas fa-palette text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">Custom Profiles</h3>
-                    <p class="text-gray-700 leading-relaxed">Personalize your identity with custom avatars, name colors, bio, and status messages.</p>
+                    <h3 class="text-xl font-bold mb-3">Custom Profiles</h3>
+                    <p class="text-gray-700 text-sm">Personalize your identity</p>
                 </div>
-                <div class="p-8 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-yellow-500 rounded-xl flex items-center justify-center mb-6">
+
+                <!-- Message Reactions -->
+                <div class="md:col-span-2 p-8 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-3xl card-hover">
+                    <div class="w-16 h-16 bg-yellow-500 rounded-xl flex items-center justify-center mb-4">
                         <i class="fas fa-smile text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">Message Reactions</h3>
-                    <p class="text-gray-700 leading-relaxed">React to any message with emojis. Express yourself beyond words with quick reactions.</p>
+                    <h3 class="text-xl font-bold mb-3">Reactions</h3>
+                    <p class="text-gray-700 text-sm">Express with emojis</p>
                 </div>
-                <div class="p-8 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-red-500 rounded-xl flex items-center justify-center mb-6">
+
+                <!-- File Sharing -->
+                <div class="md:col-span-2 p-8 bg-gradient-to-br from-red-50 to-red-100 rounded-3xl card-hover">
+                    <div class="w-16 h-16 bg-red-500 rounded-xl flex items-center justify-center mb-4">
                         <i class="fas fa-file-upload text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">File Sharing</h3>
-                    <p class="text-gray-700 leading-relaxed">Share images, documents, and videos up to 10MB. Preview images directly in the chat.</p>
+                    <h3 class="text-xl font-bold mb-3">File Sharing</h3>
+                    <p class="text-gray-700 text-sm">Share up to 10MB</p>
                 </div>
-                <div class="p-8 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-indigo-500 rounded-xl flex items-center justify-center mb-6">
-                        <i class="fas fa-search text-3xl text-white"></i>
+
+                <!-- Message Search (Wide card) -->
+                <div class="md:col-span-4 p-8 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-3xl card-hover">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-search text-3xl text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Message Search</h3>
+                            <p class="text-gray-700">Find any message instantly with powerful full-text search across all conversations</p>
+                        </div>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">Message Search</h3>
-                    <p class="text-gray-700 leading-relaxed">Find any message instantly with powerful full-text search across all your conversations.</p>
                 </div>
-                <div class="p-8 bg-gradient-to-br from-pink-50 to-pink-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-pink-500 rounded-xl flex items-center justify-center mb-6">
+
+                <!-- Typing Indicators -->
+                <div class="md:col-span-2 p-8 bg-gradient-to-br from-pink-50 to-pink-100 rounded-3xl card-hover">
+                    <div class="w-16 h-16 bg-pink-500 rounded-xl flex items-center justify-center mb-4">
                         <i class="fas fa-keyboard text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">Typing Indicators</h3>
-                    <p class="text-gray-700 leading-relaxed">See when others are typing in real-time. Know when to expect a response.</p>
+                    <h3 class="text-xl font-bold mb-3">Typing Indicators</h3>
+                    <p class="text-gray-700 text-sm">See typing in real-time</p>
                 </div>
-                <div class="p-8 bg-gradient-to-br from-teal-50 to-teal-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-teal-500 rounded-xl flex items-center justify-center mb-6">
+
+                <!-- Read Receipts -->
+                <div class="md:col-span-2 p-8 bg-gradient-to-br from-teal-50 to-teal-100 rounded-3xl card-hover">
+                    <div class="w-16 h-16 bg-teal-500 rounded-xl flex items-center justify-center mb-4">
                         <i class="fas fa-check-double text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">Read Receipts</h3>
-                    <p class="text-gray-700 leading-relaxed">Track message delivery and read status. Know when your messages are seen.</p>
+                    <h3 class="text-xl font-bold mb-3">Read Receipts</h3>
+                    <p class="text-gray-700 text-sm">Track message status</p>
                 </div>
-                <div class="p-8 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl card-hover">
-                    <div class="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center mb-6">
+
+                <!-- Online Users -->
+                <div class="md:col-span-2 p-8 bg-gradient-to-br from-orange-50 to-orange-100 rounded-3xl card-hover">
+                    <div class="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center mb-4">
                         <i class="fas fa-users text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-2xl font-bold mb-3">Online Users</h3>
-                    <p class="text-gray-700 leading-relaxed">See who's online in real-time. Connect with active users instantly.</p>
+                    <h3 class="text-xl font-bold mb-3">Online Users</h3>
+                    <p class="text-gray-700 text-sm">See who's active now</p>
                 </div>
+
+                <!-- Desktop Integration (Wide bottom card) -->
+                <div class="md:col-span-6 p-8 bg-gradient-to-r from-[#ff3f8f] to-[#1ed5ff] text-white rounded-3xl card-hover">
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-desktop text-4xl text-white"></i>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <h3 class="text-3xl font-bold mb-2">Desktop Integration</h3>
+                            <p class="text-lg opacity-90">Native desktop apps for Windows, macOS & Linux with system tray, notifications, and global shortcuts</p>
+                        </div>
+                        <a href="downloads.html" class="px-8 py-3 bg-white text-[#ff3f8f] font-bold rounded-full hover:bg-gray-100 transition-all shadow-lg flex-shrink-0">
+                            Download Now
+                        </a>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
