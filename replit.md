@@ -68,4 +68,16 @@ All tables utilize PostgreSQL SERIAL for auto-incrementing IDs and proper CASCAD
 - **`electron-updater`**: For enabling auto-updates in Electron apps.
 - **`electron-store`**: For simple data persistence in Electron apps.
 - **Google Fonts CDN**: For loading Space Grotesk and Inter fonts.
-- **Discord Webhook**: For server-wide activity logging and notifications.
+- **Discord Webhook**: For server-wide activity logging and monitoring (DISCORD_WEBHOOK_URL stored in environment secrets).
+
+## Discord Integration
+The platform includes comprehensive Discord webhook logging for real-time monitoring of server-wide activities:
+- **📝 User Registration:** Logged when new users join the platform
+- **🔐 User Login:** Logged when users authenticate
+- **🏠 Room Creation:** Logged when custom chat rooms are created
+- **🗑️ Room Deletion:** Logged when chat rooms are removed
+- **📎 File Uploads:** Logged when files are uploaded to the platform
+- **💬 Chat Messages:** Logged when messages are sent in chat rooms (with 100-char preview)
+- **📧 Private Messages:** Logged when direct messages are sent between users (with 100-char preview)
+
+All webhook notifications include color-coded embeds matching the brand identity (violet, cyan, magenta) and are sent in real-time to the configured Discord channel.

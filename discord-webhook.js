@@ -108,6 +108,36 @@ function logFileUpload(username, fileName, fileType) {
     );
 }
 
+function logChatMessage(username, room, messageText, hasFile = false) {
+    const description = hasFile 
+        ? `Message with file sent in chat room`
+        : `Message sent in chat room`;
+    
+    sendDiscordWebhook(
+        '💬 Chat Message',
+        description,
+        0x5b2bff,
+        [
+            { name: 'User', value: username, inline: true },
+            { name: 'Room', value: room, inline: true },
+            { name: 'Message', value: messageText.substring(0, 100) + (messageText.length > 100 ? '...' : ''), inline: false }
+        ]
+    );
+}
+
+function logPrivateMessage(fromUser, toUser, messageText) {
+    sendDiscordWebhook(
+        '📧 Private Message',
+        `Direct message sent between users`,
+        0x1ed5ff,
+        [
+            { name: 'From', value: fromUser, inline: true },
+            { name: 'To', value: toUser, inline: true },
+            { name: 'Message', value: messageText.substring(0, 100) + (messageText.length > 100 ? '...' : ''), inline: false }
+        ]
+    );
+}
+
 function logError(errorTitle, errorMessage) {
     sendDiscordWebhook(
         `❌ ${errorTitle}`,
@@ -123,5 +153,7 @@ module.exports = {
     logRoomCreated,
     logRoomDeleted,
     logFileUpload,
+    logChatMessage,
+    logPrivateMessage,
     logError
 };

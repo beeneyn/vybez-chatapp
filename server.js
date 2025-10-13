@@ -403,6 +403,7 @@ io.on("connection", (socket) => {
                     fileType: msg.fileType,
                     avatar: user.avatar,
                 };
+                discordWebhook.logChatMessage(user.username, socket.currentRoom, sanitizedText, !!msg.fileUrl);
                 io.to(socket.currentRoom).emit("chatMessage", messageToSend);
             },
         );
@@ -466,6 +467,7 @@ io.on("connection", (socket) => {
                     timestamp: timestamp,
                     color: user.color,
                 };
+                discordWebhook.logPrivateMessage(user.username, to, sanitizedText);
                 io.to(to).emit("privateMessage", pm);
                 socket.emit("privateMessageSent", pm);
             },
