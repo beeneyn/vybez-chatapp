@@ -70,6 +70,25 @@ All tables utilize PostgreSQL SERIAL for auto-incrementing IDs and proper CASCAD
 - **Google Fonts CDN**: For loading Space Grotesk and Inter fonts.
 - **Discord Webhook**: For server-wide activity logging and monitoring (DISCORD_WEBHOOK_URL stored in environment secrets).
 
+## Health Monitoring
+The server includes a `/health` endpoint for uptime monitoring and status checks:
+- **Endpoint:** `GET /health`
+- **Response Format:** JSON with status, uptime, timestamp, and database connectivity
+- **HTTP Status Codes:** 
+  - `200 OK` - Server and database are healthy
+  - `503 Service Unavailable` - Database connection error
+- **Use Cases:** External monitoring services, load balancers, deployment verification
+
+Example response:
+```json
+{
+  "status": "OK",
+  "uptime": 14.977,
+  "timestamp": "2025-10-13T23:19:05.476Z",
+  "database": "connected"
+}
+```
+
 ## Discord Integration
 The platform includes comprehensive Discord webhook logging for real-time monitoring of server-wide activities:
 - **📝 User Registration:** Logged when new users join the platform

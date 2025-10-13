@@ -101,6 +101,24 @@ app.get("/chat", (req, res) => {
     else res.sendFile(path.join(__dirname, "public", "chat.html"));
 });
 
+app.get("/health", (req, res) => {
+    const healthcheck = {
+        status: "OK",
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+        database: "connected"
+    };
+    
+    db.pool.query('SELECT NOW()', (err) => {
+        if (err) {
+            healthcheck.database = "disconnected";
+            healthcheck.status = "ERROR";
+            return res.status(503).json(healthcheck);
+        }
+        res.status(200).json(healthcheck);
+    });
+});
+
 app.post("/signup", (req, res) => {
     const { username, password, chat_color } = req.body;
     db.addUser(username, password, chat_color, (err) => {
