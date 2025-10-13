@@ -25,6 +25,10 @@
     <link rel="stylesheet" href="tailwind.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="landing.css">
+    
+    <!-- Microsoft Store Badge -->
+    <script type="module" src="https://get.microsoft.com/badge/ms-store-badge.bundled.js"></script>
+    
     <style>
         .gradient-text {
             background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
@@ -71,13 +75,25 @@
             
             <!-- Windows -->
             <div class="mb-12 bg-white rounded-2xl shadow-xl p-8 download-card">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center">
-                        <i class="fab fa-windows text-3xl text-white"></i>
+                <div class="flex items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center">
+                            <i class="fab fa-windows text-3xl text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-bold">Windows</h2>
+                            <p class="text-gray-600">Windows 10 and later</p>
+                        </div>
                     </div>
                     <div>
-                        <h2 class="text-3xl font-bold">Windows</h2>
-                        <p class="text-gray-600">Windows 10 and later</p>
+                        <ms-store-badge
+                            productid="9NN89Z3HS891"
+                            window-mode="direct"
+                            theme="auto"
+                            size="large"
+                            language="en-us"
+                            animation="on">
+                        </ms-store-badge>
                     </div>
                 </div>
                 
