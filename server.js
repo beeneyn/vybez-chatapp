@@ -77,6 +77,7 @@ app.use(
         },
     }),
 );
+app.use('/dist', express.static(path.join(__dirname, 'dist')));
 app.use(express.json());
 
 app.use((req, res, next) => {
