@@ -7,7 +7,8 @@ const FileStore = require("session-file-store")(session);
 const multer = require("multer");
 const fs = require("fs");
 const db = require("./database.js");
-const jwt = require("jsonwebtoken"); // JWT library import
+const jwt = require("jsonwebtoken");
+const discordWebhook = require("./discord-webhook.js"); // JWT library import
 
 const app = express();
 const server = http.createServer(app);
@@ -110,6 +111,7 @@ app.post("/signup", (req, res) => {
                     .json({ message: "Username already exists." });
             return res.status(500).json({ message: "Server error." });
         }
+        discordWebhook.logUserRegistration(username);
         res.status(201).json({ message: "User created!" });
     });
 });
@@ -151,6 +153,7 @@ app.post("/login", (req, res) => {
                         .status(500)
                         .json({ message: "Error saving session." });
                 }
+                discordWebhook.logUserLogin(username);
                 res.status(200).json({
                     message: "Login successful!",
                     user: req.session.user,
@@ -177,6 +180,7 @@ app.post("/upload-file", upload.single("file"), (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    discordWebhook.logFileUpload(req.session.user.username, req.file.filename, req.file.mimetype);
     res.status(200).json({
         fileUrl: `/uploads/${req.file.filename}`,
         fileType: req.file.mimetype,
@@ -270,6 +274,7 @@ app.post("/rooms", (req, res) => {
                 return res.status(409).json({ message: "Room already exists" });
             return res.status(500).json({ message: "Failed to create room" });
         }
+        discordWebhook.logRoomCreated(room.name, req.session.user.username);
         io.emit("roomCreated", room);
         res.status(201).json({ message: "Room created successfully", room });
     });
@@ -284,6 +289,7 @@ app.delete("/rooms/:name", (req, res) => {
                 return res.status(403).json({ message: err.message });
             return res.status(500).json({ message: "Failed to delete room" });
         }
+        discordWebhook.logRoomDeleted(roomName, req.session.user.username);
         io.emit("roomDeleted", { name: roomName });
         res.status(200).json({ message: "Room deleted successfully" });
     });
