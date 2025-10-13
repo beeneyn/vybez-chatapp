@@ -1,6 +1,5 @@
-# Vybez Chat App 💬
-
-**BREAK INTO THE VYBE** - A modern, real-time chat application with a stunning Neon Nightlife aesthetic. Built with Node.js, Socket.IO, and PostgreSQL.
+# Vybez Chatapp
+[![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Space+Grotesk&weight=900&size=32&pause=1000&color=F700C8&background=FF00E000&center=true&width=435&lines=VYBEZ+CHATAPP;BREAK+INTO+THE+VYBE;REAL-TIME+COMMUNICATION+AT+ITS+BEST)](https://git.io/typing-svg)
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-Educational-green.svg)
