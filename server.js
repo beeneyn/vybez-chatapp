@@ -136,9 +136,11 @@ app.post("/signup", (req, res) => {
 
 // --- THIS IS THE CORRECTED LOGIN ROUTE ---
 app.post("/login", (req, res) => {
-    console.log("--- SERVER-SIDE LOG: V4 LOGIN ROUTE HAS BEEN TRIGGERED ---"); // <-- ADD/VERIFY THIS LINE
+    const { username, password, client } = req.body;
+    const clientType = client || 'web';
+    
+    console.log(`--- SERVER-SIDE LOG: LOGIN from ${clientType.toUpperCase()} client ---`);
 
-    const { username, password } = req.body;
     db.findUser(username, (err, user) => {
         if (err || !user) {
             return res.status(401).json({ message: "Invalid credentials." });
@@ -171,7 +173,7 @@ app.post("/login", (req, res) => {
                         .status(500)
                         .json({ message: "Error saving session." });
                 }
-                discordWebhook.logUserLogin(username);
+                discordWebhook.logUserLogin(username, clientType);
                 res.status(200).json({
                     message: "Login successful!",
                     user: req.session.user,
@@ -319,6 +321,7 @@ const typingUsers = new Map();
 // --- THIS IS THE CORRECTED CONNECTION HANDLER ---
 io.on("connection", (socket) => {
     let user;
+    let clientType = 'web';
 
     if (socket.handshake.auth && socket.handshake.auth.token) {
         try {
@@ -326,12 +329,14 @@ io.on("connection", (socket) => {
                 socket.handshake.auth.token,
                 process.env.JWT_SECRET,
             );
+            clientType = socket.handshake.auth.client || 'desktop';
         } catch (err) {
             console.log("Authentication error: Invalid token");
             return socket.disconnect(true);
         }
     } else if (socket.request.session && socket.request.session.user) {
         user = socket.request.session.user;
+        clientType = 'web';
     }
 
     if (!user) {
@@ -339,7 +344,7 @@ io.on("connection", (socket) => {
         return socket.disconnect(true);
     }
 
-    console.log(`User connected: ${user.username}`);
+    console.log(`User connected: ${user.username} (${clientType.toUpperCase()})`);
 
     socket.join(user.username);
 
@@ -421,7 +426,7 @@ io.on("connection", (socket) => {
                     fileType: msg.fileType,
                     avatar: user.avatar,
                 };
-                discordWebhook.logChatMessage(user.username, socket.currentRoom, sanitizedText, !!msg.fileUrl);
+                discordWebhook.logChatMessage(user.username, socket.currentRoom, sanitizedText, !!msg.fileUrl, clientType);
                 io.to(socket.currentRoom).emit("chatMessage", messageToSend);
             },
         );
@@ -485,7 +490,7 @@ io.on("connection", (socket) => {
                     timestamp: timestamp,
                     color: user.color,
                 };
-                discordWebhook.logPrivateMessage(user.username, to, sanitizedText);
+                discordWebhook.logPrivateMessage(user.username, to, sanitizedText, clientType);
                 io.to(to).emit("privateMessage", pm);
                 socket.emit("privateMessageSent", pm);
             },

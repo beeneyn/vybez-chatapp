@@ -92,11 +92,14 @@ Example response:
 ## Discord Integration
 The platform includes comprehensive Discord webhook logging for real-time monitoring of server-wide activities:
 - **📝 User Registration:** Logged when new users join the platform
-- **🔐 User Login:** Logged when users authenticate
+- **🔐 User Login:** Logged when users authenticate (includes client type: 🌐 Web, 💻 Desktop, 🤖 API)
 - **🏠 Room Creation:** Logged when custom chat rooms are created
 - **🗑️ Room Deletion:** Logged when chat rooms are removed
 - **📎 File Uploads:** Logged when files are uploaded to the platform
-- **💬 Chat Messages:** Logged when messages are sent in chat rooms (with 100-char preview)
-- **📧 Private Messages:** Logged when direct messages are sent between users (with 100-char preview)
+- **💬 Chat Messages:** Logged when messages are sent in chat rooms (with 100-char preview and client type)
+- **📧 Private Messages:** Logged when direct messages are sent between users (with 100-char preview and client type)
 
-All webhook notifications include color-coded embeds matching the brand identity (violet, cyan, magenta) and are sent in real-time to the configured Discord channel.
+All webhook notifications include:
+- Color-coded embeds matching the brand identity (violet, cyan, magenta)
+- Client detection to differentiate between Web (🌐), Desktop (💻), and External API/Discord bot (🤖) usage
+- Real-time delivery to the configured Discord channel

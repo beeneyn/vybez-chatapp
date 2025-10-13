@@ -62,12 +62,25 @@ function logUserRegistration(username) {
     );
 }
 
-function logUserLogin(username) {
+function logUserLogin(username, clientType = 'web') {
+    const clientEmojis = {
+        'web': '🌐',
+        'desktop': '💻',
+        'api': '🤖',
+        'discord': '🤖'
+    };
+    
+    const emoji = clientEmojis[clientType.toLowerCase()] || '❓';
+    const clientDisplay = clientType.charAt(0).toUpperCase() + clientType.slice(1);
+    
     sendDiscordWebhook(
         '🔐 User Login',
-        `A user has logged in`,
+        `A user has logged in via ${clientDisplay}`,
         0x1ed5ff,
-        [{ name: 'Username', value: username, inline: true }]
+        [
+            { name: 'Username', value: username, inline: true },
+            { name: 'Client', value: `${emoji} ${clientDisplay}`, inline: true }
+        ]
     );
 }
 
@@ -108,10 +121,19 @@ function logFileUpload(username, fileName, fileType) {
     );
 }
 
-function logChatMessage(username, room, messageText, hasFile = false) {
+function logChatMessage(username, room, messageText, hasFile = false, clientType = 'web') {
+    const clientEmojis = {
+        'web': '🌐',
+        'desktop': '💻',
+        'api': '🤖',
+        'discord': '🤖'
+    };
+    
+    const emoji = clientEmojis[clientType.toLowerCase()] || '❓';
+    const clientDisplay = clientType.charAt(0).toUpperCase() + clientType.slice(1);
     const description = hasFile 
-        ? `Message with file sent in chat room`
-        : `Message sent in chat room`;
+        ? `Message with file sent in chat room via ${clientDisplay}`
+        : `Message sent in chat room via ${clientDisplay}`;
     
     sendDiscordWebhook(
         '💬 Chat Message',
@@ -120,19 +142,31 @@ function logChatMessage(username, room, messageText, hasFile = false) {
         [
             { name: 'User', value: username, inline: true },
             { name: 'Room', value: room, inline: true },
+            { name: 'Client', value: `${emoji} ${clientDisplay}`, inline: true },
             { name: 'Message', value: messageText.substring(0, 100) + (messageText.length > 100 ? '...' : ''), inline: false }
         ]
     );
 }
 
-function logPrivateMessage(fromUser, toUser, messageText) {
+function logPrivateMessage(fromUser, toUser, messageText, clientType = 'web') {
+    const clientEmojis = {
+        'web': '🌐',
+        'desktop': '💻',
+        'api': '🤖',
+        'discord': '🤖'
+    };
+    
+    const emoji = clientEmojis[clientType.toLowerCase()] || '❓';
+    const clientDisplay = clientType.charAt(0).toUpperCase() + clientType.slice(1);
+    
     sendDiscordWebhook(
         '📧 Private Message',
-        `Direct message sent between users`,
+        `Direct message sent between users via ${clientDisplay}`,
         0x1ed5ff,
         [
             { name: 'From', value: fromUser, inline: true },
             { name: 'To', value: toUser, inline: true },
+            { name: 'Client', value: `${emoji} ${clientDisplay}`, inline: true },
             { name: 'Message', value: messageText.substring(0, 100) + (messageText.length > 100 ? '...' : ''), inline: false }
         ]
     );
