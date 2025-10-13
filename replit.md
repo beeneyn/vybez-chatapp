@@ -8,6 +8,33 @@ Vybez is a real-time chat application built with Node.js, Express, and Socket.IO
 **Current State:** Fully configured and running in the Replit environment on port 5000.
 
 ## Recent Changes
+- **2025-10-13:** Microsoft Store submission completed
+  - **Initial EXE/MSI Submission:** Rejected due to lack of code signing certificate from Microsoft Trusted Root Program (Policy 10.2.9)
+  - **Solution Chosen:** MSIX repackaging (free alternative to $9.99/month Azure Trusted Signing)
+  - **MSIX Package Created:** Using MSIX Packaging Tool with identity values:
+    - Package name: VIBECO.Vybez
+    - Publisher: CN=016B5AA3-335B-43EB-86F6-75EE091D9CCA
+    - Publisher display name: EthanAucoin76
+    - Version: 1.0.0.0
+  - **Age Rating:** 12+ (IARC questionnaire completed)
+  - **runFullTrust Capability:** Justified as standard Electron app requirement
+  - **Status:** Submitted for certification (2-3 day review period)
+  - **Benefits of MSIX:** Free code signing, free hosting, automatic incremental updates, cleaner install/uninstall
+
+- **2025-10-13:** Website footer unification and SEO optimization
+  - **Footer Design:** Unified 4-column footer across all pages (landing, downloads, about, API docs, privacy, terms)
+    - Column 1: Vybez logo with gradient divider (Violet→Magenta)
+    - Column 2: Product links with gradient divider (Magenta→Cyan)
+    - Column 3: Company links with gradient divider (Cyan→Violet)
+    - Column 4: More Projects with multi-color gradient divider
+    - Brand-kit page retains unique simple centered footer per user preference
+  - **SEO Enhancements:**
+    - Added meta descriptions and keywords to all pages
+    - Implemented Open Graph tags for social media sharing
+    - Added Twitter Card metadata
+    - Optimized for search engines and social platforms
+  - **Download Links:** All verified and functional on production domain (www.vybez.page)
+
 - **2025-10-06:** Complete brand refresh - "Neon Nightlife" aesthetic
   - **New Brand Identity:**
     - Brand slogan updated to "BREAK FREE" (from "CHAT WITHOUT LIMITS")
