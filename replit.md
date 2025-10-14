@@ -1,7 +1,7 @@
 # Vybez Chat App
 
 ## Overview
-Vybez is a real-time chat application built with Node.js, Express, and Socket.IO. It provides a full-featured chatroom experience with user authentication, custom chat rooms, private messaging, file sharing, and a modern, responsive interface. The project serves as a learning platform for Node.js development, currently configured and running in a Replit environment. Vybez aims to offer a robust, multi-platform chat solution, including a full-featured Electron desktop client.
+Vybez is a real-time chat application built with Node.js, Express, and Socket.IO. It provides a full-featured chatroom experience with user authentication, custom chat rooms, private messaging, file sharing, and a modern, responsive interface. The project serves as a learning platform for Node.js development, currently configured and running in a Replit environment. Vybez offers a robust, multi-platform chat solution, including a full-featured Electron desktop client. The desktop app is live at https://www.vybez.page with Microsoft Store certification in progress (Store ID: 9NN89Z3HS891, Identity: VIBECO.Vybez).
 
 ## User Preferences
 I prefer detailed explanations and an iterative development approach. Ask before making major changes. Do not make changes to files within the `sessions/` directory.
