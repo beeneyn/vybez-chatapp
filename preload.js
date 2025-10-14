@@ -1,6 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+const isStoreApp = process.env.IS_STORE_BUILD === 'true' || process.windowsStore === true;
+
 contextBridge.exposeInMainWorld('electronAPI', {
+    isStoreApp: isStoreApp,
+    
     sendNotification: (title, body, tag) => {
         ipcRenderer.send('show-notification', { title, body, tag });
     },
