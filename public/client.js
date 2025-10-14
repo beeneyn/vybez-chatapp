@@ -455,10 +455,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    if (window.location.pathname === '/') {
-        document.getElementById('login-form')?.addEventListener('submit', handleLogin);
-        document.getElementById('signup-form')?.addEventListener('submit', handleSignup);
-    } else if (window.location.pathname === '/chat') {
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+    if (signupForm) {
+        signupForm.addEventListener('submit', handleSignup);
+    }
+    
+    if (window.location.pathname === '/chat') {
         initializeSockets();
         checkSession();
         
