@@ -34,9 +34,11 @@ Outputs: `.appx` package with download links automatically hidden
 
 ### Build Configuration
 The Store build uses these settings in `package.json`:
-- **Identity Name**: `9NN89Z3HS891` (Store ID)
-- **Application ID**: `VybezChat`
-- **Publisher**: `Vybez Team`
+- **Identity Name**: `VIBECO.Vybez`
+- **Publisher**: `CN=016B5AA3-335B-43EB-86F6-75EE091D9CCA`
+- **Display Name**: `Vybez`
+- **Publisher Display Name**: `VIBECO`
+- **Application ID**: `Vybez`
 - **Background Color**: `#5b2bff` (brand purple)
 
 ## Testing Store Compliance
