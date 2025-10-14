@@ -228,8 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('login-password').value; 
         const statusEl = document.getElementById('login-status'); 
         statusEl.textContent = ''; 
+        statusEl.classList.add('hidden');
         try { 
-            const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }), credentials: 'same-origin' });
+            const response = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password, client: 'web' }), credentials: 'same-origin' });
             if (response.ok) { 
                 const authModal = document.getElementById('authModal');
                 if (authModal) authModal.style.display = 'none';
@@ -237,11 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
             } else { 
                 const data = await response.json(); 
                 console.error('Login failed:', data.message);
-                statusEl.textContent = data.message || 'Login failed.'; 
+                statusEl.textContent = data.message || 'Login failed.';
+                statusEl.classList.remove('hidden');
             } 
         } catch (error) { 
             console.error('Login error:', error);
-            statusEl.textContent = 'An error occurred.'; 
+            statusEl.textContent = 'Network error. Please try again.';
+            statusEl.classList.remove('hidden');
         } 
     };
 
@@ -252,17 +255,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const color = document.getElementById('signup-color').value; 
         const statusEl = document.getElementById('signup-status'); 
         statusEl.textContent = ''; 
+        statusEl.classList.add('hidden');
         try { 
             const response = await fetch('/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password, chat_color: color }) }); 
-            if (response.ok) { 
-                statusEl.textContent = 'Signup successful! Please log in.'; 
-                e.target.reset(); 
+            if (response.ok) {
+                statusEl.className = 'mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg';
+                statusEl.textContent = 'Account created! Logging you in...'; 
+                statusEl.classList.remove('hidden');
+                setTimeout(async () => {
+                    const loginRes = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password, client: 'web' }), credentials: 'same-origin' });
+                    if (loginRes.ok) {
+                        window.location.href = '/chat';
+                    }
+                }, 500);
             } else { 
-                const data = await response.json(); 
-                statusEl.textContent = data.message || 'Signup failed.'; 
+                const data = await response.json();
+                statusEl.className = 'mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg';
+                statusEl.textContent = data.message || 'Signup failed.';
+                statusEl.classList.remove('hidden');
             } 
-        } catch (error) { 
-            statusEl.textContent = 'An error occurred.'; 
+        } catch (error) {
+            statusEl.className = 'mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg';
+            statusEl.textContent = 'Network error. Please try again.';
+            statusEl.classList.remove('hidden');
         } 
     };
 

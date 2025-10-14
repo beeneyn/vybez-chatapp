@@ -81,6 +81,35 @@
             0% { transform: translate(0, 0); }
             100% { transform: translate(50px, 50px); }
         }
+        .auth-container-modal {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(91, 43, 255, 0.4);
+            overflow: hidden;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+        }
+        .tab-button-modal {
+            padding: 12px 32px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button-modal.active {
+            color: #5b2bff;
+            border-bottom-color: #5b2bff;
+        }
+        .form-container-modal {
+            display: none;
+        }
+        .form-container-modal.active {
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -447,43 +476,112 @@
 
     <!-- Auth Modal -->
     <div id="authModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content-auth">
-            <div class="flex justify-end mb-4">
-                <button onclick="closeAuthModal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-2xl"></i>
+        <div class="auth-container-modal">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-white hover:text-gray-200 z-10 transition-colors">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            
+            <div class="text-center py-8 px-6 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white rounded-t-2xl">
+                <div class="flex items-center justify-center mb-3">
+                    <img src="favicon.png" alt="Vybez Logo" class="h-16 w-16">
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Welcome to Vybez</h1>
+                <p class="text-purple-100">Break into the vybe</p>
+            </div>
+
+            <div class="flex border-b bg-white">
+                <button class="tab-button-modal active flex-1" id="login-tab-modal" onclick="switchModalTab('login')">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+                <button class="tab-button-modal flex-1" id="signup-tab-modal" onclick="switchModalTab('signup')">
+                    <i class="fas fa-user-plus mr-2"></i>Sign Up
                 </button>
             </div>
-            <div class="grid md:grid-cols-2 gap-0">
-                <div class="p-6 md:p-8">
-                    <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
-                    <form id="login-form">
-                        <div class="mb-4">
-                            <input type="text" id="login-username" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Username" autocomplete="username" required>
-                        </div>
-                        <div class="mb-4">
-                            <input type="password" id="login-password" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" autocomplete="current-password" required>
-                        </div>
-                        <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded">Login</button>
-                        <p id="login-status" class="mt-2 text-center text-red-600 text-sm"></p>
-                    </form>
-                </div>
-                <div class="p-6 md:p-8 bg-gray-50">
-                    <h2 class="text-2xl font-bold text-center mb-6">Sign Up</h2>
-                    <form id="signup-form">
-                        <div class="mb-4">
-                            <input type="text" id="signup-username" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Username" autocomplete="username" required>
-                        </div>
-                        <div class="mb-4">
-                            <input type="password" id="signup-password" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Password" autocomplete="new-password" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="signup-color" class="block text-sm font-medium text-gray-700 mb-1">Name color:</label>
-                            <input type="color" id="signup-color" class="w-full h-10 px-1 border border-gray-300 rounded" value="#0d6efd">
-                        </div>
-                        <button type="submit" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded">Sign Up</button>
-                        <p id="signup-status" class="mt-2 text-center text-gray-600 text-sm"></p>
-                    </form>
-                </div>
+
+            <div class="p-8 bg-white rounded-b-2xl">
+                <form id="login-form" class="form-container-modal active">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="login-username">
+                            Username
+                        </label>
+                        <input 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
+                            id="login-username" 
+                            type="text" 
+                            placeholder="Enter your username"
+                            required
+                            autocomplete="username"
+                        >
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="login-password">
+                            Password
+                        </label>
+                        <input 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
+                            id="login-password" 
+                            type="password" 
+                            placeholder="Enter your password"
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+                    <div id="login-status" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"></div>
+                    <button 
+                        class="w-full bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold py-3 px-4 rounded-lg hover:shadow-xl transition-all shadow-lg transform hover:scale-105"
+                        type="submit"
+                    >
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                </form>
+
+                <form id="signup-form" class="form-container-modal">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-username">
+                            Username
+                        </label>
+                        <input 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
+                            id="signup-username" 
+                            type="text" 
+                            placeholder="Choose a username"
+                            required
+                            autocomplete="username"
+                        >
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-password">
+                            Password
+                        </label>
+                        <input 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
+                            id="signup-password" 
+                            type="password" 
+                            placeholder="Create a password"
+                            required
+                            autocomplete="new-password"
+                        >
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-color">
+                            Chat Color
+                        </label>
+                        <input 
+                            class="w-full h-12 px-2 border border-gray-300 rounded-lg cursor-pointer" 
+                            id="signup-color" 
+                            type="color" 
+                            value="#5b2bff"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">Choose your chat message color</p>
+                    </div>
+                    <div id="signup-status" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"></div>
+                    <button 
+                        class="w-full bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold py-3 px-4 rounded-lg hover:shadow-xl transition-all shadow-lg transform hover:scale-105"
+                        type="submit"
+                    >
+                        <i class="fas fa-user-plus mr-2"></i>Create Account
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -496,6 +594,25 @@
         }
         function closeAuthModal() {
             document.getElementById('authModal').style.display = 'none';
+        }
+        
+        function switchModalTab(tab) {
+            const loginTab = document.getElementById('login-tab-modal');
+            const signupTab = document.getElementById('signup-tab-modal');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+            } else {
+                signupTab.classList.add('active');
+                loginTab.classList.remove('active');
+                signupForm.classList.add('active');
+                loginForm.classList.remove('active');
+            }
         }
 
         // Smooth scroll for anchor links
