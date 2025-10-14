@@ -37,7 +37,7 @@ The Store build uses these settings in `package.json`:
 - **Identity Name**: `VIBECO.Vybez`
 - **Publisher**: `CN=016B5AA3-335B-43EB-86F6-75EE091D9CCA`
 - **Display Name**: `Vybez`
-- **Publisher Display Name**: `VIBECO`
+- **Publisher Display Name**: `Vybez Team`
 - **Application ID**: `Vybez`
 - **Background Color**: `#5b2bff` (brand purple)
 
