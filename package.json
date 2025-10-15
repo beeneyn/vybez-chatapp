@@ -1,6 +1,6 @@
 {
   "name": "vybez-chatapp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Vybez - Real-time chat application",
   "author": "Vybez Team <vybez@example.com>",
   "main": "electron.js",
