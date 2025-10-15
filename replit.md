@@ -27,6 +27,38 @@ Key Features include:
 ### System Design Choices
 The application is structured with a clear separation between server-side logic (`server.js`, `database.js`), client-side logic (`public/client.js`), and Electron-specific components (`electron.js`, `preload.js`, `desktop-integration.js`). Database interactions are handled via `pg` for PostgreSQL. The system uses a file-based session store to maintain user sessions. All frontend styles are built with `@tailwindcss/cli`, ensuring a lean and production-ready CSS output.
 
+### v1.1.0 Planned Features
+**Session Storage Migration:**
+- Migrate from file-based sessions to Replit key-value storage for better cloud-native performance
+- Use `@replit/database` for persistent session management
+- Remove dependency on `session-file-store`
+
+**Core Features:**
+- Restore file upload and search buttons to chat interface
+- Enhanced private message modal with user profiles and neon nightlife theme
+- Account deletion with 3-step confirmation and password verification
+- Username change functionality with password confirmation
+- Admin panel with user/room/message/file management
+- Moderation system with warnings, mutes, and bans
+- #announcements system channel with markdown support (admin-only posting)
+- Maintenance mode toggle for health endpoint
+
+**File Storage:**
+- Migrate file uploads to Replit App Storage (object storage)
+- Host desktop client installers via App Storage
+- Update download links on landing page
+
+**Desktop Client Improvements:**
+- Single instance lock (prevent multiple app instances)
+- Fix tray icon functionality
+- Flathub publishing support for Linux
+- Custom branded installers for Windows/macOS/Linux
+
+**UI/UX Polish:**
+- Fix chat column stretching with long strings
+- Consistent room list background colors
+- Performance optimizations and code cleanup
+
 ### Electron Desktop Client
 A full-featured Electron desktop client provides enhanced user experience with:
 - Desktop notifications for new messages.
