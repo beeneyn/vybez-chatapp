@@ -306,6 +306,27 @@ function createWindow() {
             mainWindow.webContents.send("online-status-changed", true);
         }
     });
+
+    mainWindow.webContents.on("will-navigate", (event, navigationUrl) => {
+        const allowedPaths = ["/desktop-login", "/chat"];
+        const url = new URL(navigationUrl);
+        
+        if (!allowedPaths.includes(url.pathname)) {
+            event.preventDefault();
+            console.log(`Blocked navigation to: ${navigationUrl}`);
+        }
+    });
+
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        const allowedPaths = ["/desktop-login", "/chat"];
+        const urlObj = new URL(url);
+        
+        if (!allowedPaths.includes(urlObj.pathname)) {
+            console.log(`Blocked window.open to: ${url}`);
+            return { action: "deny" };
+        }
+        return { action: "allow" };
+    });
 }
 
 function setupAutoUpdater() {
