@@ -130,7 +130,31 @@ app.post("/signup", (req, res) => {
             return res.status(500).json({ message: "Server error." });
         }
         discordWebhook.logUserRegistration(username);
-        res.status(201).json({ message: "User created!" });
+        
+        db.findUser(username, (err, user) => {
+            if (err || !user) {
+                return res.status(500).json({ message: "Error retrieving user." });
+            }
+            
+            const userPayload = {
+                id: user.id,
+                username: user.username,
+                color: user.chat_color,
+                bio: user.bio,
+                status: user.status,
+                avatar: user.avatar_url,
+                role: user.role,
+            };
+
+            req.session.user = userPayload;
+
+            req.session.save((saveErr) => {
+                if (saveErr) {
+                    return res.status(500).json({ message: "Error saving session." });
+                }
+                res.status(201).json({ message: "User created and logged in!" });
+            });
+        });
     });
 });
 
