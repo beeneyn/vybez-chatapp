@@ -308,7 +308,7 @@ function createWindow() {
     });
 
     mainWindow.webContents.on("will-navigate", (event, navigationUrl) => {
-        const allowedPaths = ["/desktop-login", "/chat"];
+        const allowedPaths = ["/desktop-login", "/chat", "/demo-chat"];
         const url = new URL(navigationUrl);
         
         if (!allowedPaths.includes(url.pathname)) {
@@ -318,7 +318,7 @@ function createWindow() {
     });
 
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-        const allowedPaths = ["/desktop-login", "/chat"];
+        const allowedPaths = ["/desktop-login", "/chat", "/demo-chat"];
         const urlObj = new URL(url);
         
         if (!allowedPaths.includes(urlObj.pathname)) {
