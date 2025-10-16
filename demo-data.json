@@ -1,0 +1,241 @@
+{
+  "users": [
+    {
+      "username": "Alex",
+      "chat_color": "#ff3f8f",
+      "avatar_url": null,
+      "bio": "Coffee enthusiast ☕ | Tech lover",
+      "status": "online",
+      "role": "user"
+    },
+    {
+      "username": "Jordan",
+      "chat_color": "#1ed5ff",
+      "avatar_url": null,
+      "bio": "Designer by day, gamer by night 🎮",
+      "status": "online",
+      "role": "user"
+    },
+    {
+      "username": "Sam",
+      "chat_color": "#5b2bff",
+      "avatar_url": null,
+      "bio": "Music producer 🎵 | Always creating",
+      "status": "online",
+      "role": "user"
+    },
+    {
+      "username": "Taylor",
+      "chat_color": "#ffb347",
+      "avatar_url": null,
+      "bio": "Travel blogger ✈️ | Adventure seeker",
+      "status": "online",
+      "role": "user"
+    },
+    {
+      "username": "Admin",
+      "chat_color": "#ff1744",
+      "avatar_url": null,
+      "bio": "Vybez Team Member",
+      "status": "online",
+      "role": "admin"
+    }
+  ],
+  "rooms": [
+    {
+      "id": 1,
+      "name": "general",
+      "created_by": "Admin",
+      "created_at": "2025-10-15T10:00:00.000Z",
+      "is_default": true
+    },
+    {
+      "id": 2,
+      "name": "tech-talk",
+      "created_by": "Jordan",
+      "created_at": "2025-10-15T10:30:00.000Z",
+      "is_default": false
+    },
+    {
+      "id": 3,
+      "name": "music-lounge",
+      "created_by": "Sam",
+      "created_at": "2025-10-15T11:00:00.000Z",
+      "is_default": false
+    },
+    {
+      "id": 4,
+      "name": "random",
+      "created_by": "Taylor",
+      "created_at": "2025-10-15T11:30:00.000Z",
+      "is_default": false
+    }
+  ],
+  "messages": [
+    {
+      "id": 1,
+      "room": "general",
+      "username": "Admin",
+      "message_text": "Welcome to Vybez! 🎉 This is the #general room where everyone hangs out.",
+      "chat_color": "#ff1744",
+      "timestamp": "2025-10-16T10:00:00.000Z",
+      "file_url": null,
+      "file_type": null,
+      "reactions": [
+        { "username": "Alex", "emoji": "👋" },
+        { "username": "Jordan", "emoji": "🎉" },
+        { "username": "Sam", "emoji": "❤️" }
+      ]
+    },
+    {
+      "id": 2,
+      "room": "general",
+      "username": "Alex",
+      "message_text": "Hey everyone! Just joined and loving the vibe here!",
+      "chat_color": "#ff3f8f",
+      "timestamp": "2025-10-16T10:05:00.000Z",
+      "file_url": null,
+      "file_type": null,
+      "reactions": [
+        { "username": "Jordan", "emoji": "👍" }
+      ]
+    },
+    {
+      "id": 3,
+      "room": "general",
+      "username": "Jordan",
+      "message_text": "Check out this cool design I'm working on!",
+      "chat_color": "#1ed5ff",
+      "timestamp": "2025-10-16T10:10:00.000Z",
+      "file_url": "/uploads/demo-design.png",
+      "file_type": "image",
+      "reactions": [
+        { "username": "Alex", "emoji": "🔥" },
+        { "username": "Sam", "emoji": "😍" },
+        { "username": "Taylor", "emoji": "🎨" }
+      ]
+    },
+    {
+      "id": 4,
+      "room": "general",
+      "username": "Sam",
+      "message_text": "That's amazing Jordan! The colors are perfect 🎨",
+      "chat_color": "#5b2bff",
+      "timestamp": "2025-10-16T10:15:00.000Z",
+      "file_url": null,
+      "file_type": null,
+      "reactions": []
+    },
+    {
+      "id": 5,
+      "room": "tech-talk",
+      "username": "Jordan",
+      "message_text": "Anyone else excited about the new web technologies coming out?",
+      "chat_color": "#1ed5ff",
+      "timestamp": "2025-10-16T10:35:00.000Z",
+      "file_url": null,
+      "file_type": null,
+      "reactions": [
+        { "username": "Alex", "emoji": "🚀" }
+      ]
+    },
+    {
+      "id": 6,
+      "room": "tech-talk",
+      "username": "Alex",
+      "message_text": "Absolutely! I've been experimenting with some cool frameworks lately.",
+      "chat_color": "#ff3f8f",
+      "timestamp": "2025-10-16T10:40:00.000Z",
+      "file_url": null,
+      "file_type": null,
+      "reactions": []
+    },
+    {
+      "id": 7,
+      "room": "tech-talk",
+      "username": "Taylor",
+      "message_text": "Here's a great article about modern web dev best practices",
+      "chat_color": "#ffb347",
+      "timestamp": "2025-10-16T10:45:00.000Z",
+      "file_url": "/uploads/web-dev-guide.pdf",
+      "file_type": "document",
+      "reactions": [
+        { "username": "Jordan", "emoji": "📚" },
+        { "username": "Alex", "emoji": "💯" }
+      ]
+    },
+    {
+      "id": 8,
+      "room": "music-lounge",
+      "username": "Sam",
+      "message_text": "Just dropped a new beat! What do you all think? 🎵",
+      "chat_color": "#5b2bff",
+      "timestamp": "2025-10-16T11:05:00.000Z",
+      "file_url": "/uploads/new-beat.mp3",
+      "file_type": "audio",
+      "reactions": [
+        { "username": "Alex", "emoji": "🔥" },
+        { "username": "Jordan", "emoji": "🎵" },
+        { "username": "Taylor", "emoji": "💃" }
+      ]
+    },
+    {
+      "id": 9,
+      "room": "music-lounge",
+      "username": "Taylor",
+      "message_text": "This is fire Sam! Love the energy 🔥",
+      "chat_color": "#ffb347",
+      "timestamp": "2025-10-16T11:10:00.000Z",
+      "file_url": null,
+      "file_type": null,
+      "reactions": [
+        { "username": "Sam", "emoji": "🙏" }
+      ]
+    },
+    {
+      "id": 10,
+      "room": "random",
+      "username": "Taylor",
+      "message_text": "Random thought: Pizza is the perfect food. Change my mind.",
+      "chat_color": "#ffb347",
+      "timestamp": "2025-10-16T11:35:00.000Z",
+      "file_url": null,
+      "file_type": null,
+      "reactions": [
+        { "username": "Alex", "emoji": "🍕" },
+        { "username": "Jordan", "emoji": "😋" },
+        { "username": "Sam", "emoji": "💯" }
+      ]
+    },
+    {
+      "id": 11,
+      "room": "random",
+      "username": "Alex",
+      "message_text": "Can't argue with that logic! 🍕",
+      "chat_color": "#ff3f8f",
+      "timestamp": "2025-10-16T11:40:00.000Z",
+      "file_url": null,
+      "file_type": null,
+      "reactions": []
+    }
+  ],
+  "privateMessages": [
+    {
+      "id": 1,
+      "from_user": "Jordan",
+      "to_user": "DemoUser",
+      "message_text": "Hey! Welcome to Vybez! If you need any help, just let me know 😊",
+      "timestamp": "2025-10-16T10:20:00.000Z",
+      "read": false
+    },
+    {
+      "id": 2,
+      "from_user": "Sam",
+      "to_user": "DemoUser",
+      "message_text": "Yo! Saw you're checking out the demo. Pretty cool, right?",
+      "timestamp": "2025-10-16T11:00:00.000Z",
+      "read": false
+    }
+  ],
+  "typingUsers": []
+}
