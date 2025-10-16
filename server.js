@@ -101,6 +101,24 @@ app.get("/chat", (req, res) => {
     else res.sendFile(path.join(__dirname, "public", "chat.html"));
 });
 
+app.get("/demo-chat", (req, res) => {
+    req.session.user = {
+        username: 'DemoUser',
+        chat_color: '#ffb347',
+        role: 'user',
+        isDemo: true
+    };
+    res.sendFile(path.join(__dirname, "public", "demo-chat.html"));
+});
+
+app.get("/demo-data", (req, res) => {
+    if (!req.session.user || !req.session.user.isDemo) {
+        return res.status(403).json({ message: "Demo access only" });
+    }
+    const demoData = require('./demo-data.json');
+    res.json(demoData);
+});
+
 app.get("/health", (req, res) => {
     const healthcheck = {
         status: "OK",
