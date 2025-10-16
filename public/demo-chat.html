@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vybez Demo - Try Before You Sign Up</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .demo-banner {
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col h-screen">
+
+    <!-- Demo Mode Banner -->
+    <div class="demo-banner text-white px-4 py-3 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-eye text-2xl"></i>
+            <div>
+                <div class="font-bold">Demo Mode - Explore Vybez!</div>
+                <div class="text-sm opacity-90">You're viewing a preview. Sign up to join real conversations!</div>
+            </div>
+        </div>
+        <button id="signup-banner-btn" class="bg-white text-[#5b2bff] px-6 py-2 rounded-lg font-bold hover:shadow-xl transition-all transform hover:scale-105">
+            <i class="fas fa-user-plus mr-2"></i>Sign Up Now
+        </button>
+    </div>
+
+    <div class="container mx-auto px-4 py-3 flex-grow overflow-hidden">
+        <div id="app-container" class="flex h-full gap-4">
+
+            <div class="w-1/6 flex flex-col">
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-4 py-3 font-bold border-b flex justify-between items-center chat-header">
+                        <span>Rooms</span>
+                        <button class="px-2 py-1 bg-gray-300 text-gray-500 text-xs rounded cursor-not-allowed" title="Demo Mode - Sign up to create rooms" disabled>
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="room-list" class="divide-y"></ul>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <div class="bg-white rounded-lg shadow flex flex-col h-full">
+                    <div class="px-4 py-3 border-b flex justify-between items-center chat-header">
+                        <h3 id="welcome-message" class="text-lg font-semibold">Welcome to Vybez Demo!</h3>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-gray-200 text-gray-600 text-sm rounded">
+                                <i class="fas fa-user mr-1"></i>DemoUser
+                            </span>
+                        </div>
+                    </div>
+                    <div id="chat-window" class="flex-1 p-4 overflow-y-auto">
+                        <ul id="message-container" class="list-none space-y-2"></ul>
+                    </div>
+                    <div class="p-4 bg-white border-t">
+                        <div class="bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white rounded-lg p-4 mb-3 text-center">
+                            <p class="font-bold mb-2">💬 Want to send messages?</p>
+                            <button id="signup-cta-btn" class="bg-white text-[#5b2bff] px-6 py-2 rounded-lg font-bold hover:shadow-xl transition-all transform hover:scale-105">
+                                Sign Up to Join the Conversation
+                            </button>
+                        </div>
+                        <form id="message-form" class="flex gap-2">
+                            <input type="text" id="message-input" class="flex-1 px-3 py-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed" placeholder="Sign up to send messages..." disabled>
+                            <button class="px-4 py-2 bg-gray-300 text-gray-500 rounded font-semibold cursor-not-allowed" type="button" disabled>
+                                <i class="fas fa-paper-plane mr-1"></i> Send
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-1/5 flex flex-col">
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-4 py-3 font-bold border-b chat-header">Demo Users</div>
+                    <ul id="online-users-list" class="divide-y"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="demo-client.js"></script>
+    <script src="store-compliance.js"></script>
+    <script>
+        document.getElementById('signup-banner-btn').addEventListener('click', () => {
+            window.location.href = '/desktop-login?tab=signup';
+        });
+        document.getElementById('signup-cta-btn').addEventListener('click', () => {
+            window.location.href = '/desktop-login?tab=signup';
+        });
+    </script>
+</body>
+</html>
