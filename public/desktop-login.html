@@ -158,6 +158,19 @@
                     <i class="fas fa-user-plus mr-2"></i>Create Account
                 </button>
             </form>
+
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <p class="text-center text-gray-600 text-sm mb-3">
+                    Want to explore first?
+                </p>
+                <button 
+                    id="demo-button"
+                    class="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:shadow-xl transition-all shadow-lg transform hover:scale-105"
+                    type="button"
+                >
+                    <i class="fas fa-eye mr-2"></i>Try Demo (No Account Needed)
+                </button>
+            </div>
         </div>
 
         <div class="px-8 py-4 bg-gray-50 text-center text-sm text-gray-600">
@@ -242,6 +255,10 @@
 
         document.getElementById('login-form').addEventListener('submit', handleLogin);
         document.getElementById('signup-form').addEventListener('submit', handleSignup);
+
+        document.getElementById('demo-button').addEventListener('click', () => {
+            window.location.href = '/demo-chat';
+        });
 
         document.getElementById('login-username').focus();
     </script>
