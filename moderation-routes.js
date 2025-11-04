@@ -59,6 +59,12 @@ module.exports = (app) => {
         }
         db.addMute(username, req.session.user.username, reason, durationMinutes, (err, mute) => {
             if (err) return res.status(500).json({ message: "Failed to create mute" });
+            
+            const notificationMessage = `You have been muted by ${req.session.user.username} for ${durationMinutes} minutes. Reason: ${reason}`;
+            db.addNotification(username, 'mute', notificationMessage, (notifErr) => {
+                if (notifErr) console.error('Failed to create notification:', notifErr);
+            });
+            
             res.status(201).json({ message: "Mute created successfully", mute });
         });
     });
@@ -92,6 +98,20 @@ module.exports = (app) => {
         
         db.addBan(username, req.session.user.username, reason, isPermanent, expiresAt, (err, ban) => {
             if (err) return res.status(500).json({ message: "Failed to create ban" });
+            
+            const isTermination = reason && reason.toLowerCase().includes('[termination]');
+            let notificationMessage;
+            if (isTermination) {
+                notificationMessage = `Your account has been permanently terminated by ${req.session.user.username}. Reason: ${reason.replace('[TERMINATION]', '').replace('[termination]', '').trim()}`;
+            } else if (isPermanent) {
+                notificationMessage = `You have been permanently banned by ${req.session.user.username}. Reason: ${reason}`;
+            } else {
+                notificationMessage = `You have been banned by ${req.session.user.username} for ${durationDays} days. Reason: ${reason}`;
+            }
+            db.addNotification(username, 'ban', notificationMessage, (notifErr) => {
+                if (notifErr) console.error('Failed to create notification:', notifErr);
+            });
+            
             res.status(201).json({ message: "Ban created successfully", ban });
         });
     });
