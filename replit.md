@@ -20,6 +20,7 @@ Key Features include:
 - **Discord-Style Settings:** Full-page settings interface with categorized navigation (Appearance, Profile, My Account, Privacy & Safety, Advanced). Features light/dark theme toggle, profile customization, account management, and advanced options.
 - **Custom Chat Rooms:** Users can create and delete rooms, with real-time updates via Socket.IO.
 - **Real-time Messaging:** Instant message delivery, message history, typing indicators, and message reactions.
+- **@Mentions:** Detect @username in messages with blue highlighting; mentioned users receive real-time notifications with XSS-safe rendering.
 - **User Profiles:** Customizable avatars, bios, status, and chat colors.
 - **File Sharing:** Uploads up to 10MB (images, documents, videos) with secure filename generation and automatic image previews.
 - **Private Messaging:** Direct messages with notifications and read receipts.
@@ -136,11 +137,20 @@ Example response:
 The platform includes comprehensive Discord webhook logging for real-time monitoring of server-wide activities:
 - **📝 User Registration:** Logged when new users join the platform
 - **🔐 User Login:** Logged when users authenticate (includes client type: 🌐 Web, 💻 Desktop, 🤖 API)
+- **👤 Profile Updates:** Logged when users change bio, status, or chat color
+- **🖼️ Avatar Uploads:** Logged when users upload new profile pictures
+- **✏️ Username Changes:** Logged when users change their display name
+- **❌ Account Deletions:** Logged when users permanently delete their accounts
 - **🏠 Room Creation:** Logged when custom chat rooms are created
 - **🗑️ Room Deletion:** Logged when chat rooms are removed
 - **📎 File Uploads:** Logged when files are uploaded to the platform
 - **💬 Chat Messages:** Logged when messages are sent in chat rooms (with 100-char preview and client type)
 - **📧 Private Messages:** Logged when direct messages are sent between users (with 100-char preview and client type)
+- **👍 Message Reactions:** Logged when users react to messages with emojis
+- **@️⃣ User Mentions:** Logged when users are mentioned in chat messages
+- **⚠️ Warnings Issued:** Logged when moderators issue warnings to users
+- **🔇 Mutes Applied:** Logged when moderators mute users (includes duration)
+- **🚫 Bans Applied:** Logged when moderators ban users (includes duration or permanent status)
 
 All webhook notifications include:
 - Color-coded embeds matching the brand identity (violet, cyan, magenta)
