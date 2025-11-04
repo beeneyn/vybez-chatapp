@@ -117,6 +117,24 @@
                 <label for="settings-color" class="block text-sm font-medium text-gray-700 mb-1">Chat Color</label>
                 <input type="color" class="w-full h-10 px-1 py-1 border border-gray-300 rounded" id="settings-color">
             </div>
+            
+            <div class="border-t pt-4 mt-4">
+                <h6 class="font-semibold text-gray-800 mb-3">Change Username</h6>
+                <div class="mb-3">
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" id="new-username-input" placeholder="New username">
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" id="username-change-password" placeholder="Confirm with password">
+                </div>
+                <button type="button" class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded" id="change-username-btn">Change Username</button>
+            </div>
+            
+            <div class="border-t pt-4 mt-4">
+                <h6 class="font-semibold text-red-600 mb-3">Danger Zone</h6>
+                <p class="text-sm text-gray-600 mb-3">Delete your account and all associated data permanently. This cannot be undone.</p>
+                <button type="button" class="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-semibold" id="delete-account-btn">Delete My Account</button>
+            </div>
+            
             <div id="settings-message" class="alert hidden"></div>
             <div class="flex gap-2 justify-end mt-4">
                 <button type="button" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded" onclick="window.closeModal('settingsModal')">Close</button>

@@ -382,6 +382,51 @@ const deleteRoom = async (name, callback) => {
     }
 };
 
+const deleteUserAccount = async (username, callback) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        await client.query('DELETE FROM read_receipts WHERE message_id IN (SELECT id FROM messages WHERE username = $1) OR message_id IN (SELECT id FROM private_messages WHERE from_user = $1 OR to_user = $1)', [username]);
+        await client.query('DELETE FROM reactions WHERE username = $1 OR message_id IN (SELECT id FROM messages WHERE username = $1)', [username]);
+        await client.query('DELETE FROM private_messages WHERE from_user = $1 OR to_user = $1', [username]);
+        await client.query('DELETE FROM messages WHERE username = $1', [username]);
+        await client.query('DELETE FROM rooms WHERE created_by = $1 AND is_default = FALSE', [username]);
+        await client.query('DELETE FROM users WHERE username = $1', [username]);
+        
+        await client.query('COMMIT');
+        callback(null);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        callback(err);
+    } finally {
+        client.release();
+    }
+};
+
+const changeUsername = async (oldUsername, newUsername, callback) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        await client.query('UPDATE users SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE messages SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE private_messages SET from_user = $1 WHERE from_user = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE private_messages SET to_user = $1 WHERE to_user = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE reactions SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE read_receipts SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE rooms SET created_by = $1 WHERE created_by = $2', [newUsername, oldUsername]);
+        
+        await client.query('COMMIT');
+        callback(null);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        callback(err);
+    } finally {
+        client.release();
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -406,5 +451,7 @@ module.exports = {
     createRoom,
     getAllRooms,
     deleteRoom,
+    deleteUserAccount,
+    changeUsername,
     pool
 };

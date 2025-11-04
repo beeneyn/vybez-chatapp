@@ -315,6 +315,83 @@ app.post("/update-profile", (req, res) => {
         },
     );
 });
+
+app.post("/delete-account", (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { password } = req.body;
+    if (!password)
+        return res.status(400).json({ message: "Password is required" });
+    
+    const username = req.session.user.username;
+    
+    db.findUser(username, (err, user) => {
+        if (err || !user)
+            return res.status(500).json({ message: "Error verifying user" });
+        
+        const bcrypt = require('bcrypt');
+        bcrypt.compare(password, user.password, (compareErr, isMatch) => {
+            if (compareErr || !isMatch)
+                return res.status(401).json({ message: "Invalid password" });
+            
+            db.deleteUserAccount(username, (deleteErr) => {
+                if (deleteErr)
+                    return res.status(500).json({ message: "Failed to delete account" });
+                
+                req.session.destroy((sessionErr) => {
+                    if (sessionErr)
+                        console.error("Error destroying session:", sessionErr);
+                    
+                    res.status(200).json({ message: "Account deleted successfully" });
+                });
+            });
+        });
+    });
+});
+
+app.post("/change-username", (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { newUsername, password } = req.body;
+    if (!newUsername || !password)
+        return res.status(400).json({ message: "New username and password are required" });
+    
+    if (newUsername.length < 3 || newUsername.length > 20)
+        return res.status(400).json({ message: "Username must be 3-20 characters" });
+    
+    const oldUsername = req.session.user.username;
+    
+    db.findUser(oldUsername, (err, user) => {
+        if (err || !user)
+            return res.status(500).json({ message: "Error verifying user" });
+        
+        const bcrypt = require('bcrypt');
+        bcrypt.compare(password, user.password, (compareErr, isMatch) => {
+            if (compareErr || !isMatch)
+                return res.status(401).json({ message: "Invalid password" });
+            
+            db.changeUsername(oldUsername, newUsername, (changeErr) => {
+                if (changeErr) {
+                    if (changeErr.code === '23505')
+                        return res.status(409).json({ message: "Username already taken" });
+                    return res.status(500).json({ message: "Failed to change username" });
+                }
+                
+                req.session.user.username = newUsername;
+                req.session.save((saveErr) => {
+                    if (saveErr)
+                        return res.status(500).json({ message: "Error saving session" });
+                    
+                    io.emit("usernameChanged", { oldUsername, newUsername });
+                    res.status(200).json({ message: "Username changed successfully", newUsername });
+                });
+            });
+        });
+    });
+});
+
 app.get("/rooms", (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
