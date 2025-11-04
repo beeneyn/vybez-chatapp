@@ -24,6 +24,7 @@ Key Features include:
 - **Private Messaging:** Direct messages with notifications and read receipts.
 - **Message Search:** Functionality to search through message history.
 - **User Roles:** Admin and standard user permission system.
+- **Moderation System:** Comprehensive admin tools for managing warnings, mutes, and bans with expiration support and admin-only management pages.
 
 ### System Design Choices
 The application is structured with a clear separation between server-side logic (`server.js`, `database.js`), client-side logic (`public/client.js`), and Electron-specific components (`electron.js`, `preload.js`, `desktop-integration.js`). Database interactions are handled via `pg` for PostgreSQL. The system uses a file-based session store to maintain user sessions. All frontend styles are built with `@tailwindcss/cli`, ensuring a lean and production-ready CSS output.
@@ -81,8 +82,11 @@ A full-featured Electron desktop client provides enhanced user experience with:
 - **`private_messages`**: id, from_user, to_user, message_text, timestamp, read
 - **`read_receipts`**: id, message_id (FK), username, read_at
 - **`rooms`**: id, name (UNIQUE), created_by, created_at, is_default
+- **`warnings`**: id, username, warned_by, reason, created_at
+- **`mutes`**: id, username, muted_by, reason, expires_at, created_at
+- **`bans`**: id, username, banned_by, reason, expires_at (NULL for permanent), created_at
 
-All tables utilize PostgreSQL SERIAL for auto-incrementing IDs and proper CASCADE foreign key constraints.
+All tables utilize PostgreSQL SERIAL for auto-incrementing IDs. The codebase uses a username-based schema pattern where relationships are maintained via TEXT username fields rather than foreign key constraints. Data integrity during account deletion and username changes is handled via transactional updates in `deleteUserAccount()` and `changeUsername()` functions.
 
 ## External Dependencies
 - **Node.js**: Backend runtime environment.
