@@ -877,6 +877,27 @@ io.on("connection", (socket) => {
         });
     });
 
+    socket.on("deleteMessage", ({ messageId }) => {
+        db.pool.query('SELECT username FROM messages WHERE id = $1', [messageId], (err, result) => {
+            if (err || result.rows.length === 0) {
+                return socket.emit('error', { message: 'Message not found' });
+            }
+            
+            const messageAuthor = result.rows[0].username;
+            const isAdmin = user.role === 'admin';
+            const isAuthor = messageAuthor === user.username;
+            
+            if (!isAdmin && !isAuthor) {
+                return socket.emit('error', { message: 'You can only delete your own messages' });
+            }
+            
+            db.deleteMessage(messageId, (deleteErr) => {
+                if (deleteErr) return console.error("Error deleting message:", deleteErr);
+                io.to(socket.currentRoom).emit("messageDeleted", { messageId });
+            });
+        });
+    });
+
     socket.on("privateMessage", ({ to, text }) => {
         db.getActiveMute(user.username, (muteErr, mute) => {
             if (mute) {

@@ -21,6 +21,7 @@ Key Features include:
 - **Custom Chat Rooms:** Users can create and delete rooms, with real-time updates via Socket.IO.
 - **Real-time Messaging:** Instant message delivery, message history, typing indicators, and message reactions.
 - **@Mentions:** Detect @username in messages with blue highlighting; mentioned users receive real-time notifications with XSS-safe rendering.
+- **Message Deletion:** Users can delete their own messages; admins can delete any message; real-time Socket.IO broadcast removes messages for all connected clients.
 - **User Profiles:** Customizable avatars, bios, status, and chat colors.
 - **File Sharing:** Uploads up to 10MB (images, documents, videos) with secure filename generation and automatic image previews.
 - **Private Messaging:** Direct messages with notifications and read receipts.

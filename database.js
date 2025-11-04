@@ -323,6 +323,15 @@ const searchMessages = async (room, query, callback) => {
     }
 };
 
+const deleteMessage = async (messageId, callback) => {
+    try {
+        await pool.query('DELETE FROM messages WHERE id = $1', [messageId]);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 const addReaction = async (message_id, username, emoji, callback) => {
     try {
         const result = await pool.query(
@@ -923,6 +932,7 @@ module.exports = {
     addMessage,
     getRecentMessages,
     searchMessages,
+    deleteMessage,
     addReaction,
     removeReaction,
     getReactionsForMessage,

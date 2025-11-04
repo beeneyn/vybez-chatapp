@@ -93,6 +93,18 @@ document.addEventListener('DOMContentLoaded', () => {
         reactionBtn.onclick = (e) => showEmojiPicker(msg.id, e);
         item.appendChild(reactionBtn);
         
+        // Add delete button for admins or message authors
+        const isAdmin = currentUserRole === 'admin';
+        const isAuthor = username === currentUser;
+        if (isAdmin || isAuthor) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-sm btn-link text-danger';
+            deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+            deleteBtn.title = 'Delete message';
+            deleteBtn.onclick = () => deleteMessage(msg.id);
+            item.appendChild(deleteBtn);
+        }
+        
         const reactionsContainer = document.createElement('div');
         reactionsContainer.className = 'reactions-container mt-1';
         reactionsContainer.setAttribute('data-message-reactions', msg.id);
@@ -129,6 +141,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = event.target.getBoundingClientRect();
         picker.style.left = rect.left + 'px';
         picker.style.top = (rect.bottom + 5) + 'px';
+    };
+
+    const deleteMessage = (messageId) => {
+        if (confirm('Delete this message?')) {
+            socket.emit('deleteMessage', { messageId });
+        }
     };
 
     const updateReactions = (messageId, reactions) => {
@@ -696,6 +714,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.on('reactionUpdate', ({ messageId, reactions }) => {
             updateReactions(messageId, reactions);
+        });
+
+        socket.on('messageDeleted', ({ messageId }) => {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.remove();
+            }
         });
 
         socket.on('privateMessage', (pm) => {
