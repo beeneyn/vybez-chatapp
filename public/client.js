@@ -296,7 +296,45 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json(); 
             if (data.loggedIn) { 
                 showChatUI(data.user); 
-                socket.connect(); 
+                socket.connect();
+                
+                if (data.user.role === 'admin') {
+                    const headerButtons = document.querySelector('.chat-header .flex.gap-2');
+                    if (headerButtons && !document.getElementById('admin-menu-btn')) {
+                        const adminMenuBtn = document.createElement('button');
+                        adminMenuBtn.id = 'admin-menu-btn';
+                        adminMenuBtn.className = 'px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white text-sm rounded relative';
+                        adminMenuBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Admin';
+                        adminMenuBtn.title = 'Admin Panel';
+                        
+                        const adminDropdown = document.createElement('div');
+                        adminDropdown.id = 'admin-dropdown';
+                        adminDropdown.className = 'hidden absolute top-full right-0 mt-1 bg-white shadow-lg rounded border border-gray-200 z-50';
+                        adminDropdown.innerHTML = `
+                            <a href="/ban-management.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-ban text-red-500"></i> Bans
+                            </a>
+                            <a href="/mute-management.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-microphone-slash text-blue-500"></i> Mutes
+                            </a>
+                            <a href="/warning-management.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-exclamation-triangle text-yellow-500"></i> Warnings
+                            </a>
+                        `;
+                        
+                        adminMenuBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            adminDropdown.classList.toggle('hidden');
+                        });
+                        
+                        document.addEventListener('click', () => {
+                            adminDropdown.classList.add('hidden');
+                        });
+                        
+                        adminMenuBtn.appendChild(adminDropdown);
+                        headerButtons.insertBefore(adminMenuBtn, headerButtons.children[headerButtons.children.length - 1]);
+                    }
+                }
             } else { 
                 window.location.href = '/'; 
             } 

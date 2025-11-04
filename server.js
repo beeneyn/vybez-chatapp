@@ -8,7 +8,8 @@ const multer = require("multer");
 const fs = require("fs");
 const db = require("./database.js");
 const jwt = require("jsonwebtoken");
-const discordWebhook = require("./discord-webhook.js"); // JWT library import
+const discordWebhook = require("./discord-webhook.js");
+const moderationRoutes = require("./moderation-routes.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -80,6 +81,8 @@ app.use(
 );
 app.use('/dist', express.static(path.join(__dirname, 'dist')));
 app.use(express.json());
+
+moderationRoutes(app);
 
 app.use((req, res, next) => {
     console.log(
