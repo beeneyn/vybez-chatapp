@@ -16,13 +16,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check authentication
     const checkAuth = async () => {
         try {
-            const response = await fetch('/api/check-session');
+            const response = await fetch('/check-session');
             if (response.ok) {
                 const data = await response.json();
-                currentUser = data.username;
-                loadUserSettings();
-                socket.auth = { username: currentUser };
-                socket.connect();
+                if (data.loggedIn && data.user) {
+                    currentUser = data.user.username;
+                    loadUserSettings(data.user);
+                    socket.auth = { username: currentUser };
+                    socket.connect();
+                } else {
+                    window.location.href = '/';
+                }
             } else {
                 window.location.href = '/';
             }
@@ -33,39 +37,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Load user settings from server
-    const loadUserSettings = async () => {
+    const loadUserSettings = (user) => {
         try {
-            const response = await fetch('/api/user-profile');
-            if (response.ok) {
-                const user = await response.json();
-                
-                // Set username
-                document.getElementById('current-username').value = user.username;
-                
-                // Set avatar
-                if (user.avatar_url) {
-                    document.getElementById('current-avatar').src = user.avatar_url;
-                    document.getElementById('current-avatar').style.display = 'block';
-                    document.getElementById('avatar-placeholder').style.display = 'none';
-                } else {
-                    const initials = user.username.substring(0, 2).toUpperCase();
-                    const userColor = (user.chat_color || '#5b2bff').replace('#', '');
-                    document.getElementById('avatar-placeholder').style.background = `#${userColor}`;
-                }
-                
-                // Set bio and status
-                document.getElementById('settings-bio').value = user.bio || '';
-                document.getElementById('settings-status').value = user.status || 'Online';
-                
-                // Set chat color
-                const chatColor = user.chat_color || '#5b2bff';
-                document.getElementById('chat-color-picker').value = chatColor;
-                document.getElementById('color-preview-text').style.color = chatColor;
-                document.getElementById('color-preview-text').textContent = user.username;
-                
-                // Set email
-                document.getElementById('settings-email').value = user.email || '';
+            // Set username
+            document.getElementById('current-username').value = user.username;
+            
+            // Set avatar
+            if (user.avatar_url) {
+                document.getElementById('current-avatar').src = user.avatar_url;
+                document.getElementById('current-avatar').style.display = 'block';
+                document.getElementById('avatar-placeholder').style.display = 'none';
+            } else {
+                const initials = user.username.substring(0, 2).toUpperCase();
+                const userColor = (user.chat_color || '#5b2bff').replace('#', '');
+                document.getElementById('avatar-placeholder').style.background = `#${userColor}`;
             }
+            
+            // Set bio and status
+            document.getElementById('settings-bio').value = user.bio || '';
+            document.getElementById('settings-status').value = user.status || 'Online';
+            
+            // Set chat color
+            const chatColor = user.chat_color || '#5b2bff';
+            document.getElementById('chat-color-picker').value = chatColor;
+            document.getElementById('color-preview-text').style.color = chatColor;
+            document.getElementById('color-preview-text').textContent = user.username;
+            
+            // Set email
+            document.getElementById('settings-email').value = user.email || '';
         } catch (error) {
             console.error('Failed to load user settings:', error);
         }
@@ -135,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData.append('avatar', file);
 
         try {
-            const response = await fetch('/api/upload-avatar', {
+            const response = await fetch('/upload-avatar', {
                 method: 'POST',
                 body: formData
             });
@@ -163,10 +162,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const chatColor = document.getElementById('chat-color-picker').value;
 
         try {
-            const response = await fetch('/api/update-profile', {
+            const response = await fetch('/update-profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bio, status, chatColor })
+                body: JSON.stringify({ bio, status, chat_color: chatColor })
             });
 
             if (response.ok) {
@@ -187,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const email = document.getElementById('settings-email').value.trim();
 
         try {
-            const response = await fetch('/api/update-email', {
+            const response = await fetch('/update-profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email || null })
@@ -223,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const response = await fetch('/api/change-username', {
+            const response = await fetch('/change-username', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ newUsername, password })
@@ -278,7 +277,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const response = await fetch('/api/delete-account', {
+            const response = await fetch('/delete-account', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password })
