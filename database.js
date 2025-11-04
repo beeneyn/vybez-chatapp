@@ -78,6 +78,42 @@ const initializeDatabase = async () => {
             )
         `);
         
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS warnings (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                warned_by TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS mutes (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                muted_by TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                duration_minutes INTEGER NOT NULL,
+                expires_at TIMESTAMP NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_active BOOLEAN DEFAULT TRUE
+            )
+        `);
+        
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS bans (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                banned_by TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                is_permanent BOOLEAN DEFAULT FALSE,
+                expires_at TIMESTAMP DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_active BOOLEAN DEFAULT TRUE
+            )
+        `);
+        
         const defaultRooms = ['#general', '#tech', '#random'];
         for (const room of defaultRooms) {
             await client.query(
@@ -427,6 +463,143 @@ const changeUsername = async (oldUsername, newUsername, callback) => {
     }
 };
 
+const addWarning = async (username, warnedBy, reason, callback) => {
+    try {
+        const result = await pool.query(
+            'INSERT INTO warnings (username, warned_by, reason) VALUES ($1, $2, $3) RETURNING *',
+            [username, warnedBy, reason]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getWarnings = async (username, callback) => {
+    try {
+        let query = 'SELECT * FROM warnings';
+        let params = [];
+        
+        if (username) {
+            query += ' WHERE username = $1 ORDER BY created_at DESC';
+            params = [username];
+        } else {
+            query += ' ORDER BY created_at DESC';
+        }
+        
+        const result = await pool.query(query, params);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const deleteWarning = async (id, callback) => {
+    try {
+        await pool.query('DELETE FROM warnings WHERE id = $1', [id]);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const addMute = async (username, mutedBy, reason, durationMinutes, callback) => {
+    try {
+        const expiresAt = new Date(Date.now() + durationMinutes * 60 * 1000);
+        const result = await pool.query(
+            'INSERT INTO mutes (username, muted_by, reason, duration_minutes, expires_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [username, mutedBy, reason, durationMinutes, expiresAt]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getMutes = async (activeOnly, callback) => {
+    try {
+        let query = 'SELECT * FROM mutes';
+        if (activeOnly) {
+            query += ' WHERE is_active = TRUE AND expires_at > NOW()';
+        }
+        query += ' ORDER BY created_at DESC';
+        
+        const result = await pool.query(query);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const removeMute = async (id, callback) => {
+    try {
+        await pool.query('UPDATE mutes SET is_active = FALSE WHERE id = $1', [id]);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const checkIfUserMuted = async (username, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM mutes WHERE username = $1 AND is_active = TRUE AND expires_at > NOW() ORDER BY expires_at DESC LIMIT 1',
+            [username]
+        );
+        callback(null, result.rows[0] || null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const addBan = async (username, bannedBy, reason, isPermanent, expiresAt, callback) => {
+    try {
+        const result = await pool.query(
+            'INSERT INTO bans (username, banned_by, reason, is_permanent, expires_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [username, bannedBy, reason, isPermanent, expiresAt]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getBans = async (activeOnly, callback) => {
+    try {
+        let query = 'SELECT * FROM bans';
+        if (activeOnly) {
+            query += ' WHERE is_active = TRUE AND (is_permanent = TRUE OR expires_at > NOW())';
+        }
+        query += ' ORDER BY created_at DESC';
+        
+        const result = await pool.query(query);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const removeBan = async (id, callback) => {
+    try {
+        await pool.query('UPDATE bans SET is_active = FALSE WHERE id = $1', [id]);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const checkIfUserBanned = async (username, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM bans WHERE username = $1 AND is_active = TRUE AND (is_permanent = TRUE OR expires_at > NOW()) ORDER BY created_at DESC LIMIT 1',
+            [username]
+        );
+        callback(null, result.rows[0] || null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -453,5 +626,16 @@ module.exports = {
     deleteRoom,
     deleteUserAccount,
     changeUsername,
+    addWarning,
+    getWarnings,
+    deleteWarning,
+    addMute,
+    getMutes,
+    removeMute,
+    checkIfUserMuted,
+    addBan,
+    getBans,
+    removeBan,
+    checkIfUserBanned,
     pool
 };
