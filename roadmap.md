@@ -154,15 +154,17 @@ Features to be added across versions:
 ---
 
 ## Release Schedule
-- **V1.2**: December 2025
-- **V1.3**: Q1 2026
-- **V1.4**: Q2 2026
-- **V1.5**: Q3 2026
-- **V1.6**: Q4 2026
-- **V1.7**: Q1 2027
-- **V1.8**: Q2 2027
-- **V1.9**: Q3 2027
-- **V2.0**: Q4 2027
+Monthly release cycle starting November 17, 2025:
+
+- **V1.2**: November 17, 2025
+- **V1.3**: December 2025
+- **V1.4**: January 2026
+- **V1.5**: February 2026
+- **V1.6**: March 2026
+- **V1.7**: April 2026
+- **V1.8**: May 2026
+- **V1.9**: June 2026
+- **V2.0**: July 2026
 
 ---
 
