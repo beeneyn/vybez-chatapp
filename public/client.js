@@ -675,6 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('updateUserList', (users) => { 
             if (!onlineUsersList) return; 
             onlineUsersList.innerHTML = ''; 
+            
             users.forEach(user => { 
                 if (user.username === currentUser) return; 
                 const item = document.createElement('li'); 
@@ -683,22 +684,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.title = 'Click to send private message';
                 item.onclick = () => openPrivateMessage(user.username);
                 
+                if (!user.isOnline) {
+                    item.style.opacity = '0.5';
+                }
+                
                 // Create avatar using DOM APIs to prevent XSS
                 const initials = user.username.substring(0, 2).toUpperCase();
                 const userColor = (user.color || '#EEE').replace('#', '');
                 const placeholderUrl = `https://placehold.co/256x256/${userColor}/31343C?font=poppins&text=${initials}`;
                 const avatarUrl = user.avatar || placeholderUrl;
                 
+                const avatarWrapper = document.createElement('div');
+                avatarWrapper.style.cssText = 'position: relative; display: inline-block; margin-right: 8px;';
+                
                 const avatar = document.createElement('img');
                 avatar.src = avatarUrl;
                 avatar.alt = user.username;
-                avatar.style.cssText = 'width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;';
+                avatar.style.cssText = 'width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; object-fit: cover;';
+                
+                const statusIndicator = document.createElement('span');
+                statusIndicator.style.cssText = `
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background-color: ${user.isOnline ? '#3dd68c' : '#8e8e93'};
+                    border: 2px solid #31343C;
+                `;
+                
+                avatarWrapper.appendChild(avatar);
+                avatarWrapper.appendChild(statusIndicator);
                 
                 const nameSpan = document.createElement('span');
                 nameSpan.style.color = user.color || '#000';
                 nameSpan.textContent = user.username;
                 
-                item.appendChild(avatar);
+                item.appendChild(avatarWrapper);
                 item.appendChild(nameSpan);
                 
                 onlineUsersList.appendChild(item); 

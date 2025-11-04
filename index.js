@@ -1284,6 +1284,35 @@ app.delete("/rooms/:name", (req, res) => {
 const onlineUsers = new Map();
 const typingUsers = new Map();
 
+const emitFullUserList = () => {
+    db.getAllUsers((err, allUsers) => {
+        if (err) {
+            console.error('Error fetching all users:', err);
+            return;
+        }
+        
+        const onlineUsernames = Array.from(onlineUsers.values()).map(u => u.username);
+        
+        const usersWithStatus = allUsers.map(user => ({
+            username: user.username,
+            color: user.chat_color,
+            avatar: user.avatar_url,
+            bio: user.bio,
+            status: user.status,
+            role: user.role,
+            isOnline: onlineUsernames.includes(user.username)
+        }));
+        
+        usersWithStatus.sort((a, b) => {
+            if (a.isOnline && !b.isOnline) return -1;
+            if (!a.isOnline && b.isOnline) return 1;
+            return a.username.localeCompare(b.username);
+        });
+        
+        io.emit("updateUserList", usersWithStatus);
+    });
+};
+
 // --- THIS IS THE CORRECTED CONNECTION HANDLER ---
 io.on("connection", (socket) => {
     let user;
@@ -1329,7 +1358,7 @@ io.on("connection", (socket) => {
         socket.join(defaultRoom);
         socket.currentRoom = defaultRoom;
         onlineUsers.set(socket.id, user);
-        io.emit("updateUserList", Array.from(onlineUsers.values()));
+        emitFullUserList();
         socket.emit("roomList", roomList);
 
         db.getRecentMessages(defaultRoom, (err, messages) => {
@@ -1573,7 +1602,7 @@ io.on("connection", (socket) => {
                 k.endsWith(":" + socket.id),
             );
             keys.forEach((key) => typingUsers.delete(key));
-            io.emit("updateUserList", Array.from(onlineUsers.values()));
+            emitFullUserList();
         });
     });
 });

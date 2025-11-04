@@ -554,6 +554,17 @@ const getReadReceipts = async (message_id, callback) => {
     }
 };
 
+const getAllUsers = async (callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT username, chat_color, avatar_url, bio, status, role FROM users ORDER BY username ASC'
+        );
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 const updateUserAvatar = async (username, avatar_url, callback) => {
     try {
         await pool.query('UPDATE users SET avatar_url = $1 WHERE username = $2', [avatar_url, username]);
@@ -1117,6 +1128,7 @@ module.exports = {
     markPrivateMessageAsRead,
     addReadReceipt,
     getReadReceipts,
+    getAllUsers,
     updateUserAvatar,
     updateUserRole,
     createRoom,

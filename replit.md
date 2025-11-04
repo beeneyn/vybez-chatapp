@@ -19,6 +19,7 @@ Vybez is a Node.js application using Express.js for the backend and Socket.IO fo
 -   **Discord-Style Settings:** Full-page settings for Appearance, Profile, Account, Privacy & Safety, and Advanced options.
 -   **Custom Chat Rooms:** User-creatable and deletable rooms with real-time updates.
 -   **Real-time Messaging:** Instant messages, history, typing indicators, reactions, @mentions (with notifications), and message deletion.
+-   **Discord-Style Members List:** Shows all registered users with online users sorted to the top. Online users have a green status indicator, offline users are dimmed with a gray indicator.
 -   **Support Ticket System:** Users can submit priority-based tickets; admins can manage and respond. Includes SendGrid integration for email notifications.
 -   **Developer Portal:** API management system with API key creation, scopes, tiered rate limiting, API logs, and built-in documentation.
 -   **Admin Panel:** Comprehensive dashboard for live stats, user management (including deletion), moderation (warnings, mutes, bans with evidence tracking), room management, message logs, file tracking, support ticket management, API/Server logs, and maintenance mode toggle.
