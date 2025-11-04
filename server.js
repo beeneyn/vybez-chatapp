@@ -99,6 +99,20 @@ const banCheckMiddleware = async (req, res, next) => {
 
 app.use(banCheckMiddleware);
 
+const requireAdmin = (req, res, next) => {
+    if (!req.session.user) {
+        return res.redirect("/");
+    }
+    if (req.session.user.role !== 'admin') {
+        return res.status(403).send("Access denied. Admin privileges required.");
+    }
+    next();
+};
+
+app.get("/admin-panel.html", requireAdmin, (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "admin-panel.html"));
+});
+
 app.use(
     express.static(path.join(__dirname, "public"), {
         setHeaders: (res, filePath) => {
@@ -116,7 +130,7 @@ app.use(express.json());
 
 moderationRoutes(app);
 
-const requireAdmin = (req, res, next) => {
+const requireAdminAPI = (req, res, next) => {
     if (!req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
     }
@@ -126,7 +140,7 @@ const requireAdmin = (req, res, next) => {
     next();
 };
 
-app.get("/api/admin/stats", requireAdmin, (req, res) => {
+app.get("/api/admin/stats", requireAdminAPI, (req, res) => {
     db.pool.query(`
         SELECT 
             (SELECT COUNT(*) FROM users) as total_users,
@@ -147,7 +161,7 @@ app.get("/api/admin/stats", requireAdmin, (req, res) => {
     });
 });
 
-app.get("/api/admin/users", requireAdmin, (req, res) => {
+app.get("/api/admin/users", requireAdminAPI, (req, res) => {
     db.pool.query(`
         SELECT 
             u.username, 
@@ -169,7 +183,7 @@ app.get("/api/admin/users", requireAdmin, (req, res) => {
     });
 });
 
-app.get("/api/admin/rooms", requireAdmin, (req, res) => {
+app.get("/api/admin/rooms", requireAdminAPI, (req, res) => {
     db.pool.query(`
         SELECT name, created_by, created_at, is_default
         FROM rooms
@@ -183,7 +197,7 @@ app.get("/api/admin/rooms", requireAdmin, (req, res) => {
     });
 });
 
-app.get("/api/admin/messages", requireAdmin, (req, res) => {
+app.get("/api/admin/messages", requireAdminAPI, (req, res) => {
     db.pool.query(`
         SELECT m.id, m.room, m.username, m.message_text, m.chat_color, m.timestamp, m.file_url, m.file_type, u.avatar_url
         FROM messages m
@@ -199,7 +213,7 @@ app.get("/api/admin/messages", requireAdmin, (req, res) => {
     });
 });
 
-app.get("/api/admin/files", requireAdmin, (req, res) => {
+app.get("/api/admin/files", requireAdminAPI, (req, res) => {
     db.pool.query(`
         SELECT id, room, username, file_url, file_type, timestamp
         FROM messages
@@ -215,7 +229,7 @@ app.get("/api/admin/files", requireAdmin, (req, res) => {
     });
 });
 
-app.post("/api/admin/toggle-admin", requireAdmin, (req, res) => {
+app.post("/api/admin/toggle-admin", requireAdminAPI, (req, res) => {
     const { username, promote } = req.body;
     
     if (!username) {
@@ -276,16 +290,6 @@ app.get("/settings", (req, res) => {
 app.get("/developer", (req, res) => {
     if (!req.session.user) res.redirect("/");
     else res.sendFile(path.join(__dirname, "public", "developer.html"));
-});
-
-app.get("/admin-panel.html", (req, res) => {
-    if (!req.session.user) {
-        return res.redirect("/");
-    }
-    if (req.session.user.role !== 'admin') {
-        return res.status(403).send("Access denied. Admin privileges required.");
-    }
-    res.sendFile(path.join(__dirname, "public", "admin-panel.html"));
 });
 
 app.get("/api-docs", (req, res) => {
