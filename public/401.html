@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>401 - Access Denied | Vybez</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="/tailwind.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #180a1a 0%, #330a33 50%, #180a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #ff3f8f 0%, #5b2bff 50%, #ff3f8f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .error-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .error-number {
+            font-size: 12rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 40px rgba(255, 63, 143, 0.5),
+                         0 0 80px rgba(91, 43, 255, 0.3);
+            animation: shake 2s ease-in-out infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            25% {
+                transform: translateX(-5px) rotate(-2deg);
+            }
+            75% {
+                transform: translateX(5px) rotate(2deg);
+            }
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 63, 143, 0.2);
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 60px rgba(255, 0, 100, 0.3);
+        }
+        
+        .lock-icon {
+            font-size: 4rem;
+            color: #ff3f8f;
+            margin-bottom: 2rem;
+            animation: lockPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes lockPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff3f8f 0%, #5b2bff 100%);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 63, 143, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 63, 143, 0.5);
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.08;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            background: #ff3f8f;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            top: 15%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            background: #5b2bff;
+            border-radius: 50%;
+            top: 60%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 120px;
+            height: 120px;
+            background: #ff3f8f;
+            border-radius: 50%;
+            bottom: 15%;
+            left: 40%;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-40px) rotate(120deg);
+            }
+            66% {
+                transform: translateY(40px) rotate(240deg);
+            }
+        }
+        
+        .warning-bar {
+            background: rgba(255, 63, 143, 0.2);
+            border-left: 4px solid #ff3f8f;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            text-align: left;
+        }
+        
+        @media (max-width: 768px) {
+            .error-number {
+                font-size: 8rem;
+            }
+            .glass-card {
+                padding: 2rem 1rem;
+            }
+            .lock-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div class="error-container">
+        <div class="glass-card max-w-2xl mx-auto">
+            <div class="lock-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h1 class="error-number gradient-text">401</h1>
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">Access Denied</h2>
+            <p class="text-gray-300 text-lg md:text-xl mb-6 max-w-md mx-auto">
+                You don't have permission to access this page. 
+                This area is restricted to authorized users only.
+            </p>
+            
+            <div class="warning-bar max-w-md mx-auto">
+                <p class="text-yellow-200 text-sm">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <strong>Common reasons:</strong>
+                </p>
+                <ul class="text-gray-300 text-sm mt-2 space-y-1">
+                    <li>• You're not logged in</li>
+                    <li>• Your account doesn't have admin privileges</li>
+                    <li>• Your session has expired</li>
+                    <li>• You've been banned or restricted</li>
+                </ul>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+                <a href="/" class="btn-primary">
+                    <i class="fas fa-home mr-2"></i>
+                    Back to Home
+                </a>
+                <a href="/chat" class="btn-primary" style="background: linear-gradient(135deg, #5b2bff 0%, #1ed5ff 100%);">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Login / Sign Up
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+</body>
+</html>
