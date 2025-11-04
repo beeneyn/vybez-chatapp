@@ -128,6 +128,18 @@
                     <button onclick="switchTab('tickets')" id="tab-tickets" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-ticket-alt"></i> Support Tickets
                     </button>
+                    <button onclick="switchTab('apikeys')" id="tab-apikeys" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                        <i class="fas fa-key"></i> API Keys
+                    </button>
+                    <button onclick="switchTab('apilogs')" id="tab-apilogs" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                        <i class="fas fa-database"></i> API Logs
+                    </button>
+                    <button onclick="switchTab('serverlogs')" id="tab-serverlogs" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                        <i class="fas fa-server"></i> Server Logs
+                    </button>
+                    <button onclick="switchTab('maintenance')" id="tab-maintenance" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                        <i class="fas fa-wrench"></i> Maintenance
+                    </button>
                 </nav>
             </div>
 
@@ -240,6 +252,102 @@
                     </div>
                 </div>
                 <div id="tickets-list" class="space-y-4"></div>
+            </div>
+
+            <!-- API Keys Tab -->
+            <div id="content-apikeys" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">API Keys Management</h3>
+                    <button onclick="loadAPIKeys()" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+                <div id="apikeys-list" class="space-y-3"></div>
+            </div>
+
+            <!-- API Logs Tab -->
+            <div id="content-apilogs" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">API Request Logs</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="apilogs-search" placeholder="Search by username..." class="px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg">
+                        <button onclick="loadAPILogs()" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-600">
+                                <th class="text-left py-3 px-4 text-gray-300">Time</th>
+                                <th class="text-left py-3 px-4 text-gray-300">User</th>
+                                <th class="text-left py-3 px-4 text-gray-300">App</th>
+                                <th class="text-left py-3 px-4 text-gray-300">Route</th>
+                                <th class="text-left py-3 px-4 text-gray-300">Method</th>
+                                <th class="text-left py-3 px-4 text-gray-300">Status</th>
+                                <th class="text-left py-3 px-4 text-gray-300">Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody id="apilogs-table" class="text-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Server Logs Tab -->
+            <div id="content-serverlogs" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">Server Logs</h3>
+                    <div class="flex gap-2">
+                        <select id="serverlogs-level" onchange="loadServerLogs()" class="px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg">
+                            <option value="">All Levels</option>
+                            <option value="error">Error</option>
+                            <option value="warn">Warning</option>
+                            <option value="info">Info</option>
+                            <option value="debug">Debug</option>
+                        </select>
+                        <select id="serverlogs-category" onchange="loadServerLogs()" class="px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg">
+                            <option value="">All Categories</option>
+                            <option value="AUTH">Auth</option>
+                            <option value="MODERATION">Moderation</option>
+                            <option value="API">API</option>
+                            <option value="SYSTEM">System</option>
+                            <option value="SOCKET">Socket</option>
+                        </select>
+                        <button onclick="loadServerLogs()" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="space-y-2 max-h-96 overflow-y-auto" id="serverlogs-list"></div>
+            </div>
+
+            <!-- Maintenance Tab -->
+            <div id="content-maintenance" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">Maintenance Mode</h3>
+                </div>
+                <div class="bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-6 mb-6">
+                    <h4 class="text-yellow-300 font-semibold mb-2">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> What is Maintenance Mode?
+                    </h4>
+                    <p class="text-gray-300 text-sm mb-3">
+                        When maintenance mode is enabled, the <code>/health</code> endpoint will return a 503 status code, 
+                        indicating that the system is under maintenance. This is useful for monitoring services and load balancers.
+                    </p>
+                    <p class="text-gray-400 text-xs">
+                        Note: This does not prevent users from accessing the application. It only affects the health endpoint status.
+                    </p>
+                </div>
+                <div class="flex items-center justify-between bg-gray-800/50 rounded-lg p-6">
+                    <div>
+                        <h4 class="text-white font-semibold text-lg mb-1">Maintenance Mode Status</h4>
+                        <p class="text-gray-400 text-sm" id="maintenance-status-text">Loading...</p>
+                    </div>
+                    <button onclick="toggleMaintenance()" id="maintenance-toggle-btn" class="px-6 py-3 rounded-lg font-semibold transition text-white">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Loading...
+                    </button>
+                </div>
             </div>
         </div>
     </div>

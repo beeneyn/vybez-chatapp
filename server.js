@@ -12,6 +12,8 @@ const discordWebhook = require("./discord-webhook.js");
 const moderationRoutes = require("./moderation-routes.js");
 const emailService = require("./emailService.js");
 const serverLogger = require("./serverLogger.js");
+const apiRoutes = require("./api-routes.js");
+const apiMiddleware = require("./api-middleware.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -114,6 +116,8 @@ const banCheckMiddleware = async (req, res, next) => {
 };
 
 app.use(banCheckMiddleware);
+
+app.use('/api/developer', apiRoutes);
 
 const requireAdmin = (req, res, next) => {
     if (!req.session.user) {

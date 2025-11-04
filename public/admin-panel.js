@@ -50,6 +50,18 @@ function switchTab(tab) {
         case 'tickets':
             loadTickets();
             break;
+        case 'apikeys':
+            loadAPIKeys();
+            break;
+        case 'apilogs':
+            loadAPILogs();
+            break;
+        case 'serverlogs':
+            loadServerLogs();
+            break;
+        case 'maintenance':
+            loadMaintenanceStatus();
+            break;
     }
 }
 
@@ -628,6 +640,166 @@ async function deleteUser(username) {
         console.error('Error deleting user:', error);
         showAlert(error.message, 'error');
     }
+}
+
+async function loadAPIKeys() {
+    try {
+        const response = await fetch('/api/developer/admin/all-keys');
+        const data = await response.json();
+        
+        const list = document.getElementById('apikeys-list');
+        if (data.keys && data.keys.length > 0) {
+            list.innerHTML = data.keys.map(key => `
+                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-600">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-semibold text-white">${escapeHtml(key.name || key.app_name)}</h4>
+                            <p class="text-sm text-gray-400">User: ${escapeHtml(key.username)} | App: ${escapeHtml(key.app_name)}</p>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Created: ${new Date(key.created_at).toLocaleDateString()} | 
+                                Last Used: ${key.last_used_at ? new Date(key.last_used_at).toLocaleDateString() : 'Never'}
+                            </p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs ${key.is_active ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}">
+                            ${key.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<p class="text-gray-400 text-center py-4">No API keys found</p>';
+        }
+    } catch (error) {
+        console.error('Error loading API keys:', error);
+        document.getElementById('apikeys-list').innerHTML = '<p class="text-red-400 text-center">Error loading API keys</p>';
+    }
+}
+
+async function loadAPILogs() {
+    try {
+        const search = document.getElementById('apilogs-search').value;
+        const url = `/api/developer/admin/logs?limit=100${search ? `&username=${encodeURIComponent(search)}` : ''}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const table = document.getElementById('apilogs-table');
+        if (data.logs && data.logs.length > 0) {
+            table.innerHTML = data.logs.map(log => `
+                <tr class="border-b border-gray-700">
+                    <td class="py-2 px-4 text-sm">${new Date(log.created_at).toLocaleString()}</td>
+                    <td class="py-2 px-4">${escapeHtml(log.username)}</td>
+                    <td class="py-2 px-4 text-sm">${escapeHtml(log.app_name || 'N/A')}</td>
+                    <td class="py-2 px-4 text-xs font-mono">${escapeHtml(log.route)}</td>
+                    <td class="py-2 px-4"><span class="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs">${log.method}</span></td>
+                    <td class="py-2 px-4"><span class="px-2 py-1 ${log.status_code < 400 ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'} rounded text-xs">${log.status_code}</span></td>
+                    <td class="py-2 px-4 text-sm">${log.latency_ms}ms</td>
+                </tr>
+            `).join('');
+        } else {
+            table.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-400">No logs found</td></tr>';
+        }
+    } catch (error) {
+        console.error('Error loading API logs:', error);
+        document.getElementById('apilogs-table').innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-400">Error loading logs</td></tr>';
+    }
+}
+
+async function loadServerLogs() {
+    try {
+        const level = document.getElementById('serverlogs-level').value;
+        const category = document.getElementById('serverlogs-category').value;
+        const url = `/api/developer/admin/server-logs?limit=100${level ? `&level=${level}` : ''}${category ? `&category=${category}` : ''}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const list = document.getElementById('serverlogs-list');
+        if (data.logs && data.logs.length > 0) {
+            list.innerHTML = data.logs.map(log => {
+                const levelColors = {
+                    error: 'bg-red-500/20 text-red-300 border-red-500',
+                    warn: 'bg-yellow-500/20 text-yellow-300 border-yellow-500',
+                    info: 'bg-blue-500/20 text-blue-300 border-blue-500',
+                    debug: 'bg-gray-500/20 text-gray-300 border-gray-500'
+                };
+                const color = levelColors[log.level] || levelColors.info;
+                return `
+                    <div class="bg-gray-800/50 rounded p-3 border-l-4 ${color}">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-mono text-xs text-gray-400">${new Date(log.created_at).toLocaleString()}</span>
+                            <span class="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">${log.category}</span>
+                        </div>
+                        <p class="text-white text-sm">${escapeHtml(log.message)}</p>
+                        ${Object.keys(log.metadata || {}).length > 0 ? `<pre class="text-xs text-gray-400 mt-2 overflow-x-auto">${JSON.stringify(log.metadata, null, 2)}</pre>` : ''}
+                    </div>
+                `;
+            }).join('');
+        } else {
+            list.innerHTML = '<p class="text-gray-400 text-center py-4">No logs found</p>';
+        }
+    } catch (error) {
+        console.error('Error loading server logs:', error);
+        document.getElementById('serverlogs-list').innerHTML = '<p class="text-red-400 text-center">Error loading logs</p>';
+    }
+}
+
+async function loadMaintenanceStatus() {
+    try {
+        const response = await fetch('/api/developer/admin/maintenance');
+        const data = await response.json();
+        
+        const statusText = document.getElementById('maintenance-status-text');
+        const toggleBtn = document.getElementById('maintenance-toggle-btn');
+        
+        if (data.maintenanceMode) {
+            statusText.textContent = 'Maintenance mode is currently ENABLED';
+            statusText.className = 'text-yellow-300 text-sm font-semibold';
+            toggleBtn.innerHTML = '<i class="fas fa-toggle-on mr-2"></i> Disable Maintenance';
+            toggleBtn.className = 'px-6 py-3 rounded-lg font-semibold transition bg-yellow-600 hover:bg-yellow-700 text-white';
+        } else {
+            statusText.textContent = 'Maintenance mode is currently DISABLED';
+            statusText.className = 'text-green-300 text-sm font-semibold';
+            toggleBtn.innerHTML = '<i class="fas fa-toggle-off mr-2"></i> Enable Maintenance';
+            toggleBtn.className = 'px-6 py-3 rounded-lg font-semibold transition bg-green-600 hover:bg-green-700 text-white';
+        }
+    } catch (error) {
+        console.error('Error loading maintenance status:', error);
+    }
+}
+
+async function toggleMaintenance() {
+    try {
+        const response = await fetch('/api/developer/admin/maintenance');
+        const currentStatus = await response.json();
+        
+        const newStatus = !currentStatus.maintenanceMode;
+        const confirmMsg = newStatus 
+            ? 'Are you sure you want to enable maintenance mode? The /health endpoint will return 503 status.'
+            : 'Disable maintenance mode?';
+        
+        if (!confirm(confirmMsg)) return;
+        
+        const updateResponse = await fetch('/api/developer/admin/maintenance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled: newStatus })
+        });
+        
+        if (updateResponse.ok) {
+            showAlert(`Maintenance mode ${newStatus ? 'enabled' : 'disabled'}`, 'success');
+            loadMaintenanceStatus();
+        } else {
+            throw new Error('Failed to toggle maintenance mode');
+        }
+    } catch (error) {
+        console.error('Error toggling maintenance:', error);
+        showAlert('Failed to toggle maintenance mode', 'error');
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

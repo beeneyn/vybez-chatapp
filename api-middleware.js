@@ -23,32 +23,38 @@ async function apiKeyAuth(req, res, next) {
     }
     
     try {
-        const result = await db.pool.query(
-            'SELECT id, username, key_hash, scopes, rate_limit_tier, is_active FROM api_keys WHERE api_key = $1',
-            [apiKey]
+        const allKeys = await db.pool.query(
+            'SELECT id, username, key_hash, scopes, rate_limit_tier, is_active FROM api_keys WHERE is_active = true'
         );
         
-        if (result.rows.length === 0) {
+        let matchedKey = null;
+        for (const row of allKeys.rows) {
+            const isMatch = await bcrypt.compare(apiKey, row.key_hash);
+            if (isMatch) {
+                matchedKey = row;
+                break;
+            }
+        }
+        
+        if (!matchedKey) {
             serverLogger.warn('API', 'Invalid API key attempt', { apiKey: apiKey.substring(0, 20) + '...' });
             return res.status(401).json({ error: 'Invalid API key' });
         }
         
-        const keyData = result.rows[0];
-        
-        if (!keyData.is_active) {
-            return res.status(403).json({ error: 'API key is deactivated' });
-        }
-        
         await db.pool.query(
             'UPDATE api_keys SET last_used_at = NOW() WHERE id = $1',
-            [keyData.id]
+            [matchedKey.id]
         );
         
+        const scopes = typeof matchedKey.scopes === 'string' 
+            ? JSON.parse(matchedKey.scopes) 
+            : (matchedKey.scopes || []);
+        
         req.apiKey = {
-            id: keyData.id,
-            username: keyData.username,
-            scopes: keyData.scopes || [],
-            rateLimitTier: keyData.rate_limit_tier || 'standard'
+            id: matchedKey.id,
+            username: matchedKey.username,
+            scopes: scopes,
+            rateLimitTier: matchedKey.rate_limit_tier || 'standard'
         };
         
         next();

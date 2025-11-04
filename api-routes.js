@@ -58,12 +58,11 @@ router.post('/keys', requireAuth, async (req, res) => {
         const keyHash = await hashAPIKey(apiKey);
         
         const result = await db.pool.query(
-            `INSERT INTO api_keys (username, api_key, key_hash, name, app_name, scopes, rate_limit_tier) 
-             VALUES ($1, $2, $3, $4, $5, $6, $7) 
+            `INSERT INTO api_keys (username, key_hash, name, app_name, scopes, rate_limit_tier) 
+             VALUES ($1, $2, $3, $4, $5, $6) 
              RETURNING id, name, app_name, scopes, rate_limit_tier, created_at`,
             [
                 req.session.user.username,
-                apiKey,
                 keyHash,
                 name,
                 appName,

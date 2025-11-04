@@ -159,7 +159,6 @@ const initializeDatabase = async () => {
             CREATE TABLE IF NOT EXISTS api_keys (
                 id SERIAL PRIMARY KEY,
                 username TEXT NOT NULL,
-                api_key TEXT UNIQUE NOT NULL,
                 app_name TEXT NOT NULL,
                 description TEXT DEFAULT NULL,
                 is_active BOOLEAN DEFAULT TRUE,
@@ -167,6 +166,14 @@ const initializeDatabase = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 rate_limit INTEGER DEFAULT 100
             )
+        `);
+        
+        await client.query(`
+            DO $$ BEGIN
+                IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='api_keys' AND column_name='api_key') THEN
+                    ALTER TABLE api_keys DROP COLUMN api_key;
+                END IF;
+            END $$;
         `);
         
         await client.query(`
