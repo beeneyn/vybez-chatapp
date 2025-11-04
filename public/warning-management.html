@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warning Management - Vybez Admin</title>
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 class="text-2xl font-bold" style="font-family: 'Space Grotesk', sans-serif;">
+                    <span style="background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        Warning Management
+                    </span>
+                </h1>
+                <div class="flex gap-2">
+                    <a href="/chat" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded">Back to Chat</a>
+                    <a href="/ban-management.html" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">Bans</a>
+                    <a href="/mute-management.html" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Mutes</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4">Create New Warning</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <input type="text" id="warning-username" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter username">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                        <textarea id="warning-reason" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Reason for warning"></textarea>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button id="create-warning-btn" class="px-4 py-2 btn-brand-gradient text-white rounded font-semibold">
+                        <i class="fas fa-exclamation-triangle"></i> Create Warning
+                    </button>
+                </div>
+                <div id="warning-message" class="alert hidden mt-3"></div>
+            </div>
+
+            <div class="bg-white shadow rounded-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">All Warnings</h2>
+                    <button id="refresh-warnings-btn" class="px-3 py-1 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Warned By</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="warnings-table" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading warnings...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="warning-management.js"></script>
+</body>
+</html>
