@@ -261,6 +261,44 @@ app.post("/api/admin/toggle-admin", requireAdminAPI, (req, res) => {
     );
 });
 
+app.post("/api/admin/delete-user", requireAdminAPI, (req, res) => {
+    const { username } = req.body;
+    
+    if (!username) {
+        return res.status(400).json({ message: "Username is required" });
+    }
+    
+    if (username === req.session.user.username) {
+        return res.status(400).json({ message: "You cannot delete your own account from the admin panel. Use settings instead." });
+    }
+    
+    db.pool.query('SELECT role FROM users WHERE username = $1', [username], (err, result) => {
+        if (err) {
+            console.error("Error checking user:", err);
+            return res.status(500).json({ message: "Failed to check user" });
+        }
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        db.deleteUserAccount(username, (deleteErr) => {
+            if (deleteErr) {
+                console.error("Error deleting user:", deleteErr);
+                return res.status(500).json({ message: "Failed to delete user account" });
+            }
+            
+            discordWebhook.sendMessage({
+                title: '🗑️ User Deleted by Admin',
+                description: `**${req.session.user.username}** permanently deleted user **${username}**`,
+                color: 0xff0000
+            });
+            
+            res.json({ success: true, message: `User ${username} has been deleted` });
+        });
+    });
+});
+
 app.get("/api/admin/user-modview/:username", requireAdminAPI, (req, res) => {
     const { username } = req.params;
     

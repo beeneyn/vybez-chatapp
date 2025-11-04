@@ -127,9 +127,12 @@ async function loadUsers() {
                                 <i class="fas fa-arrow-down"></i>
                             </button>`
                         }
-                        <a href="/ban-management.html" class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs" title="Ban User">
+                        <a href="/ban-management.html" class="px-2 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded text-xs" title="Ban User">
                             <i class="fas fa-ban"></i>
                         </a>
+                        <button onclick="deleteUser('${user.username}')" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs" title="Delete User">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </td>
             `;
@@ -593,6 +596,38 @@ async function openModView(username) {
 
 function closeModView() {
     document.getElementById('modview-modal').classList.add('hidden');
+}
+
+async function deleteUser(username) {
+    if (!confirm(`Are you sure you want to permanently delete the user "${username}"?\n\nThis will delete:\n- Their account and profile\n- All messages and files\n- All moderation history\n- Support tickets\n- API keys\n\nThis action cannot be undone!`)) {
+        return;
+    }
+    
+    const confirmText = prompt(`To confirm deletion, please type the username: ${username}`);
+    if (confirmText !== username) {
+        showAlert('Username confirmation does not match. Deletion cancelled.', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/admin/delete-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to delete user');
+        }
+        
+        showAlert(`User "${username}" has been permanently deleted`, 'success');
+        loadUsers();
+        loadStats();
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        showAlert(error.message, 'error');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

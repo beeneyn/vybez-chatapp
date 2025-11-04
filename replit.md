@@ -25,8 +25,9 @@ Key Features include:
 - **Support Ticket System:** Full-featured support system at `/support` where users can submit tickets with priority levels (low, normal, high, urgent). Admins can view, respond to, and manage tickets through the admin panel with status tracking (open, in_progress, resolved, closed).
 - **Admin Panel:** Comprehensive admin dashboard at `/admin-panel.html` with:
   - Live stats (users, rooms, messages, bans)
-  - User management (promote/demote admins)
+  - User management (promote/demote admins, **delete users**)
   - **Mod View:** Discord-style user profile inspection showing user activity (message count, file uploads, support tickets), complete moderation history (warnings, mutes, bans), and account details
+  - **User Deletion:** Admins can permanently delete any user account (except their own) with double confirmation and automatic cleanup of all associated data
   - Room management
   - Recent message logs
   - File upload tracking
