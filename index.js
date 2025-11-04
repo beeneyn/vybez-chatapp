@@ -74,7 +74,7 @@ io.engine.use(sessionMiddleware);
 
 const banCheckMiddleware = async (req, res, next) => {
     const allowedForBannedUsers = ['/ban.html', '/support', '/support.html', '/api/moderation/check-status', '/check-session', '/logout'];
-    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health', '/404.html', '/401.html'];
+    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health', '/404.html', '/401.html', '/403.html', '/500.html', '/502.html', '/maintenance.html'];
     
     const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.mp3', '.wav'];
     const isStaticAsset = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext)) ||
@@ -131,6 +131,11 @@ const maintenanceMiddleware = async (req, res, next) => {
         '/desktop-login',
         '/landing.html',
         '/check-session',
+        '/404.html',
+        '/401.html',
+        '/403.html',
+        '/500.html',
+        '/502.html',
         '/dist/',
         '/uploads/',
         '/favicon.png',
@@ -707,6 +712,18 @@ app.get("/support", (req, res) => {
 
 app.get("/maintenance", (req, res) => {
     res.status(503).sendFile(path.join(__dirname, "public", "maintenance.html"));
+});
+
+app.get("/500", (req, res) => {
+    res.status(500).sendFile(path.join(__dirname, "public", "500.html"));
+});
+
+app.get("/502", (req, res) => {
+    res.status(502).sendFile(path.join(__dirname, "public", "502.html"));
+});
+
+app.get("/403", (req, res) => {
+    res.status(403).sendFile(path.join(__dirname, "public", "403.html"));
 });
 
 app.get("/api-docs", (req, res) => {
@@ -1563,7 +1580,13 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
     console.error("Server error:", err);
-    res.status(500).send("Internal Server Error");
+    serverLogger.error('SYSTEM', 'Unhandled server error', { 
+        error: err.message, 
+        stack: err.stack,
+        path: req.path,
+        method: req.method
+    });
+    res.status(500).sendFile(path.join(__dirname, "public", "500.html"));
 });
 
 const requiredEnvVars = ['DATABASE_URL', 'SESSION_SECRET', 'JWT_SECRET'];
