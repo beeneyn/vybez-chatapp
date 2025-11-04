@@ -22,6 +22,7 @@ Key Features include:
 - **Real-time Messaging:** Instant message delivery, message history, typing indicators, and message reactions.
 - **@Mentions:** Detect @username in messages with blue highlighting; mentioned users receive real-time notifications with XSS-safe rendering.
 - **Message Deletion:** Users can delete their own messages; admins can delete any message; real-time Socket.IO broadcast removes messages for all connected clients.
+- **Admin Panel:** Comprehensive admin dashboard at `/admin-panel.html` with live stats (users, rooms, messages, bans), user management (promote/demote admins), room management, recent message logs, and file upload tracking. Quick access to moderation pages and real-time data refresh.
 - **User Profiles:** Customizable avatars, bios, status, and chat colors.
 - **File Sharing:** Uploads up to 10MB (images, documents, videos) with secure filename generation and automatic image previews.
 - **Private Messaging:** Direct messages with notifications and read receipts.
@@ -47,10 +48,6 @@ The application is structured with a clear separation between server-side logic 
 **Core Features:**
 - Restore file upload and search buttons to chat interface
 - Enhanced private message modal with user profiles and neon nightlife theme
-- Account deletion with 3-step confirmation and password verification
-- Username change functionality with password confirmation
-- Admin panel with user/room/message/file management
-- Moderation system with warnings, mutes, and bans
 - #announcements system channel with markdown support (admin-only posting)
 - Maintenance mode toggle for health endpoint
 

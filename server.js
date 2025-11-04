@@ -278,6 +278,16 @@ app.get("/developer", (req, res) => {
     else res.sendFile(path.join(__dirname, "public", "developer.html"));
 });
 
+app.get("/admin-panel.html", (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/");
+    }
+    if (req.session.user.role !== 'admin') {
+        return res.status(403).send("Access denied. Admin privileges required.");
+    }
+    res.sendFile(path.join(__dirname, "public", "admin-panel.html"));
+});
+
 app.get("/api-docs", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "api-documentation.html"));
 });
