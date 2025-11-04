@@ -1376,7 +1376,17 @@ io.on("connection", (socket) => {
     });
 });
 
+const requiredEnvVars = ['DATABASE_URL', 'SESSION_SECRET', 'JWT_SECRET'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+    console.error('⚠️  MISSING REQUIRED ENVIRONMENT VARIABLES:', missingEnvVars.join(', '));
+    console.error('⚠️  Server may not function correctly without these variables');
+}
+
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, "0.0.0.0", () =>
-    console.log(`Server is running on http://0.0.0.0:${PORT}`),
-);
+server.listen(PORT, "0.0.0.0", () => {
+    console.log(`✅ Server is running on http://0.0.0.0:${PORT}`);
+    console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`✅ Database URL: ${process.env.DATABASE_URL ? 'configured' : 'MISSING'}`);
+});

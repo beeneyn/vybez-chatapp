@@ -262,9 +262,13 @@ const initializeDatabase = async () => {
             );
         }
         
-        console.log('Connected to PostgreSQL database and tables initialized.');
+        console.log('✅ Connected to PostgreSQL database and tables initialized.');
     } catch (err) {
-        console.error('Error initializing database:', err);
+        console.error('❌ Error initializing database:', err.message);
+        console.error('   Full error:', err);
+        if (!process.env.DATABASE_URL) {
+            console.error('   DATABASE_URL environment variable is not set!');
+        }
     } finally {
         client.release();
     }
