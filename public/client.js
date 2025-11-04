@@ -751,6 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('settings-bio').value = data.user.bio || '';
                     document.getElementById('settings-status').value = data.user.status || '';
                     document.getElementById('settings-color').value = data.user.color || '#000000';
+                    document.getElementById('settings-email').value = data.user.email || '';
                     
                     const avatarImg = document.getElementById('current-avatar');
                     const avatarPlaceholder = document.getElementById('avatar-placeholder');
@@ -808,12 +809,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const bio = document.getElementById('settings-bio').value;
             const status = document.getElementById('settings-status').value;
             const chat_color = document.getElementById('settings-color').value;
+            const email = document.getElementById('settings-email').value.trim() || null;
             
             try {
                 const response = await fetch('/update-profile', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ bio, status, chat_color })
+                    body: JSON.stringify({ bio, status, chat_color, email })
                 });
                 
                 const msgEl = document.getElementById('settings-message');
