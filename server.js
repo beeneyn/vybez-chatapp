@@ -141,6 +141,95 @@ app.get("/settings", (req, res) => {
     else res.sendFile(path.join(__dirname, "public", "settings.html"));
 });
 
+app.get("/developer", (req, res) => {
+    if (!req.session.user) res.redirect("/");
+    else res.sendFile(path.join(__dirname, "public", "developer.html"));
+});
+
+app.get("/api-docs", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "api-documentation.html"));
+});
+
+// Developer API Key Management Routes
+app.get("/api/developer/keys", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    db.getUserApiKeys(req.session.user.username, (err, keys) => {
+        if (err) {
+            console.error("Failed to get API keys:", err);
+            return res.status(500).json({ message: "Failed to retrieve API keys" });
+        }
+        res.status(200).json({ keys });
+    });
+});
+
+app.post("/api/developer/keys", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const { appName, description } = req.body;
+    
+    if (!appName || appName.trim().length === 0) {
+        return res.status(400).json({ message: "Application name is required" });
+    }
+    
+    db.createApiKey(req.session.user.username, appName.trim(), description?.trim() || null, (err, apiKeyData) => {
+        if (err) {
+            console.error("Failed to create API key:", err);
+            return res.status(500).json({ message: "Failed to create API key" });
+        }
+        
+        // Log to Discord webhook
+        discordWebhook.sendDiscordWebhook({
+            title: "🔑 API Key Created",
+            description: `User **${req.session.user.username}** created a new API key`,
+            fields: [
+                { name: "App Name", value: appName.trim(), inline: true },
+                { name: "Description", value: description?.trim() || "None", inline: true }
+            ],
+            color: 0x5b2bff
+        }).catch(console.error);
+        
+        // Return the plaintext key (only time it will be shown)
+        res.status(201).json({ apiKey: apiKeyData.plaintextKey, message: "API key created successfully" });
+    });
+});
+
+app.post("/api/developer/keys/:keyId/deactivate", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const keyId = parseInt(req.params.keyId);
+    
+    db.deactivateApiKey(req.session.user.username, keyId, (err, result) => {
+        if (err) {
+            console.error("Failed to deactivate API key:", err);
+            return res.status(500).json({ message: err.message || "Failed to deactivate API key" });
+        }
+        res.status(200).json({ message: "API key deactivated successfully" });
+    });
+});
+
+app.delete("/api/developer/keys/:keyId", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const keyId = parseInt(req.params.keyId);
+    
+    db.deleteApiKey(req.session.user.username, keyId, (err, result) => {
+        if (err) {
+            console.error("Failed to delete API key:", err);
+            return res.status(500).json({ message: err.message || "Failed to delete API key" });
+        }
+        res.status(200).json({ message: "API key deleted successfully" });
+    });
+});
+
 app.get("/demo-chat", (req, res) => {
     req.session.user = {
         username: 'DemoUser',

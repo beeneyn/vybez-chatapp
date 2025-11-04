@@ -136,6 +136,20 @@ const initializeDatabase = async () => {
             )
         `);
         
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS api_keys (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                api_key TEXT UNIQUE NOT NULL,
+                app_name TEXT NOT NULL,
+                description TEXT DEFAULT NULL,
+                is_active BOOLEAN DEFAULT TRUE,
+                last_used_at TIMESTAMP DEFAULT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                rate_limit INTEGER DEFAULT 100
+            )
+        `);
+        
         const defaultRooms = ['#general', '#tech', '#random'];
         for (const room of defaultRooms) {
             await client.query(
@@ -795,6 +809,107 @@ const isBlockedBy = async (username, otherUsername, callback) => {
     }
 };
 
+// API Key Management Functions
+const crypto = require('crypto');
+
+const generateApiKey = () => {
+    return `vybez_${crypto.randomBytes(32).toString('hex')}`;
+};
+
+const createApiKey = async (username, appName, description, callback) => {
+    try {
+        const plaintextKey = generateApiKey();
+        const hashedKey = await bcrypt.hash(plaintextKey, 10);
+        const result = await pool.query(
+            'INSERT INTO api_keys (username, api_key, app_name, description) VALUES ($1, $2, $3, $4) RETURNING id, username, app_name, description, is_active, created_at, rate_limit',
+            [username, hashedKey, appName, description]
+        );
+        // Return the plaintext key so it can be shown to the user once
+        callback(null, { ...result.rows[0], plaintextKey });
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getUserApiKeys = async (username, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT id, app_name, description, is_active, last_used_at, created_at, rate_limit FROM api_keys WHERE username = $1 ORDER BY created_at DESC',
+            [username]
+        );
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const validateApiKey = async (apiKey, callback) => {
+    try {
+        // Get all active API keys (we need to check hashes)
+        const result = await pool.query(
+            'SELECT id, username, app_name, api_key, is_active, rate_limit FROM api_keys WHERE is_active = TRUE'
+        );
+        
+        // Find matching key by comparing hashes
+        let matchedKey = null;
+        for (const row of result.rows) {
+            const isMatch = await bcrypt.compare(apiKey, row.api_key);
+            if (isMatch) {
+                matchedKey = row;
+                break;
+            }
+        }
+        
+        if (!matchedKey) {
+            return callback(null, null);
+        }
+        
+        // Update last_used_at
+        await pool.query(
+            'UPDATE api_keys SET last_used_at = CURRENT_TIMESTAMP WHERE id = $1',
+            [matchedKey.id]
+        );
+        
+        callback(null, {
+            username: matchedKey.username,
+            appName: matchedKey.app_name,
+            rateLimit: matchedKey.rate_limit
+        });
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const deactivateApiKey = async (username, keyId, callback) => {
+    try {
+        const result = await pool.query(
+            'UPDATE api_keys SET is_active = FALSE WHERE id = $1 AND username = $2 RETURNING *',
+            [keyId, username]
+        );
+        if (result.rowCount === 0) {
+            return callback(new Error('API key not found'));
+        }
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const deleteApiKey = async (username, keyId, callback) => {
+    try {
+        const result = await pool.query(
+            'DELETE FROM api_keys WHERE id = $1 AND username = $2 RETURNING *',
+            [keyId, username]
+        );
+        if (result.rowCount === 0) {
+            return callback(new Error('API key not found'));
+        }
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -842,5 +957,10 @@ module.exports = {
     getBlockedUsers,
     isUserBlocked,
     isBlockedBy,
+    createApiKey,
+    getUserApiKeys,
+    validateApiKey,
+    deactivateApiKey,
+    deleteApiKey,
     pool
 };
