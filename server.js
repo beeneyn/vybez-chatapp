@@ -183,15 +183,15 @@ app.post("/api/developer/keys", (req, res) => {
         }
         
         // Log to Discord webhook
-        discordWebhook.sendDiscordWebhook({
-            title: "🔑 API Key Created",
-            description: `User **${req.session.user.username}** created a new API key`,
-            fields: [
+        discordWebhook.sendDiscordWebhook(
+            "🔑 API Key Created",
+            `User **${req.session.user.username}** created a new API key`,
+            0x5b2bff,
+            [
                 { name: "App Name", value: appName.trim(), inline: true },
                 { name: "Description", value: description?.trim() || "None", inline: true }
-            ],
-            color: 0x5b2bff
-        }).catch(console.error);
+            ]
+        );
         
         // Return the plaintext key (only time it will be shown)
         res.status(201).json({ apiKey: apiKeyData.plaintextKey, message: "API key created successfully" });
