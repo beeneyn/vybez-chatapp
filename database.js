@@ -428,6 +428,9 @@ const deleteUserAccount = async (username, callback) => {
         await client.query('DELETE FROM private_messages WHERE from_user = $1 OR to_user = $1', [username]);
         await client.query('DELETE FROM messages WHERE username = $1', [username]);
         await client.query('DELETE FROM rooms WHERE created_by = $1 AND is_default = FALSE', [username]);
+        await client.query('DELETE FROM warnings WHERE username = $1', [username]);
+        await client.query('DELETE FROM mutes WHERE username = $1', [username]);
+        await client.query('DELETE FROM bans WHERE username = $1', [username]);
         await client.query('DELETE FROM users WHERE username = $1', [username]);
         
         await client.query('COMMIT');
@@ -452,6 +455,12 @@ const changeUsername = async (oldUsername, newUsername, callback) => {
         await client.query('UPDATE reactions SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
         await client.query('UPDATE read_receipts SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
         await client.query('UPDATE rooms SET created_by = $1 WHERE created_by = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE warnings SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE warnings SET warned_by = $1 WHERE warned_by = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE mutes SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE mutes SET muted_by = $1 WHERE muted_by = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE bans SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE bans SET banned_by = $1 WHERE banned_by = $2', [newUsername, oldUsername]);
         
         await client.query('COMMIT');
         callback(null);
