@@ -150,6 +150,10 @@ app.get("/api-docs", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "api-documentation.html"));
 });
 
+app.get("/developer-terms", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "developer-terms.html"));
+});
+
 // Developer API Key Management Routes
 app.get("/api/developer/keys", (req, res) => {
     if (!req.session.user) {
