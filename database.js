@@ -169,6 +169,68 @@ const initializeDatabase = async () => {
             )
         `);
         
+        await client.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='api_keys' AND column_name='key_hash') THEN
+                    ALTER TABLE api_keys ADD COLUMN key_hash TEXT;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='api_keys' AND column_name='name') THEN
+                    ALTER TABLE api_keys ADD COLUMN name TEXT;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='api_keys' AND column_name='scopes') THEN
+                    ALTER TABLE api_keys ADD COLUMN scopes JSONB DEFAULT '[]'::jsonb;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='api_keys' AND column_name='rate_limit_tier') THEN
+                    ALTER TABLE api_keys ADD COLUMN rate_limit_tier TEXT DEFAULT 'standard';
+                END IF;
+            END $$;
+        `);
+        
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS api_logs (
+                id SERIAL PRIMARY KEY,
+                api_key_id INTEGER,
+                username TEXT,
+                route TEXT NOT NULL,
+                method TEXT NOT NULL,
+                status_code INTEGER,
+                latency_ms INTEGER,
+                ip_address TEXT,
+                user_agent TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS server_logs (
+                id SERIAL PRIMARY KEY,
+                level TEXT NOT NULL,
+                category TEXT NOT NULL,
+                message TEXT NOT NULL,
+                metadata JSONB DEFAULT '{}'::jsonb,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_api_logs_created_at ON api_logs(created_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_api_logs_api_key_id ON api_logs(api_key_id);
+            CREATE INDEX IF NOT EXISTS idx_server_logs_created_at ON server_logs(created_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_server_logs_level ON server_logs(level);
+            CREATE INDEX IF NOT EXISTS idx_server_logs_category ON server_logs(category);
+        `);
+        
+        await client.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='support_tickets' AND column_name='confirmation_sent_at') THEN
+                    ALTER TABLE support_tickets ADD COLUMN confirmation_sent_at TIMESTAMP DEFAULT NULL;
+                END IF;
+                IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='support_tickets' AND column_name='response_sent_at') THEN
+                    ALTER TABLE support_tickets ADD COLUMN response_sent_at TIMESTAMP DEFAULT NULL;
+                END IF;
+            END $$;
+        `);
+        
         const defaultRooms = ['#general', '#tech', '#random'];
         for (const room of defaultRooms) {
             await client.query(
