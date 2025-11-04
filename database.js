@@ -85,6 +85,7 @@ const initializeDatabase = async () => {
                 username TEXT NOT NULL,
                 warned_by TEXT NOT NULL,
                 reason TEXT NOT NULL,
+                message_evidence TEXT DEFAULT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
@@ -95,6 +96,7 @@ const initializeDatabase = async () => {
                 username TEXT NOT NULL,
                 muted_by TEXT NOT NULL,
                 reason TEXT NOT NULL,
+                message_evidence TEXT DEFAULT NULL,
                 duration_minutes INTEGER NOT NULL,
                 expires_at TIMESTAMP NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -108,6 +110,7 @@ const initializeDatabase = async () => {
                 username TEXT NOT NULL,
                 banned_by TEXT NOT NULL,
                 reason TEXT NOT NULL,
+                message_evidence TEXT DEFAULT NULL,
                 is_permanent BOOLEAN DEFAULT FALSE,
                 expires_at TIMESTAMP DEFAULT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -543,11 +546,11 @@ const changeUsername = async (oldUsername, newUsername, callback) => {
     }
 };
 
-const addWarning = async (username, warnedBy, reason, callback) => {
+const addWarning = async (username, warnedBy, reason, messageEvidence, callback) => {
     try {
         const result = await pool.query(
-            'INSERT INTO warnings (username, warned_by, reason) VALUES ($1, $2, $3) RETURNING *',
-            [username, warnedBy, reason]
+            'INSERT INTO warnings (username, warned_by, reason, message_evidence) VALUES ($1, $2, $3, $4) RETURNING *',
+            [username, warnedBy, reason, messageEvidence || null]
         );
         callback(null, result.rows[0]);
     } catch (err) {
@@ -583,12 +586,12 @@ const deleteWarning = async (id, callback) => {
     }
 };
 
-const addMute = async (username, mutedBy, reason, durationMinutes, callback) => {
+const addMute = async (username, mutedBy, reason, messageEvidence, durationMinutes, callback) => {
     try {
         const expiresAt = new Date(Date.now() + durationMinutes * 60 * 1000);
         const result = await pool.query(
-            'INSERT INTO mutes (username, muted_by, reason, duration_minutes, expires_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [username, mutedBy, reason, durationMinutes, expiresAt]
+            'INSERT INTO mutes (username, muted_by, reason, message_evidence, duration_minutes, expires_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [username, mutedBy, reason, messageEvidence || null, durationMinutes, expiresAt]
         );
         callback(null, result.rows[0]);
     } catch (err) {
@@ -632,11 +635,11 @@ const checkIfUserMuted = async (username, callback) => {
     }
 };
 
-const addBan = async (username, bannedBy, reason, isPermanent, expiresAt, callback) => {
+const addBan = async (username, bannedBy, reason, messageEvidence, isPermanent, expiresAt, callback) => {
     try {
         const result = await pool.query(
-            'INSERT INTO bans (username, banned_by, reason, is_permanent, expires_at) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [username, bannedBy, reason, isPermanent, expiresAt]
+            'INSERT INTO bans (username, banned_by, reason, message_evidence, is_permanent, expires_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [username, bannedBy, reason, messageEvidence || null, isPermanent, expiresAt]
         );
         callback(null, result.rows[0]);
     } catch (err) {

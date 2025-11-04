@@ -34,12 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = document.createElement('tr');
                 const minutesRemaining = Math.max(0, Math.floor((new Date(mute.expires_at) - Date.now()) / 60000));
                 const emailDisplay = mute.user_email || '<span class="text-gray-400 italic">No email</span>';
+                const evidenceDisplay = mute.message_evidence 
+                    ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">MSG: ${mute.message_evidence}</span>` 
+                    : '<span class="text-gray-400 italic">None</span>';
                 
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${mute.username}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${emailDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${mute.muted_by}</td>
                     <td class="px-6 py-4 text-sm">${mute.reason}</td>
+                    <td class="px-6 py-4 text-sm">${evidenceDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${mute.duration_minutes} min${mute.duration_minutes !== 1 ? 's' : ''}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                         ${new Date(mute.expires_at).toLocaleString()}
@@ -63,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     createMuteBtn.addEventListener('click', async () => {
         const username = document.getElementById('mute-username').value.trim();
         const reason = document.getElementById('mute-reason').value.trim();
+        const messageEvidence = document.getElementById('mute-evidence').value.trim();
         let durationMinutes;
 
         if (muteDurationSelect.value === 'custom') {
@@ -80,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/moderation/mutes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, reason, durationMinutes })
+                body: JSON.stringify({ username, reason, messageEvidence: messageEvidence || null, durationMinutes })
             });
 
             const data = await response.json();
@@ -89,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showMessage('Mute created successfully', 'success');
                 document.getElementById('mute-username').value = '';
                 document.getElementById('mute-reason').value = '';
+                document.getElementById('mute-evidence').value = '';
                 loadMutes();
             } else {
                 showMessage(data.message || 'Failed to create mute', 'error');

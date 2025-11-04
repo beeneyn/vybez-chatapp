@@ -21,11 +21,11 @@ module.exports = (app) => {
     });
 
     app.post('/api/moderation/warnings', isAdmin, (req, res) => {
-        const { username, reason } = req.body;
+        const { username, reason, messageEvidence } = req.body;
         if (!username || !reason) {
             return res.status(400).json({ message: "Username and reason are required" });
         }
-        db.addWarning(username, req.session.user.username, reason, (err, warning) => {
+        db.addWarning(username, req.session.user.username, reason, messageEvidence || null, (err, warning) => {
             if (err) return res.status(500).json({ message: "Failed to create warning" });
             
             const notificationMessage = `You have received a warning from ${req.session.user.username}: ${reason}`;
@@ -56,11 +56,11 @@ module.exports = (app) => {
     });
 
     app.post('/api/moderation/mutes', isAdmin, (req, res) => {
-        const { username, reason, durationMinutes } = req.body;
+        const { username, reason, messageEvidence, durationMinutes } = req.body;
         if (!username || !reason || !durationMinutes) {
             return res.status(400).json({ message: "Username, reason, and duration are required" });
         }
-        db.addMute(username, req.session.user.username, reason, durationMinutes, (err, mute) => {
+        db.addMute(username, req.session.user.username, reason, messageEvidence || null, durationMinutes, (err, mute) => {
             if (err) return res.status(500).json({ message: "Failed to create mute" });
             
             const notificationMessage = `You have been muted by ${req.session.user.username} for ${durationMinutes} minutes. Reason: ${reason}`;
@@ -91,7 +91,7 @@ module.exports = (app) => {
     });
 
     app.post('/api/moderation/bans', isAdmin, (req, res) => {
-        const { username, reason, isPermanent, durationDays } = req.body;
+        const { username, reason, messageEvidence, isPermanent, durationDays } = req.body;
         if (!username || !reason) {
             return res.status(400).json({ message: "Username and reason are required" });
         }
@@ -101,7 +101,7 @@ module.exports = (app) => {
             expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
         }
         
-        db.addBan(username, req.session.user.username, reason, isPermanent, expiresAt, (err, ban) => {
+        db.addBan(username, req.session.user.username, reason, messageEvidence || null, isPermanent, expiresAt, (err, ban) => {
             if (err) return res.status(500).json({ message: "Failed to create ban" });
             
             const isTermination = reason && reason.toLowerCase().includes('[termination]');

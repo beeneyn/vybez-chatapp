@@ -30,7 +30,8 @@ Key Features include:
   - **Warning System:** Sends notifications to user's mailbox inbox; users retain full access but see warning messages
   - **Mute System:** Blocks message sending (chat and private messages); grays out input with visual feedback showing mute duration and reason; users can still view site
   - **Ban System:** Completely blocks site access; redirects to dedicated ban page showing reason, duration, and admin info; supports permanent and temporary bans (1 day, 3 day, 7 day, 2 week, 1 month)
-  - **Admin Management:** Three dedicated management pages for warnings, mutes, and bans with CRUD operations
+  - **Message Evidence:** Moderators can attach message IDs as evidence when issuing warnings, mutes, or bans; evidence displayed in management tables for accountability
+  - **Admin Management:** Three dedicated management pages for warnings, mutes, and bans with CRUD operations and evidence tracking
   - **Real-time Enforcement:** Server-side and client-side validation; Socket.IO middleware blocks banned/muted users; automatic expiration handling
 
 ### System Design Choices
@@ -89,9 +90,9 @@ A full-featured Electron desktop client provides enhanced user experience with:
 - **`private_messages`**: id, from_user, to_user, message_text, timestamp, read
 - **`read_receipts`**: id, message_id (FK), username, read_at
 - **`rooms`**: id, name (UNIQUE), created_by, created_at, is_default
-- **`warnings`**: id, username, warned_by, reason, created_at
-- **`mutes`**: id, username, muted_by, reason, expires_at, created_at
-- **`bans`**: id, username, banned_by, reason, expires_at (NULL for permanent), created_at
+- **`warnings`**: id, username, warned_by, reason, message_evidence, created_at
+- **`mutes`**: id, username, muted_by, reason, message_evidence, duration_minutes, expires_at, created_at, is_active
+- **`bans`**: id, username, banned_by, reason, message_evidence, is_permanent, expires_at (NULL for permanent), created_at, is_active
 
 All tables utilize PostgreSQL SERIAL for auto-incrementing IDs. The codebase uses a username-based schema pattern where relationships are maintained via TEXT username fields rather than foreign key constraints. Data integrity during account deletion and username changes is handled via transactional updates in `deleteUserAccount()` and `changeUsername()` functions.
 

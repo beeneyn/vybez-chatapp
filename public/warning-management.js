@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             data.warnings.forEach(warning => {
                 const emailDisplay = warning.user_email || '<span class="text-gray-400 italic">No email</span>';
+                const evidenceDisplay = warning.message_evidence 
+                    ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">MSG: ${warning.message_evidence}</span>` 
+                    : '<span class="text-gray-400 italic">None</span>';
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -29,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${emailDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${warning.warned_by}</td>
                     <td class="px-6 py-4 text-sm">${warning.reason}</td>
+                    <td class="px-6 py-4 text-sm">${evidenceDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${new Date(warning.created_at).toLocaleString()}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                         <button class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs" onclick="deleteWarning(${warning.id})">
@@ -47,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     createWarningBtn.addEventListener('click', async () => {
         const username = document.getElementById('warning-username').value.trim();
         const reason = document.getElementById('warning-reason').value.trim();
+        const messageEvidence = document.getElementById('warning-evidence').value.trim();
 
         if (!username || !reason) {
             showMessage('Username and reason are required', 'error');
@@ -57,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/moderation/warnings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, reason })
+                body: JSON.stringify({ username, reason, messageEvidence: messageEvidence || null })
             });
 
             const data = await response.json();
@@ -66,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showMessage('Warning created successfully', 'success');
                 document.getElementById('warning-username').value = '';
                 document.getElementById('warning-reason').value = '';
+                document.getElementById('warning-evidence').value = '';
                 loadWarnings();
             } else {
                 showMessage(data.message || 'Failed to create warning', 'error');

@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isTermination = ban.reason && ban.reason.toLowerCase().includes('[termination]');
                 const displayReason = ban.reason.replace('[TERMINATION]', '').replace('[termination]', '').trim();
                 const emailDisplay = ban.user_email || '<span class="text-gray-400 italic">No email</span>';
+                const evidenceDisplay = ban.message_evidence 
+                    ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">MSG: ${ban.message_evidence}</span>` 
+                    : '<span class="text-gray-400 italic">None</span>';
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -41,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${emailDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${ban.banned_by}</td>
                     <td class="px-6 py-4 text-sm">${displayReason}</td>
+                    <td class="px-6 py-4 text-sm">${evidenceDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                         ${isTermination ? '<span class="px-2 py-1 bg-black text-white text-xs rounded">Terminated</span>' : ban.is_permanent ? '<span class="px-2 py-1 bg-red-500 text-white text-xs rounded">Permanent</span>' : '<span class="px-2 py-1 bg-orange-500 text-white text-xs rounded">Temporary</span>'}
                     </td>
@@ -63,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     createBanBtn.addEventListener('click', async () => {
         const username = document.getElementById('ban-username').value.trim();
         let reason = document.getElementById('ban-reason').value.trim();
+        const messageEvidence = document.getElementById('ban-evidence').value.trim();
         const banType = banTypeSelect.value;
         const isTermination = banType === 'termination';
         const isPermanent = banType === 'permanent' || isTermination;
@@ -81,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/moderation/bans', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, reason, isPermanent, durationDays })
+                body: JSON.stringify({ username, reason, messageEvidence: messageEvidence || null, isPermanent, durationDays })
             });
 
             const data = await response.json();
@@ -90,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showMessage('Ban created successfully', 'success');
                 document.getElementById('ban-username').value = '';
                 document.getElementById('ban-reason').value = '';
+                document.getElementById('ban-evidence').value = '';
                 loadBans();
             } else {
                 showMessage(data.message || 'Failed to create ban', 'error');
