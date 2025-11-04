@@ -50,6 +50,9 @@ function switchTab(tab) {
         case 'tickets':
             loadTickets();
             break;
+        case 'announcements':
+            loadAnnouncements();
+            break;
         case 'apikeys':
             loadAPIKeys();
             break;
@@ -793,6 +796,126 @@ async function toggleMaintenance() {
     } catch (error) {
         console.error('Error toggling maintenance:', error);
         showAlert('Failed to toggle maintenance mode', 'error');
+    }
+}
+
+async function loadAnnouncements() {
+    try {
+        const response = await fetch('/api/admin/announcements');
+        if (!response.ok) throw new Error('Failed to load announcements');
+        
+        const data = await response.json();
+        const list = document.getElementById('announcements-list');
+        
+        if (data.announcements.length === 0) {
+            list.innerHTML = '<p class="text-gray-400 text-center py-8">No announcements yet. Create your first announcement!</p>';
+            return;
+        }
+        
+        list.innerHTML = data.announcements.map(announcement => `
+            <div class="bg-gray-800 bg-opacity-50 rounded-lg p-4 border ${announcement.is_pinned ? 'border-yellow-500' : 'border-gray-700'}">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            ${announcement.is_pinned ? '<i class="fas fa-thumbtack text-yellow-400"></i>' : ''}
+                            <h4 class="text-lg font-bold text-white">${escapeHtml(announcement.title)}</h4>
+                        </div>
+                        <p class="text-gray-300 whitespace-pre-wrap">${escapeHtml(announcement.content)}</p>
+                    </div>
+                    <div class="flex gap-2 ml-4">
+                        <button onclick="togglePinAnnouncement(${announcement.id})" 
+                                class="px-3 py-1 ${announcement.is_pinned ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-gray-600 hover:bg-gray-700'} text-white rounded transition text-sm"
+                                title="${announcement.is_pinned ? 'Unpin' : 'Pin'}">
+                            <i class="fas fa-thumbtack"></i>
+                        </button>
+                        <button onclick="deleteAnnouncement(${announcement.id})" 
+                                class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition text-sm"
+                                title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 mt-2">
+                    Posted by ${escapeHtml(announcement.posted_by)} on ${new Date(announcement.created_at).toLocaleString()}
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading announcements:', error);
+        document.getElementById('announcements-list').innerHTML = 
+            '<p class="text-red-400 text-center py-4">Failed to load announcements</p>';
+    }
+}
+
+function showNewAnnouncementForm() {
+    document.getElementById('new-announcement-form').classList.remove('hidden');
+    document.getElementById('announcement-title').value = '';
+    document.getElementById('announcement-content').value = '';
+}
+
+function hideNewAnnouncementForm() {
+    document.getElementById('new-announcement-form').classList.add('hidden');
+}
+
+async function createAnnouncement() {
+    const title = document.getElementById('announcement-title').value.trim();
+    const content = document.getElementById('announcement-content').value.trim();
+    
+    if (!title || !content) {
+        showAlert('Please fill in both title and content', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/admin/announcements', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content })
+        });
+        
+        if (!response.ok) throw new Error('Failed to create announcement');
+        
+        showAlert('Announcement posted successfully!', 'success');
+        hideNewAnnouncementForm();
+        loadAnnouncements();
+    } catch (error) {
+        console.error('Error creating announcement:', error);
+        showAlert('Failed to post announcement', 'error');
+    }
+}
+
+async function deleteAnnouncement(id) {
+    if (!confirm('Are you sure you want to delete this announcement?')) return;
+    
+    try {
+        const response = await fetch(`/api/admin/announcements/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) throw new Error('Failed to delete announcement');
+        
+        showAlert('Announcement deleted successfully', 'success');
+        loadAnnouncements();
+    } catch (error) {
+        console.error('Error deleting announcement:', error);
+        showAlert('Failed to delete announcement', 'error');
+    }
+}
+
+async function togglePinAnnouncement(id) {
+    try {
+        const response = await fetch(`/api/admin/announcements/${id}/pin`, {
+            method: 'PATCH'
+        });
+        
+        if (!response.ok) throw new Error('Failed to toggle pin');
+        
+        const data = await response.json();
+        showAlert(`Announcement ${data.announcement.is_pinned ? 'pinned' : 'unpinned'}`, 'success');
+        loadAnnouncements();
+    } catch (error) {
+        console.error('Error toggling pin:', error);
+        showAlert('Failed to toggle pin', 'error');
     }
 }
 

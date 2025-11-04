@@ -128,6 +128,9 @@
                     <button onclick="switchTab('tickets')" id="tab-tickets" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-ticket-alt"></i> Support Tickets
                     </button>
+                    <button onclick="switchTab('announcements')" id="tab-announcements" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                        <i class="fas fa-bullhorn"></i> Announcements
+                    </button>
                     <button onclick="switchTab('apikeys')" id="tab-apikeys" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-key"></i> API Keys
                     </button>
@@ -252,6 +255,44 @@
                     </div>
                 </div>
                 <div id="tickets-list" class="space-y-4"></div>
+            </div>
+
+            <!-- Announcements Tab -->
+            <div id="content-announcements" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">System Announcements</h3>
+                    <button onclick="showNewAnnouncementForm()" class="px-4 py-2 bg-magenta-500 hover:bg-magenta-600 text-white rounded-lg transition">
+                        <i class="fas fa-plus"></i> New Announcement
+                    </button>
+                </div>
+
+                <!-- New Announcement Form (hidden by default) -->
+                <div id="new-announcement-form" class="hidden mb-6 p-4 bg-gray-800 bg-opacity-50 rounded-lg border border-magenta-500">
+                    <h4 class="text-lg font-bold text-white mb-4">Create New Announcement</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 mb-2">Title</label>
+                            <input type="text" id="announcement-title" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:border-magenta-500" placeholder="Announcement title...">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">Content</label>
+                            <textarea id="announcement-content" rows="4" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:border-magenta-500" placeholder="Announcement content..."></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="createAnnouncement()" class="px-6 py-2 bg-magenta-500 hover:bg-magenta-600 text-white rounded-lg transition">
+                                <i class="fas fa-paper-plane"></i> Post Announcement
+                            </button>
+                            <button onclick="hideNewAnnouncementForm()" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Announcements List -->
+                <div id="announcements-list" class="space-y-4">
+                    <p class="text-gray-400 text-center py-4">Loading announcements...</p>
+                </div>
             </div>
 
             <!-- API Keys Tab -->
