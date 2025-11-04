@@ -31,7 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
         item.innerHTML = `${avatarHtml}<span class="timestamp">[${time}]</span> <strong style="color: ${msg.color || '#000'}">${isPrivate ? `(private from ${msg.from})` : username}:</strong> `;
         
         if (msg.text) {
-            const textWithMentions = msg.text.replace(/@(\w+)/g, (match, username) => {
+            const escapeHtml = (text) => {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            };
+            
+            const escapedText = escapeHtml(msg.text);
+            const textWithMentions = escapedText.replace(/@(\w+)/g, (match, username) => {
                 if (username === currentUser) {
                     return `<span style="background-color: #5b2bff; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 600;">@${username}</span>`;
                 }
