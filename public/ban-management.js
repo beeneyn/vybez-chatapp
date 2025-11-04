@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const banMessage = document.getElementById('ban-message');
 
     banTypeSelect.addEventListener('change', () => {
-        if (banTypeSelect.value === 'permanent') {
+        if (banTypeSelect.value === 'permanent' || banTypeSelect.value === 'termination') {
             durationContainer.classList.add('hidden');
         } else {
             durationContainer.classList.remove('hidden');
@@ -31,13 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             data.bans.forEach(ban => {
+                const isTermination = ban.reason && ban.reason.toLowerCase().includes('[termination]');
+                const displayReason = ban.reason.replace('[TERMINATION]', '').replace('[termination]', '').trim();
+                
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${ban.username}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${ban.banned_by}</td>
-                    <td class="px-6 py-4 text-sm">${ban.reason}</td>
+                    <td class="px-6 py-4 text-sm">${displayReason}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        ${ban.is_permanent ? '<span class="px-2 py-1 bg-red-500 text-white text-xs rounded">Permanent</span>' : '<span class="px-2 py-1 bg-orange-500 text-white text-xs rounded">Temporary</span>'}
+                        ${isTermination ? '<span class="px-2 py-1 bg-black text-white text-xs rounded">Terminated</span>' : ban.is_permanent ? '<span class="px-2 py-1 bg-red-500 text-white text-xs rounded">Permanent</span>' : '<span class="px-2 py-1 bg-orange-500 text-white text-xs rounded">Temporary</span>'}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${ban.is_permanent ? 'N/A' : new Date(ban.expires_at).toLocaleString()}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${new Date(ban.created_at).toLocaleString()}</td>
@@ -57,13 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     createBanBtn.addEventListener('click', async () => {
         const username = document.getElementById('ban-username').value.trim();
-        const reason = document.getElementById('ban-reason').value.trim();
-        const isPermanent = banTypeSelect.value === 'permanent';
+        let reason = document.getElementById('ban-reason').value.trim();
+        const banType = banTypeSelect.value;
+        const isTermination = banType === 'termination';
+        const isPermanent = banType === 'permanent' || isTermination;
         const durationDays = isPermanent ? null : parseInt(document.getElementById('ban-duration').value);
 
         if (!username || !reason) {
             showMessage('Username and reason are required', 'error');
             return;
+        }
+
+        if (isTermination) {
+            reason = `[TERMINATION] ${reason}`;
         }
 
         try {
