@@ -26,6 +26,12 @@ module.exports = (app) => {
         }
         db.addWarning(username, req.session.user.username, reason, (err, warning) => {
             if (err) return res.status(500).json({ message: "Failed to create warning" });
+            
+            const notificationMessage = `You have received a warning from ${req.session.user.username}: ${reason}`;
+            db.addNotification(username, 'warning', notificationMessage, (notifErr) => {
+                if (notifErr) console.error('Failed to create notification:', notifErr);
+            });
+            
             res.status(201).json({ message: "Warning created successfully", warning });
         });
     });
@@ -95,6 +101,59 @@ module.exports = (app) => {
         db.removeBan(id, (err) => {
             if (err) return res.status(500).json({ message: "Failed to remove ban" });
             res.status(200).json({ message: "Ban removed successfully" });
+        });
+    });
+
+    app.get('/api/notifications', (req, res) => {
+        if (!req.session.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const unreadOnly = req.query.unread === 'true';
+        db.getNotifications(req.session.user.username, unreadOnly, (err, notifications) => {
+            if (err) return res.status(500).json({ message: "Failed to get notifications" });
+            res.status(200).json({ notifications });
+        });
+    });
+
+    app.put('/api/notifications/:id/read', (req, res) => {
+        if (!req.session.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const { id } = req.params;
+        
+        db.pool.query('SELECT username FROM user_notifications WHERE id = $1', [id], (err, result) => {
+            if (err) return res.status(500).json({ message: "Failed to check notification ownership" });
+            if (!result.rows[0]) return res.status(404).json({ message: "Notification not found" });
+            if (result.rows[0].username !== req.session.user.username) {
+                return res.status(403).json({ message: "You can only mark your own notifications as read" });
+            }
+            
+            db.markNotificationRead(id, (err) => {
+                if (err) return res.status(500).json({ message: "Failed to mark notification as read" });
+                res.status(200).json({ message: "Notification marked as read" });
+            });
+        });
+    });
+
+    app.get('/api/moderation/check-status', (req, res) => {
+        if (!req.session.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const username = req.session.user.username;
+        
+        db.getActiveMute(username, (muteErr, mute) => {
+            if (muteErr) return res.status(500).json({ message: "Failed to check mute status" });
+            
+            db.getActiveBan(username, (banErr, ban) => {
+                if (banErr) return res.status(500).json({ message: "Failed to check ban status" });
+                
+                res.status(200).json({
+                    isMuted: !!mute,
+                    isBanned: !!ban,
+                    mute: mute || null,
+                    ban: ban || null
+                });
+            });
         });
     });
 };

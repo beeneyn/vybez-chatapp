@@ -114,6 +114,17 @@ const initializeDatabase = async () => {
             )
         `);
         
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS user_notifications (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                type TEXT NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                read_at TIMESTAMP DEFAULT NULL
+            )
+        `);
+        
         const defaultRooms = ['#general', '#tech', '#random'];
         for (const room of defaultRooms) {
             await client.query(
@@ -431,6 +442,7 @@ const deleteUserAccount = async (username, callback) => {
         await client.query('DELETE FROM warnings WHERE username = $1', [username]);
         await client.query('DELETE FROM mutes WHERE username = $1', [username]);
         await client.query('DELETE FROM bans WHERE username = $1', [username]);
+        await client.query('DELETE FROM user_notifications WHERE username = $1', [username]);
         await client.query('DELETE FROM users WHERE username = $1', [username]);
         
         await client.query('COMMIT');
@@ -461,6 +473,7 @@ const changeUsername = async (oldUsername, newUsername, callback) => {
         await client.query('UPDATE mutes SET muted_by = $1 WHERE muted_by = $2', [newUsername, oldUsername]);
         await client.query('UPDATE bans SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
         await client.query('UPDATE bans SET banned_by = $1 WHERE banned_by = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE user_notifications SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
         
         await client.query('COMMIT');
         callback(null);
@@ -609,6 +622,66 @@ const checkIfUserBanned = async (username, callback) => {
     }
 };
 
+const addNotification = async (username, type, message, callback) => {
+    try {
+        const result = await pool.query(
+            'INSERT INTO user_notifications (username, type, message) VALUES ($1, $2, $3) RETURNING *',
+            [username, type, message]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getNotifications = async (username, unreadOnly, callback) => {
+    try {
+        let query = 'SELECT * FROM user_notifications WHERE username = $1';
+        if (unreadOnly) {
+            query += ' AND read_at IS NULL';
+        }
+        query += ' ORDER BY created_at DESC';
+        
+        const result = await pool.query(query, [username]);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const markNotificationRead = async (id, callback) => {
+    try {
+        await pool.query('UPDATE user_notifications SET read_at = NOW() WHERE id = $1', [id]);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getActiveMute = async (username, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM mutes WHERE username = $1 AND is_active = TRUE AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1',
+            [username]
+        );
+        callback(null, result.rows[0] || null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getActiveBan = async (username, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM bans WHERE username = $1 AND is_active = TRUE AND (is_permanent = TRUE OR expires_at > NOW()) ORDER BY created_at DESC LIMIT 1',
+            [username]
+        );
+        callback(null, result.rows[0] || null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -646,5 +719,10 @@ module.exports = {
     getBans,
     removeBan,
     checkIfUserBanned,
+    addNotification,
+    getNotifications,
+    markNotificationRead,
+    getActiveMute,
+    getActiveBan,
     pool
 };

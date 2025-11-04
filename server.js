@@ -67,6 +67,38 @@ const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 io.engine.use(sessionMiddleware);
+
+const banCheckMiddleware = async (req, res, next) => {
+    const publicRoutes = ['/', '/signup', '/login', '/logout', '/ban.html', '/desktop-login', '/api/moderation/check-status', '/health'];
+    const isPublicRoute = publicRoutes.includes(req.path) || 
+                          req.path.startsWith('/tailwind.css') || 
+                          req.path.startsWith('/dist/') ||
+                          req.path.startsWith('/uploads/');
+    
+    if (isPublicRoute || !req.session.user) {
+        return next();
+    }
+    
+    db.getActiveBan(req.session.user.username, (err, ban) => {
+        if (err) {
+            console.error('Error checking ban status:', err);
+            return next();
+        }
+        
+        if (ban) {
+            if (req.path.startsWith('/api/')) {
+                return res.status(403).json({ banned: true, message: 'Your account is banned', ban });
+            } else {
+                return res.redirect('/ban.html');
+            }
+        }
+        
+        next();
+    });
+};
+
+app.use(banCheckMiddleware);
+
 app.use(
     express.static(path.join(__dirname, "public"), {
         setHeaders: (res, filePath) => {
@@ -466,11 +498,20 @@ io.on("connection", (socket) => {
         return socket.disconnect(true);
     }
 
-    console.log(`User connected: ${user.username} (${clientType.toUpperCase()})`);
+    db.getActiveBan(user.username, (banErr, ban) => {
+        if (ban) {
+            console.log(`Banned user ${user.username} attempted to connect. Disconnecting.`);
+            socket.emit('error', { type: 'banned', message: 'You are banned from this server', ban });
+            return socket.disconnect(true);
+        }
 
-    socket.join(user.username);
+        console.log(`User connected: ${user.username} (${clientType.toUpperCase()})`);
 
-    db.getAllRooms((err, rooms) => {
+        socket.join(user.username);
+        socket.user = user;
+        socket.clientType = clientType;
+
+        db.getAllRooms((err, rooms) => {
         const roomList = err ? ["#general"] : rooms.map((r) => r.name);
         const defaultRoom = roomList[0];
         socket.join(defaultRoom);
@@ -524,34 +565,40 @@ io.on("connection", (socket) => {
     });
 
     socket.on("chatMessage", (msg) => {
-        const timestamp = new Date();
-        const sanitizedText = msg.text
-            ? msg.text.replace(/</g, "&lt;").replace(/>/g, "&gt;")
-            : "";
-        db.addMessage(
-            socket.currentRoom,
-            user.username,
-            sanitizedText,
-            user.color,
-            timestamp,
-            msg.fileUrl || null,
-            msg.fileType || null,
-            (err, result) => {
-                if (err) return console.error("Error saving message:", err);
-                const messageToSend = {
-                    id: result.id,
-                    user: user.username,
-                    text: sanitizedText,
-                    color: user.color,
-                    timestamp: timestamp,
-                    fileUrl: msg.fileUrl,
-                    fileType: msg.fileType,
-                    avatar: user.avatar,
-                };
-                discordWebhook.logChatMessage(user.username, socket.currentRoom, sanitizedText, !!msg.fileUrl, clientType);
-                io.to(socket.currentRoom).emit("chatMessage", messageToSend);
-            },
-        );
+        db.getActiveMute(user.username, (muteErr, mute) => {
+            if (mute) {
+                return socket.emit('error', { type: 'muted', message: 'You are muted and cannot send messages', mute });
+            }
+            
+            const timestamp = new Date();
+            const sanitizedText = msg.text
+                ? msg.text.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                : "";
+            db.addMessage(
+                socket.currentRoom,
+                user.username,
+                sanitizedText,
+                user.color,
+                timestamp,
+                msg.fileUrl || null,
+                msg.fileType || null,
+                (err, result) => {
+                    if (err) return console.error("Error saving message:", err);
+                    const messageToSend = {
+                        id: result.id,
+                        user: user.username,
+                        text: sanitizedText,
+                        color: user.color,
+                        timestamp: timestamp,
+                        fileUrl: msg.fileUrl,
+                        fileType: msg.fileType,
+                        avatar: user.avatar,
+                    };
+                    discordWebhook.logChatMessage(user.username, socket.currentRoom, sanitizedText, !!msg.fileUrl, clientType);
+                    io.to(socket.currentRoom).emit("chatMessage", messageToSend);
+                },
+            );
+        });
     });
 
     socket.on("typing", (isTyping) => {
@@ -594,29 +641,35 @@ io.on("connection", (socket) => {
     });
 
     socket.on("privateMessage", ({ to, text }) => {
-        const timestamp = new Date();
-        const sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        db.addPrivateMessage(
-            user.username,
-            to,
-            sanitizedText,
-            timestamp,
-            (err, result) => {
-                if (err)
-                    return console.error("Error sending private message:", err);
-                const pm = {
-                    id: result.id,
-                    from: user.username,
-                    to: to,
-                    text: sanitizedText,
-                    timestamp: timestamp,
-                    color: user.color,
-                };
-                discordWebhook.logPrivateMessage(user.username, to, sanitizedText, clientType);
-                io.to(to).emit("privateMessage", pm);
-                socket.emit("privateMessageSent", pm);
-            },
-        );
+        db.getActiveMute(user.username, (muteErr, mute) => {
+            if (mute) {
+                return socket.emit('error', { type: 'muted', message: 'You are muted and cannot send messages', mute });
+            }
+            
+            const timestamp = new Date();
+            const sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            db.addPrivateMessage(
+                user.username,
+                to,
+                sanitizedText,
+                timestamp,
+                (err, result) => {
+                    if (err)
+                        return console.error("Error sending private message:", err);
+                    const pm = {
+                        id: result.id,
+                        from: user.username,
+                        to: to,
+                        text: sanitizedText,
+                        timestamp: timestamp,
+                        color: user.color,
+                    };
+                    discordWebhook.logPrivateMessage(user.username, to, sanitizedText, clientType);
+                    io.to(to).emit("privateMessage", pm);
+                    socket.emit("privateMessageSent", pm);
+                },
+            );
+        });
     });
 
     socket.on("markAsRead", ({ messageId }) => {
@@ -633,13 +686,14 @@ io.on("connection", (socket) => {
         });
     });
 
-    socket.on("disconnect", () => {
-        onlineUsers.delete(socket.id);
-        const keys = Array.from(typingUsers.keys()).filter((k) =>
-            k.endsWith(":" + socket.id),
-        );
-        keys.forEach((key) => typingUsers.delete(key));
-        io.emit("updateUserList", Array.from(onlineUsers.values()));
+        socket.on("disconnect", () => {
+            onlineUsers.delete(socket.id);
+            const keys = Array.from(typingUsers.keys()).filter((k) =>
+                k.endsWith(":" + socket.id),
+            );
+            keys.forEach((key) => typingUsers.delete(key));
+            io.emit("updateUserList", Array.from(onlineUsers.values()));
+        });
     });
 });
 
