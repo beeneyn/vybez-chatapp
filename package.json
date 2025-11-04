@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@replit/database": "^3.0.1",
+    "@sendgrid/mail": "^8.1.6",
     "@tailwindcss/cli": "^4.1.14",
     "auto-launch": "^5.0.6",
     "autoprefixer": "^10.4.21",

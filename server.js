@@ -10,6 +10,8 @@ const db = require("./database.js");
 const jwt = require("jsonwebtoken");
 const discordWebhook = require("./discord-webhook.js");
 const moderationRoutes = require("./moderation-routes.js");
+const emailService = require("./emailService.js");
+const serverLogger = require("./serverLogger.js");
 
 const app = express();
 const server = http.createServer(app);
@@ -380,70 +382,110 @@ app.get("/api/support/tickets", requireAdminAPI, (req, res) => {
     });
 });
 
-app.post("/api/support/tickets", (req, res) => {
+app.post("/api/support/tickets", async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
     }
     
     const { email, priority, subject, message } = req.body;
     const username = req.session.user.username;
+    const userEmail = email || req.session.user.email;
     
     if (!subject || !message) {
         return res.status(400).json({ message: "Subject and message are required" });
     }
     
-    db.pool.query(
-        'INSERT INTO support_tickets (username, email, subject, message, priority) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-        [username, email || req.session.user.email, subject, message, priority || 'normal'],
-        (err, result) => {
-            if (err) {
-                console.error("Error creating ticket:", err);
-                return res.status(500).json({ message: "Failed to create ticket" });
+    try {
+        const result = await db.pool.query(
+            'INSERT INTO support_tickets (username, email, subject, message, priority) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [username, userEmail, subject, message, priority || 'normal']
+        );
+        
+        const ticketId = result.rows[0].id;
+        
+        discordWebhook.sendDiscordWebhook(
+            '🎫 New Support Ticket',
+            `**${username}** submitted a new **${priority || 'normal'}** priority ticket\n**Subject:** ${subject}`,
+            0x1ed5ff
+        );
+        
+        if (userEmail) {
+            const emailSent = await emailService.sendSupportTicketConfirmation(userEmail, username, ticketId, subject);
+            if (emailSent) {
+                await db.pool.query(
+                    'UPDATE support_tickets SET confirmation_sent_at = NOW() WHERE id = $1',
+                    [ticketId]
+                );
+                serverLogger.system('Support ticket confirmation email sent', { ticketId, username, email: userEmail });
             }
-            
-            discordWebhook.sendDiscordWebhook(
-                '🎫 New Support Ticket',
-                `**${username}** submitted a new **${priority}** priority ticket\n**Subject:** ${subject}`,
-                0x1ed5ff
-            );
-            
-            res.json({ success: true, ticketId: result.rows[0].id, user: req.session.user });
         }
-    );
+        
+        res.json({ success: true, ticketId, user: req.session.user });
+    } catch (err) {
+        console.error("Error creating ticket:", err);
+        serverLogger.error('SUPPORT', 'Failed to create support ticket', { username, error: err.message });
+        res.status(500).json({ message: "Failed to create ticket" });
+    }
 });
 
-app.put("/api/support/tickets/:id", requireAdminAPI, (req, res) => {
+app.put("/api/support/tickets/:id", requireAdminAPI, async (req, res) => {
     const { id } = req.params;
     const { status, adminResponse } = req.body;
     
-    const updates = [];
-    const params = [];
-    let paramIndex = 1;
-    
-    if (status) {
-        updates.push(`status = $${paramIndex++}`);
-        params.push(status);
-    }
-    
-    if (adminResponse !== undefined) {
-        updates.push(`admin_response = $${paramIndex++}`);
-        params.push(adminResponse);
-        updates.push(`responded_by = $${paramIndex++}`);
-        params.push(req.session.user.username);
-    }
-    
-    updates.push(`updated_at = NOW()`);
-    params.push(id);
-    
-    const query = `UPDATE support_tickets SET ${updates.join(', ')} WHERE id = $${paramIndex}`;
-    
-    db.pool.query(query, params, (err) => {
-        if (err) {
-            console.error("Error updating ticket:", err);
-            return res.status(500).json({ message: "Failed to update ticket" });
+    try {
+        const ticketResult = await db.pool.query('SELECT username, email, subject FROM support_tickets WHERE id = $1', [id]);
+        if (ticketResult.rows.length === 0) {
+            return res.status(404).json({ message: "Ticket not found" });
         }
+        
+        const ticket = ticketResult.rows[0];
+        const updates = [];
+        const params = [];
+        let paramIndex = 1;
+        
+        if (status) {
+            updates.push(`status = $${paramIndex++}`);
+            params.push(status);
+        }
+        
+        if (adminResponse !== undefined) {
+            updates.push(`admin_response = $${paramIndex++}`);
+            params.push(adminResponse);
+            updates.push(`responded_by = $${paramIndex++}`);
+            params.push(req.session.user.username);
+        }
+        
+        updates.push(`updated_at = NOW()`);
+        params.push(id);
+        
+        const query = `UPDATE support_tickets SET ${updates.join(', ')} WHERE id = $${paramIndex} RETURNING *`;
+        
+        await db.pool.query(query, params);
+        
+        if (adminResponse && ticket.email) {
+            const emailSent = await emailService.sendSupportTicketResponse(
+                ticket.email, 
+                ticket.username, 
+                id, 
+                ticket.subject, 
+                adminResponse, 
+                req.session.user.username
+            );
+            if (emailSent) {
+                await db.pool.query(
+                    'UPDATE support_tickets SET response_sent_at = NOW() WHERE id = $1',
+                    [id]
+                );
+                serverLogger.system('Support ticket response email sent', { ticketId: id, username: ticket.username, email: ticket.email });
+            }
+        }
+        
         res.json({ success: true });
-    });
+    } catch (err) {
+        console.error("Error updating ticket:", err);
+        serverLogger.error('SUPPORT', 'Failed to update support ticket', { ticketId: id, error: err.message });
+        res.status(500).json({ message: "Failed to update ticket" });
+    }
 });
 
 app.use((req, res, next) => {
