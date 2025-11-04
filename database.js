@@ -529,6 +529,9 @@ const deleteUserAccount = async (username, callback) => {
         await client.query('DELETE FROM mutes WHERE username = $1', [username]);
         await client.query('DELETE FROM bans WHERE username = $1', [username]);
         await client.query('DELETE FROM user_notifications WHERE username = $1', [username]);
+        await client.query('DELETE FROM support_tickets WHERE username = $1', [username]);
+        await client.query('DELETE FROM blocked_users WHERE blocker_username = $1 OR blocked_username = $1', [username]);
+        await client.query('DELETE FROM api_keys WHERE username = $1', [username]);
         await client.query('DELETE FROM users WHERE username = $1', [username]);
         
         await client.query('COMMIT');
@@ -560,6 +563,11 @@ const changeUsername = async (oldUsername, newUsername, callback) => {
         await client.query('UPDATE bans SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
         await client.query('UPDATE bans SET banned_by = $1 WHERE banned_by = $2', [newUsername, oldUsername]);
         await client.query('UPDATE user_notifications SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE support_tickets SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE support_tickets SET responded_by = $1 WHERE responded_by = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE blocked_users SET blocker_username = $1 WHERE blocker_username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE blocked_users SET blocked_username = $1 WHERE blocked_username = $2', [newUsername, oldUsername]);
+        await client.query('UPDATE api_keys SET username = $1 WHERE username = $2', [newUsername, oldUsername]);
         
         await client.query('COMMIT');
         callback(null);
