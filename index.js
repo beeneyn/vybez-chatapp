@@ -121,11 +121,8 @@ app.use(banCheckMiddleware);
 app.use('/api/developer', apiRoutes);
 
 const requireAdmin = (req, res, next) => {
-    if (!req.session.user) {
-        return res.redirect("/");
-    }
-    if (req.session.user.role !== 'admin') {
-        return res.status(403).send("Access denied. Admin privileges required.");
+    if (!req.session.user || req.session.user.role !== 'admin') {
+        return res.status(401).sendFile(path.join(__dirname, "public", "401.html"));
     }
     next();
 };
@@ -1374,6 +1371,15 @@ io.on("connection", (socket) => {
             io.emit("updateUserList", Array.from(onlineUsers.values()));
         });
     });
+});
+
+app.use((req, res, next) => {
+    res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
+});
+
+app.use((err, req, res, next) => {
+    console.error("Server error:", err);
+    res.status(500).send("Internal Server Error");
 });
 
 const requiredEnvVars = ['DATABASE_URL', 'SESSION_SECRET', 'JWT_SECRET'];
