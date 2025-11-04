@@ -747,7 +747,7 @@ async function loadServerLogs() {
 
 async function loadMaintenanceStatus() {
     try {
-        const response = await fetch('/api/developer/admin/maintenance');
+        const response = await fetch('/api/admin/maintenance');
         const data = await response.json();
         
         const statusText = document.getElementById('maintenance-status-text');
@@ -771,7 +771,7 @@ async function loadMaintenanceStatus() {
 
 async function toggleMaintenance() {
     try {
-        const response = await fetch('/api/developer/admin/maintenance');
+        const response = await fetch('/api/admin/maintenance');
         const currentStatus = await response.json();
         
         const newStatus = !currentStatus.maintenanceMode;
@@ -781,7 +781,7 @@ async function toggleMaintenance() {
         
         if (!confirm(confirmMsg)) return;
         
-        const updateResponse = await fetch('/api/developer/admin/maintenance', {
+        const updateResponse = await fetch('/api/admin/maintenance', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ enabled: newStatus })

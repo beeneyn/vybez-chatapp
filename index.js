@@ -575,6 +575,40 @@ app.patch("/api/admin/announcements/:id/pin", requireAdminAPI, (req, res) => {
     });
 });
 
+app.get("/api/admin/maintenance", requireAdminAPI, async (req, res) => {
+    try {
+        const result = await db.pool.query(
+            "SELECT value FROM system_settings WHERE key = 'maintenance_mode'"
+        );
+        const maintenanceMode = result.rows[0]?.value === 'true';
+        res.json({ maintenanceMode });
+    } catch (err) {
+        serverLogger.error('SYSTEM', 'Failed to get maintenance mode status', { error: err.message });
+        res.status(500).json({ message: 'Failed to get maintenance mode status' });
+    }
+});
+
+app.post("/api/admin/maintenance", requireAdminAPI, async (req, res) => {
+    try {
+        const { enabled } = req.body;
+        
+        await db.pool.query(
+            "UPDATE system_settings SET value = $1, updated_at = NOW() WHERE key = 'maintenance_mode'",
+            [enabled ? 'true' : 'false']
+        );
+        
+        serverLogger.system('Maintenance mode toggled', { 
+            enabled, 
+            admin: req.session.user.username 
+        });
+        
+        res.json({ success: true, maintenanceMode: enabled });
+    } catch (err) {
+        serverLogger.error('SYSTEM', 'Failed to toggle maintenance mode', { error: err.message });
+        res.status(500).json({ message: 'Failed to toggle maintenance mode' });
+    }
+});
+
 app.use((req, res, next) => {
     console.log(
         `--- SERVER LOG: Request Received! Method: [${req.method}], URL: [${req.url}] ---`,
