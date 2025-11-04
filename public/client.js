@@ -448,6 +448,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         adminDropdown.id = 'admin-dropdown';
                         adminDropdown.className = 'hidden absolute top-full right-0 mt-1 bg-white shadow-lg rounded border border-gray-200 z-50';
                         adminDropdown.innerHTML = `
+                            <a href="/admin-panel.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-b border-gray-200 font-semibold">
+                                <i class="fas fa-tachometer-alt text-purple-500"></i> Admin Dashboard
+                            </a>
                             <a href="/ban-management.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                 <i class="fas fa-ban text-red-500"></i> Bans
                             </a>
