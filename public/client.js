@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
         const applyTheme = (theme) => {
-            const icon = theme === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-fill"></i>';
+            const icon = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
             document.body.setAttribute('data-theme', theme);
             themeToggle.innerHTML = icon;
         };
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const savedTheme = localStorage.getItem('theme') || 'light';
         applyTheme(savedTheme);
         themeToggle.addEventListener('click', () => {
             const newTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
