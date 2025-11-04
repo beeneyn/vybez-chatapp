@@ -69,14 +69,20 @@ app.use(sessionMiddleware);
 io.engine.use(sessionMiddleware);
 
 const banCheckMiddleware = async (req, res, next) => {
-    const publicRoutes = ['/', '/signup', '/login', '/logout', '/ban.html', '/desktop-login', '/api/moderation/check-status', '/health'];
-    const isPublicRoute = publicRoutes.includes(req.path) || 
-                          req.path.startsWith('/tailwind.css') || 
+    const allowedForBannedUsers = ['/ban.html', '/support', '/support.html', '/api/moderation/check-status', '/check-session', '/logout'];
+    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health'];
+    const isStaticAsset = req.path.startsWith('/tailwind.css') || 
                           req.path.startsWith('/dist/') ||
-                          req.path.startsWith('/uploads/');
+                          req.path.startsWith('/uploads/') ||
+                          req.path === '/support.js';
+    const isSupportAPI = req.path.startsWith('/api/support/');
     
-    if (isPublicRoute || !req.session.user) {
-        return next();
+    if (!req.session.user) {
+        const isAnonymousRoute = allowedForAnonymous.includes(req.path) || isStaticAsset;
+        if (isAnonymousRoute) {
+            return next();
+        }
+        return res.redirect('/');
     }
     
     db.getActiveBan(req.session.user.username, (err, ban) => {
@@ -86,6 +92,14 @@ const banCheckMiddleware = async (req, res, next) => {
         }
         
         if (ban) {
+            const isBannedUserRoute = allowedForBannedUsers.includes(req.path) || 
+                                     isSupportAPI || 
+                                     isStaticAsset;
+            
+            if (isBannedUserRoute) {
+                return next();
+            }
+            
             if (req.path.startsWith('/api/')) {
                 return res.status(403).json({ banned: true, message: 'Your account is banned', ban });
             } else {
