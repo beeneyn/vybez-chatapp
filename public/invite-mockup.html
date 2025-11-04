@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Gaming Squad - Vybez Invite</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0118 0%, #1a0633 50%, #0a0118 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            background: #5b2bff;
+            border-radius: 50%;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            background: #ff3f8f;
+            border-radius: 50%;
+            top: 70%;
+            right: 20%;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            background: #1ed5ff;
+            border-radius: 50%;
+            bottom: 10%;
+            left: 30%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-50px) rotate(180deg);
+            }
+        }
+
+        .invite-container {
+            position: relative;
+            z-index: 10;
+            max-width: 600px;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .invite-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .server-banner {
+            height: 200px;
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .server-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1ed5ff 0%, #5b2bff 100%);
+            border: 6px solid rgba(10, 1, 24, 0.8);
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .invite-content {
+            padding: 80px 40px 40px;
+            text-align: center;
+        }
+
+        .server-name {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .server-description {
+            color: #b8b9ba;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .server-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1ed5ff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .stat-label {
+            color: #8e8e93;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .online-indicator {
+            width: 10px;
+            height: 10px;
+            background: #3dd68c;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #3dd68c;
+        }
+
+        .invite-info {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .invited-by {
+            color: #8e8e93;
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .inviter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .inviter-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff3f8f 0%, #5b2bff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .inviter-name {
+            color: white;
+            font-weight: 600;
+        }
+
+        .join-button {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(91, 43, 255, 0.4);
+            margin-bottom: 1rem;
+        }
+
+        .join-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(91, 43, 255, 0.6);
+        }
+
+        .invite-code {
+            color: #8e8e93;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .code {
+            color: #1ed5ff;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .expire-info {
+            color: #8e8e93;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .vybez-logo {
+            text-align: center;
+            margin-top: 2rem;
+            color: #8e8e93;
+            font-size: 0.875rem;
+        }
+
+        .vybez-logo a {
+            color: #1ed5ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .vybez-logo a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .invite-content {
+                padding: 80px 24px 24px;
+            }
+
+            .server-name {
+                font-size: 1.5rem;
+            }
+
+            .server-stats {
+                gap: 1.5rem;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="invite-container">
+        <div class="invite-card">
+            <div class="server-banner">
+                <div class="server-icon">
+                    🎮
+                </div>
+            </div>
+
+            <div class="invite-content">
+                <h1 class="server-name">Gaming Squad</h1>
+                <p class="server-description">
+                    A vibrant community for gamers to connect, compete, and share epic moments. 
+                    Join us for tournaments, game nights, and endless fun!
+                </p>
+
+                <div class="server-stats">
+                    <div class="stat">
+                        <div class="stat-value">
+                            <span class="online-indicator"></span>
+                            1,247
+                        </div>
+                        <div class="stat-label">Online</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">
+                            <i class="fas fa-users" style="color: #5b2bff;"></i>
+                            5,832
+                        </div>
+                        <div class="stat-label">Members</div>
+                    </div>
+                </div>
+
+                <div class="invite-info">
+                    <div class="invited-by">You've been invited by</div>
+                    <div class="inviter">
+                        <div class="inviter-avatar">AJ</div>
+                        <div class="inviter-name">Alex Johnson</div>
+                    </div>
+                </div>
+
+                <button class="join-button">
+                    <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
+                    Join Gaming Squad
+                </button>
+
+                <div class="invite-code">
+                    Invite Code: <span class="code">rAnD0msTrInG</span>
+                </div>
+
+                <div class="expire-info">
+                    <i class="fas fa-clock"></i>
+                    This invite expires in 7 days
+                </div>
+            </div>
+        </div>
+
+        <div class="vybez-logo">
+            Powered by <a href="/">Vybez</a>
+        </div>
+    </div>
+
+    <script>
+        // Mockup interaction
+        document.querySelector('.join-button').addEventListener('click', function() {
+            alert('🎉 In the real implementation, this would:\n\n1. Check if user is logged in\n2. Validate the invite code\n3. Add user to the server\n4. Redirect to the server chat room');
+        });
+    </script>
+</body>
+</html>

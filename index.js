@@ -74,7 +74,7 @@ io.engine.use(sessionMiddleware);
 
 const banCheckMiddleware = async (req, res, next) => {
     const allowedForBannedUsers = ['/ban.html', '/support', '/support.html', '/api/moderation/check-status', '/check-session', '/logout'];
-    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health', '/404.html', '/401.html', '/403.html', '/500.html', '/502.html', '/maintenance.html'];
+    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health', '/404.html', '/401.html', '/403.html', '/500.html', '/502.html', '/maintenance.html', '/invite-mockup.html'];
     
     const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.mp3', '.wav'];
     const isStaticAsset = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext)) ||
@@ -732,6 +732,10 @@ app.get("/api-docs", (req, res) => {
 
 app.get("/developer-terms", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "developer-terms.html"));
+});
+
+app.get("/invite-mockup.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "invite-mockup.html"));
 });
 
 // Developer API Key Management Routes
