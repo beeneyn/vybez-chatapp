@@ -126,6 +126,16 @@ const initializeDatabase = async () => {
             )
         `);
         
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS blocked_users (
+                id SERIAL PRIMARY KEY,
+                blocker_username TEXT NOT NULL,
+                blocked_username TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(blocker_username, blocked_username)
+            )
+        `);
+        
         const defaultRooms = ['#general', '#tech', '#random'];
         for (const room of defaultRooms) {
             await client.query(
@@ -716,6 +726,75 @@ const getActiveBan = async (username, callback) => {
     }
 };
 
+const blockUser = async (blockerUsername, blockedUsername, callback) => {
+    try {
+        if (blockerUsername === blockedUsername) {
+            return callback(new Error('Cannot block yourself'));
+        }
+        const result = await pool.query(
+            'INSERT INTO blocked_users (blocker_username, blocked_username) VALUES ($1, $2) RETURNING *',
+            [blockerUsername, blockedUsername]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        if (err.code === '23505') {
+            return callback(new Error('User is already blocked'));
+        }
+        callback(err);
+    }
+};
+
+const unblockUser = async (blockerUsername, blockedUsername, callback) => {
+    try {
+        const result = await pool.query(
+            'DELETE FROM blocked_users WHERE blocker_username = $1 AND blocked_username = $2 RETURNING *',
+            [blockerUsername, blockedUsername]
+        );
+        if (result.rowCount === 0) {
+            return callback(new Error('User is not blocked'));
+        }
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getBlockedUsers = async (username, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT blocked_username, created_at FROM blocked_users WHERE blocker_username = $1 ORDER BY created_at DESC',
+            [username]
+        );
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const isUserBlocked = async (blockerUsername, blockedUsername, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM blocked_users WHERE blocker_username = $1 AND blocked_username = $2',
+            [blockerUsername, blockedUsername]
+        );
+        callback(null, result.rows.length > 0);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const isBlockedBy = async (username, otherUsername, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM blocked_users WHERE blocker_username = $1 AND blocked_username = $2',
+            [otherUsername, username]
+        );
+        callback(null, result.rows.length > 0);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -758,5 +837,10 @@ module.exports = {
     markNotificationRead,
     getActiveMute,
     getActiveBan,
+    blockUser,
+    unblockUser,
+    getBlockedUsers,
+    isUserBlocked,
+    isBlockedBy,
     pool
 };
