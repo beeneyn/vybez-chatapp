@@ -303,6 +303,30 @@ function logError(errorTitle, errorMessage) {
     );
 }
 
+function logUserBlocked(blockerUsername, blockedUsername) {
+    sendDiscordWebhook(
+        '🚫 User Blocked',
+        `A user has blocked another user`,
+        0xff3f8f,
+        [
+            { name: 'Blocked By', value: blockerUsername, inline: true },
+            { name: 'Blocked User', value: blockedUsername, inline: true }
+        ]
+    );
+}
+
+function logUserUnblocked(blockerUsername, unblockedUsername) {
+    sendDiscordWebhook(
+        '✅ User Unblocked',
+        `A user has unblocked another user`,
+        0x1ed5ff,
+        [
+            { name: 'Unblocked By', value: blockerUsername, inline: true },
+            { name: 'Unblocked User', value: unblockedUsername, inline: true }
+        ]
+    );
+}
+
 module.exports = {
     sendDiscordWebhook,
     logUserRegistration,
@@ -321,6 +345,8 @@ module.exports = {
     logWarning,
     logMute,
     logBan,
+    logUserBlocked,
+    logUserUnblocked,
     logStatusChange,
     logError
 };

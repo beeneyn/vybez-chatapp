@@ -467,6 +467,61 @@ app.post("/change-username", (req, res) => {
     });
 });
 
+app.get("/blocked-users", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    db.getBlockedUsers(req.session.user.username, (err, blockedUsers) => {
+        if (err) {
+            return res.status(500).json({ message: "Failed to get blocked users" });
+        }
+        res.status(200).json({ blockedUsers });
+    });
+});
+
+app.post("/block-user", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    const { username } = req.body;
+    if (!username) {
+        return res.status(400).json({ message: "Username is required" });
+    }
+    db.blockUser(req.session.user.username, username, (err, block) => {
+        if (err) {
+            if (err.message === 'Cannot block yourself') {
+                return res.status(400).json({ message: err.message });
+            }
+            if (err.message === 'User is already blocked') {
+                return res.status(409).json({ message: err.message });
+            }
+            return res.status(500).json({ message: "Failed to block user" });
+        }
+        discordWebhook.logUserBlocked(req.session.user.username, username);
+        res.status(201).json({ message: "User blocked successfully", block });
+    });
+});
+
+app.post("/unblock-user", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    const { username } = req.body;
+    if (!username) {
+        return res.status(400).json({ message: "Username is required" });
+    }
+    db.unblockUser(req.session.user.username, username, (err, block) => {
+        if (err) {
+            if (err.message === 'User is not blocked') {
+                return res.status(404).json({ message: err.message });
+            }
+            return res.status(500).json({ message: "Failed to unblock user" });
+        }
+        discordWebhook.logUserUnblocked(req.session.user.username, username);
+        res.status(200).json({ message: "User unblocked successfully" });
+    });
+});
+
 app.get("/rooms", (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
@@ -716,16 +771,32 @@ io.on("connection", (socket) => {
                 return socket.emit('error', { type: 'muted', message: 'You are muted and cannot send messages', mute });
             }
             
-            const timestamp = new Date();
-            const sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            db.addPrivateMessage(
-                user.username,
-                to,
-                sanitizedText,
-                timestamp,
-                (err, result) => {
-                    if (err)
-                        return console.error("Error sending private message:", err);
+            db.isUserBlocked(user.username, to, (blockErr, youBlocked) => {
+                if (blockErr) {
+                    return console.error("Error checking if user is blocked:", blockErr);
+                }
+                if (youBlocked) {
+                    return socket.emit('error', { type: 'blocked', message: 'Cannot send message to blocked user' });
+                }
+                
+                db.isBlockedBy(user.username, to, (blockedByErr, blockedByThem) => {
+                    if (blockedByErr) {
+                        return console.error("Error checking if blocked by user:", blockedByErr);
+                    }
+                    if (blockedByThem) {
+                        return socket.emit('error', { type: 'blocked', message: 'This user has blocked you' });
+                    }
+                    
+                    const timestamp = new Date();
+                    const sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    db.addPrivateMessage(
+                        user.username,
+                        to,
+                        sanitizedText,
+                        timestamp,
+                        (err, result) => {
+                            if (err)
+                                return console.error("Error sending private message:", err);
                     const pm = {
                         id: result.id,
                         from: user.username,
@@ -734,11 +805,13 @@ io.on("connection", (socket) => {
                         timestamp: timestamp,
                         color: user.color,
                     };
-                    discordWebhook.logPrivateMessage(user.username, to, sanitizedText, clientType);
-                    io.to(to).emit("privateMessage", pm);
-                    socket.emit("privateMessageSent", pm);
-                },
-            );
+                            discordWebhook.logPrivateMessage(user.username, to, sanitizedText, clientType);
+                            io.to(to).emit("privateMessage", pm);
+                            socket.emit("privateMessageSent", pm);
+                        },
+                    );
+                });
+            });
         });
     });
 
