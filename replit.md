@@ -29,10 +29,11 @@ Vybez is a Node.js application using Express.js for the backend and Socket.IO fo
 -   **Message Search:** Search functionality for message history.
 -   **User Roles:** Admin and standard user permission system.
 -   **Moderation System:** Three-tier enforcement (warnings, mutes, bans) with evidence tracking, real-time enforcement, and dedicated management pages.
+-   **Custom Error Pages:** Branded 404 (Page Not Found) and 401 (Access Denied) pages with Neon Nightlife aesthetic, glassmorphism design, animated floating shapes, and helpful navigation buttons.
 -   **Electron Desktop Client:** Offers desktop notifications, system tray integration, badge counts, global shortcuts, native dark mode, offline detection, auto-updater, auto-launch, native file picker, and secure IPC.
 
 ### System Design Choices
-The application separates server-side logic (`server.js`, `database.js`), client-side logic (`public/client.js`), and Electron components. Database interactions use `pg` for PostgreSQL. A file-based session store manages user sessions (migrating to Replit key-value store). Frontend styles are compiled with `@tailwindcss/cli`. Database schema uses username-based relationships with transactional integrity for user actions.
+The application separates server-side logic (`index.js`, `database.js`), client-side logic (`public/client.js`), and Electron components. The main server file is `index.js` with `server.js` as a symbolic link for deployment compatibility. Database interactions use `pg` for PostgreSQL. A file-based session store manages user sessions (migrating to Replit key-value store). Frontend styles are compiled with `@tailwindcss/cli`. Database schema uses username-based relationships with transactional integrity for user actions. Custom error handling middleware serves branded 404 and 401 pages while preserving API JSON responses.
 
 ## External Dependencies
 -   **Node.js**: Backend runtime.

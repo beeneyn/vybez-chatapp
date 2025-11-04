@@ -74,7 +74,7 @@ io.engine.use(sessionMiddleware);
 
 const banCheckMiddleware = async (req, res, next) => {
     const allowedForBannedUsers = ['/ban.html', '/support', '/support.html', '/api/moderation/check-status', '/check-session', '/logout'];
-    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health'];
+    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health', '/404.html', '/401.html'];
     
     const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.mp3', '.wav'];
     const isStaticAsset = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext)) ||
@@ -87,7 +87,10 @@ const banCheckMiddleware = async (req, res, next) => {
         if (isAnonymousRoute) {
             return next();
         }
-        return res.redirect('/');
+        if (req.path.endsWith('.html') || req.path.startsWith('/api/')) {
+            return res.redirect('/');
+        }
+        return next();
     }
     
     db.getActiveBan(req.session.user.username, (err, ban) => {
