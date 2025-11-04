@@ -24,7 +24,12 @@ Key Features include:
 - **Private Messaging:** Direct messages with notifications and read receipts.
 - **Message Search:** Functionality to search through message history.
 - **User Roles:** Admin and standard user permission system.
-- **Moderation System:** Comprehensive admin tools for managing warnings, mutes, and bans with expiration support and admin-only management pages.
+- **Moderation System:** Three-tier enforcement system with warnings (notification mailbox), mutes (chat blocking with countdown), and bans (complete site access restriction). Features include:
+  - **Warning System:** Sends notifications to user's mailbox inbox; users retain full access but see warning messages
+  - **Mute System:** Blocks message sending (chat and private messages); grays out input with visual feedback showing mute duration and reason; users can still view site
+  - **Ban System:** Completely blocks site access; redirects to dedicated ban page showing reason, duration, and admin info; supports permanent and temporary bans (1 day, 3 day, 7 day, 2 week, 1 month)
+  - **Admin Management:** Three dedicated management pages for warnings, mutes, and bans with CRUD operations
+  - **Real-time Enforcement:** Server-side and client-side validation; Socket.IO middleware blocks banned/muted users; automatic expiration handling
 
 ### System Design Choices
 The application is structured with a clear separation between server-side logic (`server.js`, `database.js`), client-side logic (`public/client.js`), and Electron-specific components (`electron.js`, `preload.js`, `desktop-integration.js`). Database interactions are handled via `pg` for PostgreSQL. The system uses a file-based session store to maintain user sessions. All frontend styles are built with `@tailwindcss/cli`, ensuring a lean and production-ready CSS output.
