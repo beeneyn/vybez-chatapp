@@ -261,6 +261,139 @@ app.post("/api/admin/toggle-admin", requireAdminAPI, (req, res) => {
     );
 });
 
+app.get("/api/admin/user-modview/:username", requireAdminAPI, (req, res) => {
+    const { username } = req.params;
+    
+    const queries = {
+        user: db.pool.query('SELECT username, email, chat_color, bio, status, avatar_url, role FROM users WHERE username = $1', [username]),
+        messageCount: db.pool.query('SELECT COUNT(*) as count FROM messages WHERE username = $1', [username]),
+        fileCount: db.pool.query('SELECT COUNT(*) as count FROM messages WHERE username = $1 AND file_url IS NOT NULL', [username]),
+        warnings: db.pool.query('SELECT * FROM warnings WHERE username = $1 ORDER BY created_at DESC', [username]),
+        mutes: db.pool.query('SELECT * FROM mutes WHERE username = $1 ORDER BY created_at DESC LIMIT 10', [username]),
+        bans: db.pool.query('SELECT * FROM bans WHERE username = $1 ORDER BY created_at DESC LIMIT 10', [username]),
+        tickets: db.pool.query('SELECT COUNT(*) as count FROM support_tickets WHERE username = $1', [username])
+    };
+    
+    Promise.all([
+        queries.user,
+        queries.messageCount,
+        queries.fileCount,
+        queries.warnings,
+        queries.mutes,
+        queries.bans,
+        queries.tickets
+    ]).then(([userResult, msgResult, fileResult, warningsResult, mutesResult, bansResult, ticketsResult]) => {
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        res.json({
+            user: userResult.rows[0],
+            activity: {
+                messages: parseInt(msgResult.rows[0].count),
+                files: parseInt(fileResult.rows[0].count),
+                supportTickets: parseInt(ticketsResult.rows[0].count)
+            },
+            moderation: {
+                warnings: warningsResult.rows,
+                mutes: mutesResult.rows,
+                bans: bansResult.rows
+            }
+        });
+    }).catch(err => {
+        console.error("Error fetching mod view data:", err);
+        res.status(500).json({ message: "Failed to fetch user data" });
+    });
+});
+
+app.get("/api/support/tickets", requireAdminAPI, (req, res) => {
+    const status = req.query.status || 'all';
+    
+    let query = 'SELECT * FROM support_tickets';
+    const params = [];
+    
+    if (status !== 'all') {
+        query += ' WHERE status = $1';
+        params.push(status);
+    }
+    
+    query += ' ORDER BY created_at DESC';
+    
+    db.pool.query(query, params, (err, result) => {
+        if (err) {
+            console.error("Error fetching tickets:", err);
+            return res.status(500).json({ message: "Failed to fetch tickets" });
+        }
+        res.json({ tickets: result.rows });
+    });
+});
+
+app.post("/api/support/tickets", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const { email, priority, subject, message } = req.body;
+    const username = req.session.user.username;
+    
+    if (!subject || !message) {
+        return res.status(400).json({ message: "Subject and message are required" });
+    }
+    
+    db.pool.query(
+        'INSERT INTO support_tickets (username, email, subject, message, priority) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+        [username, email || req.session.user.email, subject, message, priority || 'normal'],
+        (err, result) => {
+            if (err) {
+                console.error("Error creating ticket:", err);
+                return res.status(500).json({ message: "Failed to create ticket" });
+            }
+            
+            discordWebhook.sendMessage({
+                title: '🎫 New Support Ticket',
+                description: `**${username}** submitted a new **${priority}** priority ticket\n**Subject:** ${subject}`,
+                color: 0x1ed5ff
+            });
+            
+            res.json({ success: true, ticketId: result.rows[0].id, user: req.session.user });
+        }
+    );
+});
+
+app.put("/api/support/tickets/:id", requireAdminAPI, (req, res) => {
+    const { id } = req.params;
+    const { status, adminResponse } = req.body;
+    
+    const updates = [];
+    const params = [];
+    let paramIndex = 1;
+    
+    if (status) {
+        updates.push(`status = $${paramIndex++}`);
+        params.push(status);
+    }
+    
+    if (adminResponse !== undefined) {
+        updates.push(`admin_response = $${paramIndex++}`);
+        params.push(adminResponse);
+        updates.push(`responded_by = $${paramIndex++}`);
+        params.push(req.session.user.username);
+    }
+    
+    updates.push(`updated_at = NOW()`);
+    params.push(id);
+    
+    const query = `UPDATE support_tickets SET ${updates.join(', ')} WHERE id = $${paramIndex}`;
+    
+    db.pool.query(query, params, (err) => {
+        if (err) {
+            console.error("Error updating ticket:", err);
+            return res.status(500).json({ message: "Failed to update ticket" });
+        }
+        res.json({ success: true });
+    });
+});
+
 app.use((req, res, next) => {
     console.log(
         `--- SERVER LOG: Request Received! Method: [${req.method}], URL: [${req.url}] ---`,
@@ -289,6 +422,11 @@ app.get("/settings", (req, res) => {
 app.get("/developer", (req, res) => {
     if (!req.session.user) res.redirect("/");
     else res.sendFile(path.join(__dirname, "public", "developer.html"));
+});
+
+app.get("/support", (req, res) => {
+    if (!req.session.user) res.redirect("/");
+    else res.sendFile(path.join(__dirname, "public", "support.html"));
 });
 
 app.get("/api-docs", (req, res) => {

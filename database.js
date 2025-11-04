@@ -140,6 +140,22 @@ const initializeDatabase = async () => {
         `);
         
         await client.query(`
+            CREATE TABLE IF NOT EXISTS support_tickets (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                email TEXT,
+                subject TEXT NOT NULL,
+                message TEXT NOT NULL,
+                status TEXT DEFAULT 'open',
+                priority TEXT DEFAULT 'normal',
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW(),
+                admin_response TEXT,
+                responded_by TEXT
+            )
+        `);
+        
+        await client.query(`
             CREATE TABLE IF NOT EXISTS api_keys (
                 id SERIAL PRIMARY KEY,
                 username TEXT NOT NULL,

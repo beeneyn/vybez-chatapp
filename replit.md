@@ -22,7 +22,17 @@ Key Features include:
 - **Real-time Messaging:** Instant message delivery, message history, typing indicators, and message reactions.
 - **@Mentions:** Detect @username in messages with blue highlighting; mentioned users receive real-time notifications with XSS-safe rendering.
 - **Message Deletion:** Users can delete their own messages; admins can delete any message; real-time Socket.IO broadcast removes messages for all connected clients.
-- **Admin Panel:** Comprehensive admin dashboard at `/admin-panel.html` with live stats (users, rooms, messages, bans), user management (promote/demote admins), room management, recent message logs, and file upload tracking. Quick access to moderation pages and real-time data refresh.
+- **Support Ticket System:** Full-featured support system at `/support` where users can submit tickets with priority levels (low, normal, high, urgent). Admins can view, respond to, and manage tickets through the admin panel with status tracking (open, in_progress, resolved, closed).
+- **Admin Panel:** Comprehensive admin dashboard at `/admin-panel.html` with:
+  - Live stats (users, rooms, messages, bans)
+  - User management (promote/demote admins)
+  - **Mod View:** Discord-style user profile inspection showing user activity (message count, file uploads, support tickets), complete moderation history (warnings, mutes, bans), and account details
+  - Room management
+  - Recent message logs
+  - File upload tracking
+  - **Support Tickets tab:** View and manage support tickets with filtering by status, respond to tickets, and update ticket status
+  - Quick access to moderation pages
+  - Real-time data refresh
 - **User Profiles:** Customizable avatars, bios, status, and chat colors.
 - **File Sharing:** Uploads up to 10MB (images, documents, videos) with secure filename generation and automatic image previews.
 - **Private Messaging:** Direct messages with notifications and read receipts.
@@ -91,6 +101,7 @@ A full-featured Electron desktop client provides enhanced user experience with:
 - **`warnings`**: id, username, warned_by, reason, message_evidence, created_at
 - **`mutes`**: id, username, muted_by, reason, message_evidence, duration_minutes, expires_at, created_at, is_active
 - **`bans`**: id, username, banned_by, reason, message_evidence, is_permanent, expires_at (NULL for permanent), created_at, is_active
+- **`support_tickets`**: id, username, email, subject, message, status (open/in_progress/resolved/closed), priority (low/normal/high/urgent), created_at, updated_at, admin_response, responded_by
 
 All tables utilize PostgreSQL SERIAL for auto-incrementing IDs. The codebase uses a username-based schema pattern where relationships are maintained via TEXT username fields rather than foreign key constraints. Data integrity during account deletion and username changes is handled via transactional updates in `deleteUserAccount()` and `changeUsername()` functions.
 

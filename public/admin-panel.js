@@ -47,6 +47,9 @@ function switchTab(tab) {
         case 'files':
             loadFiles();
             break;
+        case 'tickets':
+            loadTickets();
+            break;
     }
 }
 
@@ -113,6 +116,9 @@ async function loadUsers() {
                 <td class="py-3 px-4">${statusDisplay}</td>
                 <td class="py-3 px-4">
                     <div class="flex gap-2">
+                        <button onclick="openModView('${user.username}')" class="px-2 py-1 bg-cyan-500 hover:bg-cyan-600 text-white rounded text-xs" title="View Profile">
+                            <i class="fas fa-eye"></i>
+                        </button>
                         ${user.role !== 'admin' ? 
                             `<button onclick="toggleAdmin('${user.username}', true)" class="px-2 py-1 bg-purple-500 hover:bg-purple-600 text-white rounded text-xs" title="Promote to Admin">
                                 <i class="fas fa-arrow-up"></i>
@@ -334,6 +340,259 @@ async function deleteRoom(roomName) {
         console.error('Error deleting room:', error);
         showAlert(error.message, 'error');
     }
+}
+
+async function loadTickets() {
+    const container = document.getElementById('tickets-list');
+    const status = document.getElementById('ticket-filter').value;
+    container.innerHTML = '<p class="text-gray-400 text-center py-4">Loading...</p>';
+    
+    try {
+        const response = await fetch(`/api/support/tickets?status=${status}`);
+        if (!response.ok) {
+            throw new Error('Failed to load tickets');
+        }
+        const data = await response.json();
+        
+        container.innerHTML = '';
+        
+        if (data.tickets.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-center py-4">No tickets found</p>';
+            return;
+        }
+        
+        data.tickets.forEach(ticket => {
+            const ticketDiv = document.createElement('div');
+            ticketDiv.className = 'p-4 bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700';
+            
+            const priorityColors = {
+                low: 'bg-gray-500',
+                normal: 'bg-blue-500',
+                high: 'bg-orange-500',
+                urgent: 'bg-red-500'
+            };
+            
+            const statusColors = {
+                open: 'bg-green-500',
+                in_progress: 'bg-yellow-500',
+                resolved: 'bg-blue-500',
+                closed: 'bg-gray-500'
+            };
+            
+            const createdDate = new Date(ticket.created_at).toLocaleString();
+            
+            ticketDiv.innerHTML = `
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-1 ${priorityColors[ticket.priority]} text-white rounded text-xs font-semibold">${ticket.priority.toUpperCase()}</span>
+                        <span class="px-2 py-1 ${statusColors[ticket.status]} text-white rounded text-xs">${ticket.status.replace('_', ' ').toUpperCase()}</span>
+                        <span class="text-xs text-gray-500">ID: ${ticket.id}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">${createdDate}</span>
+                </div>
+                <div class="mb-2">
+                    <p class="text-white font-semibold mb-1">
+                        <i class="fas fa-user text-purple-400"></i> ${ticket.username}
+                        ${ticket.email ? `<span class="text-gray-400 text-sm ml-2"><i class="fas fa-envelope"></i> ${ticket.email}</span>` : ''}
+                    </p>
+                    <p class="text-lg text-white font-semibold">${ticket.subject}</p>
+                </div>
+                <p class="text-gray-300 mb-3">${ticket.message}</p>
+                ${ticket.admin_response ? `
+                    <div class="bg-blue-900 bg-opacity-30 p-3 rounded border border-blue-500 mb-3">
+                        <p class="text-xs text-blue-300 mb-1"><i class="fas fa-reply"></i> Response from ${ticket.responded_by}</p>
+                        <p class="text-white">${ticket.admin_response}</p>
+                    </div>
+                ` : ''}
+                <div class="flex gap-2">
+                    ${ticket.status !== 'closed' ? `
+                        <select onchange="updateTicketStatus(${ticket.id}, this.value)" class="px-3 py-1 bg-gray-700 border border-gray-600 text-white rounded text-sm">
+                            <option value="">Change Status...</option>
+                            <option value="open">Open</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="closed">Close</option>
+                        </select>
+                        <button onclick="respondToTicket(${ticket.id})" class="px-3 py-1 bg-cyan-500 hover:bg-cyan-600 text-white rounded text-sm">
+                            <i class="fas fa-reply"></i> Respond
+                        </button>
+                    ` : '<span class="text-gray-500 italic text-sm">Ticket Closed</span>'}
+                </div>
+            `;
+            
+            container.appendChild(ticketDiv);
+        });
+    } catch (error) {
+        console.error('Error loading tickets:', error);
+        container.innerHTML = `<p class="text-red-400 text-center py-4">Error: ${error.message}</p>`;
+    }
+}
+
+async function updateTicketStatus(ticketId, status) {
+    if (!status) return;
+    
+    try {
+        const response = await fetch(`/api/support/tickets/${ticketId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to update ticket');
+        }
+        
+        showAlert(`Ticket #${ticketId} status updated to ${status}`, 'success');
+        loadTickets();
+    } catch (error) {
+        console.error('Error updating ticket:', error);
+        showAlert(error.message, 'error');
+    }
+}
+
+async function respondToTicket(ticketId) {
+    const response = prompt('Enter your response to this ticket:');
+    if (!response) return;
+    
+    try {
+        const res = await fetch(`/api/support/tickets/${ticketId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminResponse: response, status: 'in_progress' })
+        });
+        
+        if (!res.ok) {
+            throw new Error('Failed to respond to ticket');
+        }
+        
+        showAlert(`Response sent to ticket #${ticketId}`, 'success');
+        loadTickets();
+    } catch (error) {
+        console.error('Error responding to ticket:', error);
+        showAlert(error.message, 'error');
+    }
+}
+
+async function openModView(username) {
+    const modal = document.getElementById('modview-modal');
+    const content = document.getElementById('modview-content');
+    
+    modal.classList.remove('hidden');
+    content.innerHTML = '<p class="text-center text-gray-400">Loading...</p>';
+    
+    try {
+        const response = await fetch(`/api/admin/user-modview/${username}`);
+        if (!response.ok) {
+            throw new Error('Failed to load user data');
+        }
+        const data = await response.json();
+        
+        const { user, activity, moderation } = data;
+        
+        content.innerHTML = `
+            <div class="mb-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <img src="${user.avatar_url || 'https://placehold.co/64x64/5b2bff/ffffff?text=' + user.username.substring(0, 2).toUpperCase()}" 
+                         class="w-16 h-16 rounded-full object-cover" alt="${user.username}">
+                    <div>
+                        <h3 class="text-2xl font-bold" style="color: ${user.chat_color || '#fff'}">${user.username}</h3>
+                        <p class="text-gray-400">${user.email || 'No email provided'}</p>
+                        <span class="px-2 py-1 ${user.role === 'admin' ? 'bg-purple-500' : 'bg-gray-600'} text-white rounded text-xs">${user.role.toUpperCase()}</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="p-3 bg-gray-800 rounded">
+                        <p class="text-gray-400 text-sm">Bio</p>
+                        <p class="text-white">${user.bio || 'No bio'}</p>
+                    </div>
+                    <div class="p-3 bg-gray-800 rounded">
+                        <p class="text-gray-400 text-sm">Status</p>
+                        <p class="text-white">${user.status || 'Online'}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-white mb-3"><i class="fas fa-chart-line text-cyan-400"></i> Activity Stats</h3>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="p-4 bg-gray-800 rounded text-center">
+                        <i class="fas fa-comments text-3xl text-purple-400 mb-2"></i>
+                        <p class="text-2xl font-bold text-white">${activity.messages}</p>
+                        <p class="text-sm text-gray-400">Messages</p>
+                    </div>
+                    <div class="p-4 bg-gray-800 rounded text-center">
+                        <i class="fas fa-file text-3xl text-cyan-400 mb-2"></i>
+                        <p class="text-2xl font-bold text-white">${activity.files}</p>
+                        <p class="text-sm text-gray-400">Files Uploaded</p>
+                    </div>
+                    <div class="p-4 bg-gray-800 rounded text-center">
+                        <i class="fas fa-ticket-alt text-3xl text-orange-400 mb-2"></i>
+                        <p class="text-2xl font-bold text-white">${activity.supportTickets}</p>
+                        <p class="text-sm text-gray-400">Support Tickets</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-bold text-white mb-3"><i class="fas fa-gavel text-yellow-400"></i> Moderation History</h3>
+                
+                <div class="mb-4">
+                    <h4 class="text-sm font-semibold text-yellow-300 mb-2">
+                        <i class="fas fa-exclamation-triangle"></i> Warnings (${moderation.warnings.length})
+                    </h4>
+                    ${moderation.warnings.length > 0 ? `
+                        <div class="space-y-2">
+                            ${moderation.warnings.slice(0, 5).map(w => `
+                                <div class="p-2 bg-yellow-900 bg-opacity-30 rounded border border-yellow-600 text-sm">
+                                    <p class="text-white">${w.reason}</p>
+                                    <p class="text-xs text-gray-400">By ${w.warned_by} on ${new Date(w.created_at).toLocaleString()}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p class="text-gray-500 text-sm italic">No warnings</p>'}
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="text-sm font-semibold text-blue-300 mb-2">
+                        <i class="fas fa-microphone-slash"></i> Mutes (${moderation.mutes.length})
+                    </h4>
+                    ${moderation.mutes.length > 0 ? `
+                        <div class="space-y-2">
+                            ${moderation.mutes.slice(0, 5).map(m => `
+                                <div class="p-2 bg-blue-900 bg-opacity-30 rounded border border-blue-600 text-sm">
+                                    <p class="text-white">${m.reason}</p>
+                                    <p class="text-xs text-gray-400">By ${m.muted_by} for ${m.duration_minutes} mins on ${new Date(m.created_at).toLocaleString()}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p class="text-gray-500 text-sm italic">No mutes</p>'}
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-semibold text-red-300 mb-2">
+                        <i class="fas fa-ban"></i> Bans (${moderation.bans.length})
+                    </h4>
+                    ${moderation.bans.length > 0 ? `
+                        <div class="space-y-2">
+                            ${moderation.bans.slice(0, 5).map(b => `
+                                <div class="p-2 bg-red-900 bg-opacity-30 rounded border border-red-600 text-sm">
+                                    <p class="text-white">${b.reason}</p>
+                                    <p class="text-xs text-gray-400">By ${b.banned_by} on ${new Date(b.created_at).toLocaleString()}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p class="text-gray-500 text-sm italic">No bans</p>'}
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading mod view:', error);
+        content.innerHTML = `<p class="text-red-400 text-center">Error: ${error.message}</p>`;
+    }
+}
+
+function closeModView() {
+    document.getElementById('modview-modal').classList.add('hidden');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
