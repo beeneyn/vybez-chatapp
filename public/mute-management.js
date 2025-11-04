@@ -33,8 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
             data.mutes.forEach(mute => {
                 const row = document.createElement('tr');
                 const minutesRemaining = Math.max(0, Math.floor((new Date(mute.expires_at) - Date.now()) / 60000));
+                const emailDisplay = mute.user_email || '<span class="text-gray-400 italic">No email</span>';
+                
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${mute.username}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${emailDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${mute.muted_by}</td>
                     <td class="px-6 py-4 text-sm">${mute.reason}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${mute.duration_minutes} min${mute.duration_minutes !== 1 ? 's' : ''}</td>

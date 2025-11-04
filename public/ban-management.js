@@ -33,10 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
             data.bans.forEach(ban => {
                 const isTermination = ban.reason && ban.reason.toLowerCase().includes('[termination]');
                 const displayReason = ban.reason.replace('[TERMINATION]', '').replace('[termination]', '').trim();
+                const emailDisplay = ban.user_email || '<span class="text-gray-400 italic">No email</span>';
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${ban.username}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${emailDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${ban.banned_by}</td>
                     <td class="px-6 py-4 text-sm">${displayReason}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">

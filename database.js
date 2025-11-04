@@ -533,14 +533,14 @@ const addWarning = async (username, warnedBy, reason, callback) => {
 
 const getWarnings = async (username, callback) => {
     try {
-        let query = 'SELECT * FROM warnings';
+        let query = 'SELECT warnings.*, users.email AS user_email FROM warnings LEFT JOIN users ON warnings.username = users.username';
         let params = [];
         
         if (username) {
-            query += ' WHERE username = $1 ORDER BY created_at DESC';
+            query += ' WHERE warnings.username = $1 ORDER BY warnings.created_at DESC';
             params = [username];
         } else {
-            query += ' ORDER BY created_at DESC';
+            query += ' ORDER BY warnings.created_at DESC';
         }
         
         const result = await pool.query(query, params);
@@ -574,11 +574,11 @@ const addMute = async (username, mutedBy, reason, durationMinutes, callback) => 
 
 const getMutes = async (activeOnly, callback) => {
     try {
-        let query = 'SELECT * FROM mutes';
+        let query = 'SELECT mutes.*, users.email AS user_email FROM mutes LEFT JOIN users ON mutes.username = users.username';
         if (activeOnly) {
-            query += ' WHERE is_active = TRUE AND expires_at > NOW()';
+            query += ' WHERE mutes.is_active = TRUE AND mutes.expires_at > NOW()';
         }
-        query += ' ORDER BY created_at DESC';
+        query += ' ORDER BY mutes.created_at DESC';
         
         const result = await pool.query(query);
         callback(null, result.rows);
@@ -622,11 +622,11 @@ const addBan = async (username, bannedBy, reason, isPermanent, expiresAt, callba
 
 const getBans = async (activeOnly, callback) => {
     try {
-        let query = 'SELECT * FROM bans';
+        let query = 'SELECT bans.*, users.email AS user_email FROM bans LEFT JOIN users ON bans.username = users.username';
         if (activeOnly) {
-            query += ' WHERE is_active = TRUE AND (is_permanent = TRUE OR expires_at > NOW())';
+            query += ' WHERE bans.is_active = TRUE AND (bans.is_permanent = TRUE OR bans.expires_at > NOW())';
         }
-        query += ' ORDER BY created_at DESC';
+        query += ' ORDER BY bans.created_at DESC';
         
         const result = await pool.query(query);
         callback(null, result.rows);
