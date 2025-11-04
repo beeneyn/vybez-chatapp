@@ -5,7 +5,7 @@
   "author": "Vybez Team <vybez@example.com>",
   "main": "electron.js",
   "scripts": {
-    "start": "npm run build:css && node server.js",
+    "start": "npm run build:css && node index.js",
     "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/tailwind.css --minify",
     "electron": "cross-env NODE_ENV=development electron .",
     "electron-dev": "cross-env NODE_ENV=development electron . --inspect",
