@@ -250,11 +250,11 @@ app.post("/api/admin/toggle-admin", requireAdminAPI, (req, res) => {
                 return res.status(500).json({ message: "Failed to update user role" });
             }
             
-            discordWebhook.sendMessage({
-                title: promote ? '⬆️ Admin Promotion' : '⬇️ Admin Demotion',
-                description: `**${req.session.user.username}** ${promote ? 'promoted' : 'demoted'} **${username}** ${promote ? 'to' : 'from'} admin`,
-                color: promote ? 0x5b2bff : 0x808080
-            });
+            discordWebhook.sendDiscordWebhook(
+                promote ? '⬆️ Admin Promotion' : '⬇️ Admin Demotion',
+                `**${req.session.user.username}** ${promote ? 'promoted' : 'demoted'} **${username}** ${promote ? 'to' : 'from'} admin`,
+                promote ? 0x5b2bff : 0x808080
+            );
             
             res.json({ success: true, message: `User ${promote ? 'promoted to' : 'demoted from'} admin` });
         }
@@ -288,11 +288,11 @@ app.post("/api/admin/delete-user", requireAdminAPI, (req, res) => {
                 return res.status(500).json({ message: "Failed to delete user account" });
             }
             
-            discordWebhook.sendMessage({
-                title: '🗑️ User Deleted by Admin',
-                description: `**${req.session.user.username}** permanently deleted user **${username}**`,
-                color: 0xff0000
-            });
+            discordWebhook.sendDiscordWebhook(
+                '🗑️ User Deleted by Admin',
+                `**${req.session.user.username}** permanently deleted user **${username}**`,
+                0xff0000
+            );
             
             res.json({ success: true, message: `User ${username} has been deleted` });
         });
@@ -387,11 +387,11 @@ app.post("/api/support/tickets", (req, res) => {
                 return res.status(500).json({ message: "Failed to create ticket" });
             }
             
-            discordWebhook.sendMessage({
-                title: '🎫 New Support Ticket',
-                description: `**${username}** submitted a new **${priority}** priority ticket\n**Subject:** ${subject}`,
-                color: 0x1ed5ff
-            });
+            discordWebhook.sendDiscordWebhook(
+                '🎫 New Support Ticket',
+                `**${username}** submitted a new **${priority}** priority ticket\n**Subject:** ${subject}`,
+                0x1ed5ff
+            );
             
             res.json({ success: true, ticketId: result.rows[0].id, user: req.session.user });
         }
