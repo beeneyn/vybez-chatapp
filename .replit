@@ -40,8 +40,9 @@ localPort = 42107
 externalPort = 3000
 
 [deployment]
-deploymentTarget = "vm"
-run = ["node", "server.js"]
+deploymentTarget = "autoscale"
+run = ["npm", "start"]
+build = ["npm", "run", "build:css"]
 
 [objectStorage]
 defaultBucketID = "replit-objstore-3cb6c369-1cb2-46a1-a2e5-05546f2b1d4e"

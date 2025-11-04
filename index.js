@@ -75,10 +75,11 @@ io.engine.use(sessionMiddleware);
 const banCheckMiddleware = async (req, res, next) => {
     const allowedForBannedUsers = ['/ban.html', '/support', '/support.html', '/api/moderation/check-status', '/check-session', '/logout'];
     const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health'];
-    const isStaticAsset = req.path.startsWith('/tailwind.css') || 
+    
+    const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.mp3', '.wav'];
+    const isStaticAsset = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext)) ||
                           req.path.startsWith('/dist/') ||
-                          req.path.startsWith('/uploads/') ||
-                          req.path === '/support.js';
+                          req.path.startsWith('/uploads/');
     const isSupportAPI = req.path.startsWith('/api/support/');
     
     if (!req.session.user) {
