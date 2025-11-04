@@ -118,7 +118,10 @@ h1, h2, h3, h4, h5, h6 {
 #chat-window { flex-grow: 1; }
 #message-container li { 
     background-color: transparent; 
-    word-wrap: break-word; 
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    max-width: 100%;
     border-radius: .375rem; 
     padding: .625rem .875rem; 
     margin-bottom: .375rem; 
@@ -204,12 +207,29 @@ body[data-theme='dark'] .form-label, body[data-theme='dark'] h6 { color: var(--t
     border-color: var(--brand-experiment) !important;
 }
 
+/* Room list styling */
+#room-list .list-group-item {
+    background-color: var(--background-primary);
+    border-color: var(--border-color);
+}
+
+#room-list .list-group-item:hover {
+    background-color: var(--background-tertiary);
+}
+
+#room-list .list-group-item.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+}
+
 /* Online users list styling */
 #online-users-list .list-group-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1rem;
+    background-color: var(--background-primary);
 }
 
 #online-users-list .list-group-item:hover {

@@ -676,5 +676,124 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => msgEl.classList.add('d-none'), 3000);
             }
         });
+
+        document.getElementById('change-username-btn')?.addEventListener('click', async () => {
+            const newUsername = document.getElementById('new-username-input').value.trim();
+            const password = document.getElementById('username-change-password').value;
+            
+            if (!newUsername || !password) {
+                alert('Please enter a new username and password');
+                return;
+            }
+            
+            if (!confirm(`Change username to "${newUsername}"? This will update your username across all messages and rooms.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/change-username', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newUsername, password })
+                });
+                
+                const data = await response.json();
+                const msgEl = document.getElementById('settings-message');
+                
+                if (response.ok) {
+                    msgEl.textContent = 'Username changed successfully! Redirecting...';
+                    msgEl.className = 'alert alert-success';
+                    msgEl.classList.remove('d-none');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    msgEl.textContent = 'Failed to change username: ' + (data.message || 'Unknown error');
+                    msgEl.className = 'alert alert-danger';
+                    msgEl.classList.remove('d-none');
+                    setTimeout(() => msgEl.classList.add('d-none'), 3000);
+                }
+            } catch (error) {
+                console.error('Change username error:', error);
+                const msgEl = document.getElementById('settings-message');
+                msgEl.textContent = 'Failed to change username';
+                msgEl.className = 'alert alert-danger';
+                msgEl.classList.remove('d-none');
+                setTimeout(() => msgEl.classList.add('d-none'), 3000);
+            }
+            
+            document.getElementById('new-username-input').value = '';
+            document.getElementById('username-change-password').value = '';
+        });
+
+        document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
+            const msgEl = document.getElementById('settings-message');
+            
+            const step1 = confirm('⚠️ WARNING: Delete your account?\n\nThis will permanently delete:\n- Your user profile\n- All your messages\n- All your private messages\n- All rooms you created\n- All your reactions\n\nThis action CANNOT be undone!');
+            
+            if (!step1) return;
+            
+            const response = await fetch('/check-session');
+            const data = await response.json();
+            const currentUsername = data.user?.username;
+            
+            if (!currentUsername) {
+                msgEl.textContent = 'Could not verify current user. Please try again.';
+                msgEl.className = 'alert alert-danger';
+                msgEl.classList.remove('d-none');
+                setTimeout(() => msgEl.classList.add('d-none'), 3000);
+                return;
+            }
+            
+            const step2 = prompt(`Type your username "${currentUsername}" to confirm deletion:`);
+            
+            if (!step2 || step2 !== currentUsername) {
+                msgEl.textContent = 'Username confirmation failed. Account deletion cancelled.';
+                msgEl.className = 'alert alert-warning';
+                msgEl.classList.remove('d-none');
+                setTimeout(() => msgEl.classList.add('d-none'), 3000);
+                return;
+            }
+            
+            const password = prompt('Enter your password to confirm account deletion:');
+            
+            if (!password) {
+                msgEl.textContent = 'Account deletion cancelled.';
+                msgEl.className = 'alert alert-info';
+                msgEl.classList.remove('d-none');
+                setTimeout(() => msgEl.classList.add('d-none'), 3000);
+                return;
+            }
+            
+            try {
+                const deleteResponse = await fetch('/delete-account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                const deleteData = await deleteResponse.json();
+                
+                if (deleteResponse.ok) {
+                    msgEl.textContent = 'Account deleted successfully. Redirecting...';
+                    msgEl.className = 'alert alert-success';
+                    msgEl.classList.remove('d-none');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
+                } else {
+                    msgEl.textContent = 'Failed to delete account: ' + (deleteData.message || 'Unknown error');
+                    msgEl.className = 'alert alert-danger';
+                    msgEl.classList.remove('d-none');
+                    setTimeout(() => msgEl.classList.add('d-none'), 3000);
+                }
+            } catch (error) {
+                console.error('Delete account error:', error);
+                msgEl.textContent = 'Failed to delete account. Please try again.';
+                msgEl.className = 'alert alert-danger';
+                msgEl.classList.remove('d-none');
+                setTimeout(() => msgEl.classList.add('d-none'), 3000);
+            }
+        });
     }
 });
