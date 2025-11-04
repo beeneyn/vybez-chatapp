@@ -163,8 +163,77 @@ document.addEventListener('DOMContentLoaded', () => {
     const openPrivateMessage = async (username) => {
         window.openModal('privateMessageModal');
         document.getElementById('pm-recipient-name').textContent = username;
-        document.getElementById('pm-messages-container').innerHTML = '<p class="text-gray-500">Loading...</p>';
+        document.getElementById('pm-messages-container').innerHTML = '<p class="text-gray-500 text-center">Loading...</p>';
         
+        // Load user profile
+        try {
+            const profileResponse = await fetch(`/user-profile/${username}`);
+            if (profileResponse.ok) {
+                const profile = await profileResponse.json();
+                
+                // Set avatar
+                const initials = username.substring(0, 2).toUpperCase();
+                const userColor = (profile.chat_color || '#5b2bff').replace('#', '');
+                const placeholderUrl = `https://placehold.co/256x256/${userColor}/ffffff?font=poppins&text=${initials}`;
+                const avatarUrl = profile.avatar_url || placeholderUrl;
+                document.getElementById('pm-user-avatar').src = avatarUrl;
+                
+                // Set status and bio
+                document.getElementById('pm-user-status').textContent = profile.status || 'Online';
+                document.getElementById('pm-user-bio').textContent = profile.bio || 'No bio yet.';
+            }
+        } catch (error) {
+            console.error('Failed to load user profile:', error);
+        }
+        
+        // Check if user is blocked
+        try {
+            const blockResponse = await fetch('/blocked-users');
+            if (blockResponse.ok) {
+                const data = await blockResponse.json();
+                const isBlocked = data.blockedUsers.some(u => u.blocked_username === username);
+                const blockBtn = document.getElementById('pm-block-btn');
+                const blockBtnText = document.getElementById('pm-block-btn-text');
+                
+                if (isBlocked) {
+                    blockBtn.className = 'flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded font-semibold transition flex items-center justify-center gap-2';
+                    blockBtnText.textContent = 'Unblock User';
+                } else {
+                    blockBtn.className = 'flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-semibold transition flex items-center justify-center gap-2';
+                    blockBtnText.textContent = 'Block User';
+                }
+                
+                blockBtn.onclick = async () => {
+                    const endpoint = isBlocked ? '/unblock-user' : '/block-user';
+                    const confirmMsg = isBlocked ? `Unblock ${username}?` : `Block ${username}? They won't be able to send you messages.`;
+                    
+                    if (!confirm(confirmMsg)) return;
+                    
+                    try {
+                        const response = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username })
+                        });
+                        
+                        if (response.ok) {
+                            window.closeModal('privateMessageModal');
+                            alert(isBlocked ? `${username} has been unblocked` : `${username} has been blocked`);
+                        } else {
+                            const data = await response.json();
+                            alert(data.message || 'Operation failed');
+                        }
+                    } catch (error) {
+                        console.error('Failed to block/unblock user:', error);
+                        alert('An error occurred');
+                    }
+                };
+            }
+        } catch (error) {
+            console.error('Failed to check block status:', error);
+        }
+        
+        // Load messages
         try {
             const response = await fetch(`/private-messages/${username}`);
             if (response.ok) {
@@ -173,10 +242,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.innerHTML = '';
                 data.messages.forEach(msg => {
                     const div = document.createElement('div');
-                    div.className = `mb-2 ${msg.from_user === currentUser ? 'text-end' : ''}`;
-                    div.innerHTML = `<strong>${msg.from_user}:</strong> ${msg.message_text}`;
+                    div.className = `mb-3 ${msg.from_user === currentUser ? 'text-end' : ''}`;
+                    const bubble = document.createElement('div');
+                    bubble.className = `inline-block px-4 py-2 rounded-lg max-w-md ${msg.from_user === currentUser ? 'bg-violet-500 text-white' : 'bg-white border border-gray-200'}`;
+                    bubble.innerHTML = `<p class="text-sm font-semibold mb-1">${msg.from_user}</p><p>${msg.message_text}</p>`;
+                    div.appendChild(bubble);
                     container.appendChild(div);
                 });
+                container.scrollTop = container.scrollHeight;
             }
         } catch (error) {
             console.error('Failed to load private messages:', error);
@@ -189,8 +262,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 socket.emit('privateMessage', { to: username, text: input.value });
                 const container = document.getElementById('pm-messages-container');
                 const div = document.createElement('div');
-                div.className = 'mb-2 text-end';
-                div.innerHTML = `<strong>You:</strong> ${input.value}`;
+                div.className = 'mb-3 text-end';
+                const bubble = document.createElement('div');
+                bubble.className = 'inline-block px-4 py-2 rounded-lg max-w-md bg-violet-500 text-white';
+                bubble.innerHTML = `<p class="text-sm font-semibold mb-1">You</p><p>${input.value}</p>`;
+                div.appendChild(bubble);
                 container.appendChild(div);
                 input.value = '';
             }

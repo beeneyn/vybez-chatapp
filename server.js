@@ -467,6 +467,25 @@ app.post("/change-username", (req, res) => {
     });
 });
 
+app.get("/user-profile/:username", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    const { username } = req.params;
+    db.findUser(username, (err, user) => {
+        if (err || !user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({
+            username: user.username,
+            chat_color: user.chat_color,
+            bio: user.bio,
+            status: user.status,
+            avatar_url: user.avatar_url
+        });
+    });
+});
+
 app.get("/blocked-users", (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });
