@@ -31,7 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
         item.innerHTML = `${avatarHtml}<span class="timestamp">[${time}]</span> <strong style="color: ${msg.color || '#000'}">${isPrivate ? `(private from ${msg.from})` : username}:</strong> `;
         
         if (msg.text) {
-            item.appendChild(document.createTextNode(msg.text));
+            const textWithMentions = msg.text.replace(/@(\w+)/g, (match, username) => {
+                if (username === currentUser) {
+                    return `<span style="background-color: #5b2bff; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 600;">@${username}</span>`;
+                }
+                return `<span style="background-color: rgba(91, 43, 255, 0.1); color: #5b2bff; padding: 2px 6px; border-radius: 4px; font-weight: 600;">@${username}</span>`;
+            });
+            
+            const textSpan = document.createElement('span');
+            textSpan.innerHTML = textWithMentions;
+            item.appendChild(textSpan);
         }
         
         if (msg.fileUrl) {

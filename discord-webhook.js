@@ -172,6 +172,129 @@ function logPrivateMessage(fromUser, toUser, messageText, clientType = 'web') {
     );
 }
 
+function logProfileUpdate(username, updatedFields) {
+    const fieldsList = updatedFields.join(', ');
+    sendDiscordWebhook(
+        '👤 Profile Updated',
+        `A user has updated their profile`,
+        0xff3f8f,
+        [
+            { name: 'Username', value: username, inline: true },
+            { name: 'Updated Fields', value: fieldsList, inline: true }
+        ]
+    );
+}
+
+function logAvatarUpload(username) {
+    sendDiscordWebhook(
+        '🖼️ Avatar Uploaded',
+        `A user has uploaded a new profile avatar`,
+        0x5b2bff,
+        [{ name: 'Username', value: username, inline: true }]
+    );
+}
+
+function logUsernameChange(oldUsername, newUsername) {
+    sendDiscordWebhook(
+        '🔄 Username Changed',
+        `A user has changed their username`,
+        0xf6b73c,
+        [
+            { name: 'Old Username', value: oldUsername, inline: true },
+            { name: 'New Username', value: newUsername, inline: true }
+        ]
+    );
+}
+
+function logAccountDeletion(username) {
+    sendDiscordWebhook(
+        '🗑️ Account Deleted',
+        `A user has permanently deleted their account`,
+        0xff0000,
+        [{ name: 'Username', value: username, inline: true }]
+    );
+}
+
+function logMention(mentionedBy, mentionedUser, room, messagePreview) {
+    sendDiscordWebhook(
+        '📢 User Mentioned',
+        `A user was mentioned in a chat message`,
+        0x1ed5ff,
+        [
+            { name: 'Mentioned By', value: mentionedBy, inline: true },
+            { name: 'Mentioned User', value: `@${mentionedUser}`, inline: true },
+            { name: 'Room', value: room, inline: true },
+            { name: 'Message Preview', value: messagePreview.substring(0, 100) + (messagePreview.length > 100 ? '...' : ''), inline: false }
+        ]
+    );
+}
+
+function logReaction(username, emoji, room) {
+    sendDiscordWebhook(
+        '😊 Reaction Added',
+        `A user reacted to a message`,
+        0xff3f8f,
+        [
+            { name: 'User', value: username, inline: true },
+            { name: 'Emoji', value: emoji, inline: true },
+            { name: 'Room', value: room, inline: true }
+        ]
+    );
+}
+
+function logWarning(username, warnedBy, reason) {
+    sendDiscordWebhook(
+        '⚠️ Warning Issued',
+        `A warning has been issued to a user`,
+        0xf6b73c,
+        [
+            { name: 'User', value: username, inline: true },
+            { name: 'Warned By', value: warnedBy, inline: true },
+            { name: 'Reason', value: reason, inline: false }
+        ]
+    );
+}
+
+function logMute(username, mutedBy, reason, duration) {
+    sendDiscordWebhook(
+        '🔇 User Muted',
+        `A user has been muted`,
+        0xff3f8f,
+        [
+            { name: 'User', value: username, inline: true },
+            { name: 'Muted By', value: mutedBy, inline: true },
+            { name: 'Duration', value: duration, inline: true },
+            { name: 'Reason', value: reason, inline: false }
+        ]
+    );
+}
+
+function logBan(username, bannedBy, reason, duration) {
+    sendDiscordWebhook(
+        '🔨 User Banned',
+        `A user has been banned from the platform`,
+        0xff0000,
+        [
+            { name: 'User', value: username, inline: true },
+            { name: 'Banned By', value: bannedBy, inline: true },
+            { name: 'Duration', value: duration, inline: true },
+            { name: 'Reason', value: reason, inline: false }
+        ]
+    );
+}
+
+function logStatusChange(username, newStatus) {
+    sendDiscordWebhook(
+        '🟢 Status Changed',
+        `A user has updated their status`,
+        0x1ed5ff,
+        [
+            { name: 'Username', value: username, inline: true },
+            { name: 'New Status', value: newStatus, inline: true }
+        ]
+    );
+}
+
 function logError(errorTitle, errorMessage) {
     sendDiscordWebhook(
         `❌ ${errorTitle}`,
@@ -189,5 +312,15 @@ module.exports = {
     logFileUpload,
     logChatMessage,
     logPrivateMessage,
+    logProfileUpdate,
+    logAvatarUpload,
+    logUsernameChange,
+    logAccountDeletion,
+    logMention,
+    logReaction,
+    logWarning,
+    logMute,
+    logBan,
+    logStatusChange,
     logError
 };

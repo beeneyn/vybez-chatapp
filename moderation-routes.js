@@ -1,4 +1,5 @@
 const db = require('./database.js');
+const discordWebhook = require('./discord-webhook.js');
 
 const isAdmin = (req, res, next) => {
     if (!req.session.user) {
@@ -32,6 +33,8 @@ module.exports = (app) => {
                 if (notifErr) console.error('Failed to create notification:', notifErr);
             });
             
+            discordWebhook.logWarning(username, req.session.user.username, reason);
+            
             res.status(201).json({ message: "Warning created successfully", warning });
         });
     });
@@ -64,6 +67,8 @@ module.exports = (app) => {
             db.addNotification(username, 'mute', notificationMessage, (notifErr) => {
                 if (notifErr) console.error('Failed to create notification:', notifErr);
             });
+            
+            discordWebhook.logMute(username, req.session.user.username, reason, `${durationMinutes} minutes`);
             
             res.status(201).json({ message: "Mute created successfully", mute });
         });
@@ -111,6 +116,9 @@ module.exports = (app) => {
             db.addNotification(username, 'ban', notificationMessage, (notifErr) => {
                 if (notifErr) console.error('Failed to create notification:', notifErr);
             });
+            
+            const durationText = isPermanent ? 'Permanent' : `${durationDays} days`;
+            discordWebhook.logBan(username, req.session.user.username, reason, durationText);
             
             res.status(201).json({ message: "Ban created successfully", ban });
         });

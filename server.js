@@ -297,6 +297,7 @@ app.post("/upload-avatar", upload.single("avatar"), (req, res) => {
         if (err)
             return res.status(500).json({ message: "Failed to update avatar" });
         req.session.user.avatar = avatarUrl;
+        discordWebhook.logAvatarUpload(req.session.user.username);
         res.status(200).json({ avatarUrl });
     });
 });
@@ -358,6 +359,21 @@ app.post("/update-profile", (req, res) => {
             if (email !== undefined) {
                 req.session.user.email = email || null;
             }
+            
+            const updatedFields = [];
+            if (bio !== undefined) updatedFields.push('Bio');
+            if (status !== undefined) updatedFields.push('Status');
+            if (chat_color !== undefined) updatedFields.push('Chat Color');
+            if (email !== undefined) updatedFields.push('Email');
+            
+            if (updatedFields.length > 0) {
+                discordWebhook.logProfileUpdate(req.session.user.username, updatedFields);
+            }
+            
+            if (status !== undefined) {
+                discordWebhook.logStatusChange(req.session.user.username, status);
+            }
+            
             req.session.save((saveErr) => {
                 if (saveErr)
                     return res
@@ -394,6 +410,8 @@ app.post("/delete-account", (req, res) => {
             db.deleteUserAccount(username, (deleteErr) => {
                 if (deleteErr)
                     return res.status(500).json({ message: "Failed to delete account" });
+                
+                discordWebhook.logAccountDeletion(username);
                 
                 req.session.destroy((sessionErr) => {
                     if (sessionErr)
@@ -436,6 +454,7 @@ app.post("/change-username", (req, res) => {
                 }
                 
                 req.session.user.username = newUsername;
+                discordWebhook.logUsernameChange(oldUsername, newUsername);
                 req.session.save((saveErr) => {
                     if (saveErr)
                         return res.status(500).json({ message: "Error saving session" });
@@ -595,6 +614,14 @@ io.on("connection", (socket) => {
             const sanitizedText = msg.text
                 ? msg.text.replace(/</g, "&lt;").replace(/>/g, "&gt;")
                 : "";
+            
+            const mentionRegex = /@(\w+)/g;
+            const mentions = [];
+            let match;
+            while ((match = mentionRegex.exec(msg.text || '')) !== null) {
+                mentions.push(match[1]);
+            }
+            
             db.addMessage(
                 socket.currentRoom,
                 user.username,
@@ -614,9 +641,30 @@ io.on("connection", (socket) => {
                         fileUrl: msg.fileUrl,
                         fileType: msg.fileType,
                         avatar: user.avatar,
+                        mentions: mentions,
                     };
                     discordWebhook.logChatMessage(user.username, socket.currentRoom, sanitizedText, !!msg.fileUrl, clientType);
                     io.to(socket.currentRoom).emit("chatMessage", messageToSend);
+                    
+                    mentions.forEach((mentionedUser) => {
+                        if (mentionedUser !== user.username) {
+                            db.findUser(mentionedUser, (userErr, foundUser) => {
+                                if (!userErr && foundUser) {
+                                    db.addNotification(mentionedUser, 'mention', `${user.username} mentioned you in ${socket.currentRoom}`, (notifErr) => {
+                                        if (!notifErr) {
+                                            io.to(mentionedUser).emit('notification', {
+                                                type: 'mention',
+                                                from: user.username,
+                                                room: socket.currentRoom,
+                                                message: sanitizedText
+                                            });
+                                            discordWebhook.logMention(user.username, mentionedUser, socket.currentRoom, sanitizedText);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
                 },
             );
         });
@@ -638,6 +686,7 @@ io.on("connection", (socket) => {
     socket.on("addReaction", ({ messageId, emoji }) => {
         db.addReaction(messageId, user.username, emoji, (err) => {
             if (err) return console.error("Error adding reaction:", err);
+            discordWebhook.logReaction(user.username, emoji, socket.currentRoom);
             db.getReactionsForMessage(messageId, (err, reactions) => {
                 if (!err)
                     io.to(socket.currentRoom).emit("reactionUpdate", {
