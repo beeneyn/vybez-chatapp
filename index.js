@@ -126,6 +126,11 @@ const maintenanceMiddleware = async (req, res, next) => {
         '/maintenance',
         '/admin-panel.html',
         '/api/admin/maintenance',
+        '/login',
+        '/signup',
+        '/desktop-login',
+        '/landing.html',
+        '/check-session',
         '/dist/',
         '/uploads/',
         '/favicon.png',
@@ -138,12 +143,19 @@ const maintenanceMiddleware = async (req, res, next) => {
         '.jpeg',
         '.gif',
         '.svg',
-        '.ico'
+        '.ico',
+        '.woff',
+        '.woff2',
+        '.ttf'
     ];
     
     const isExcluded = excludedPaths.some(path => req.path.includes(path));
     
     if (isExcluded) {
+        return next();
+    }
+    
+    if (req.path === '/') {
         return next();
     }
     
