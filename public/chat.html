@@ -31,6 +31,10 @@
                     <div class="px-4 py-3 border-b flex justify-between items-center chat-header">
                         <h3 id="welcome-message" class="text-lg font-semibold"></h3>
                         <div class="flex gap-2">
+                            <button id="notifications-button" class="px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded relative" title="Notifications">
+                                <i class="fas fa-bell"></i>
+                                <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                            </button>
                             <button id="settings-button" class="px-3 py-1 btn-brand-gradient text-white text-sm rounded" title="Settings" onclick="window.openModal('settingsModal')">
                                 <i class="fas fa-gear"></i>
                             </button>
@@ -177,6 +181,22 @@
             </div>
             <div id="search-results" class="max-h-[400px] overflow-y-auto">
                 <p class="text-gray-500 text-center py-4">Enter a search term to find messages</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notificationsModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content max-w-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h5 class="text-lg font-semibold">
+                    <i class="fas fa-bell text-yellow-500"></i> Notifications
+                </h5>
+                <button onclick="window.closeModal('notificationsModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="notifications-list" class="max-h-[500px] overflow-y-auto space-y-2">
+                <p class="text-gray-500 text-center py-8">Loading notifications...</p>
             </div>
         </div>
     </div>

@@ -343,6 +343,110 @@ document.addEventListener('DOMContentLoaded', () => {
         } 
     };
 
+    const checkModerationStatus = async () => {
+        try {
+            const response = await fetch('/api/moderation/check-status');
+            const data = await response.json();
+            
+            if (data.isMuted && data.mute) {
+                const messageInput = document.getElementById('message-input');
+                const messageForm = document.getElementById('message-form');
+                const sendButton = messageForm.querySelector('button[type="submit"]');
+                
+                messageInput.disabled = true;
+                messageInput.classList.add('bg-gray-200', 'cursor-not-allowed');
+                sendButton.disabled = true;
+                sendButton.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                const expiresAt = new Date(data.mute.expires_at);
+                const now = new Date();
+                const diffMs = expiresAt - now;
+                const diffMinutes = Math.ceil(diffMs / (1000 * 60));
+                const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
+                
+                let timeLeft = '';
+                if (diffHours > 1) {
+                    timeLeft = `${diffHours} hours`;
+                } else if (diffMinutes > 1) {
+                    timeLeft = `${diffMinutes} minutes`;
+                } else {
+                    timeLeft = 'less than 1 minute';
+                }
+                
+                messageInput.placeholder = `You are muted for ${timeLeft}. Reason: ${data.mute.reason}`;
+                messageInput.title = `Muted by ${data.mute.muted_by}. Expires: ${expiresAt.toLocaleString()}`;
+            }
+        } catch (error) {
+            console.error('Error checking moderation status:', error);
+        }
+    };
+
+    const loadNotifications = async () => {
+        try {
+            const response = await fetch('/api/notifications');
+            const data = await response.json();
+            const notificationsList = document.getElementById('notifications-list');
+            const notificationBadge = document.getElementById('notification-badge');
+            
+            const unreadCount = data.notifications.filter(n => !n.read_at).length;
+            
+            if (unreadCount > 0) {
+                notificationBadge.textContent = unreadCount;
+                notificationBadge.classList.remove('hidden');
+            } else {
+                notificationBadge.classList.add('hidden');
+            }
+            
+            if (data.notifications.length === 0) {
+                notificationsList.innerHTML = '<p class="text-gray-500 text-center py-8">No notifications</p>';
+                return;
+            }
+            
+            notificationsList.innerHTML = data.notifications.map(notification => {
+                const createdAt = new Date(notification.created_at);
+                const isUnread = !notification.read_at;
+                
+                return `
+                    <div class="p-4 rounded-lg ${isUnread ? 'bg-yellow-50 border-2 border-yellow-300' : 'bg-gray-50 border border-gray-200'}" data-notification-id="${notification.id}">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas ${notification.type === 'warning' ? 'fa-exclamation-triangle text-yellow-500' : 'fa-info-circle text-blue-500'} text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="font-semibold text-sm ${notification.type === 'warning' ? 'text-yellow-700' : 'text-blue-700'}">${notification.type.toUpperCase()}</span>
+                                    <span class="text-xs text-gray-500">${createdAt.toLocaleString()}</span>
+                                </div>
+                                <p class="text-gray-700 text-sm">${notification.message}</p>
+                                ${isUnread ? `
+                                    <button onclick="markNotificationRead(${notification.id})" class="mt-2 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded">
+                                        Mark as Read
+                                    </button>
+                                ` : '<span class="text-xs text-gray-500 mt-2 inline-block">Read</span>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+            document.getElementById('notifications-list').innerHTML = '<p class="text-red-500 text-center py-8">Failed to load notifications</p>';
+        }
+    };
+
+    window.markNotificationRead = async (notificationId) => {
+        try {
+            const response = await fetch(`/api/notifications/${notificationId}/read`, {
+                method: 'PUT'
+            });
+            if (response.ok) {
+                await loadNotifications();
+            }
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+        }
+    };
+
     const initializeSockets = () => {
         const roomList = document.getElementById('room-list');
         const welcomeMessage = document.getElementById('welcome-message');
@@ -506,6 +610,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 socket.emit('switchRoom', '#general');
             }
         });
+        
+        socket.on('error', (error) => {
+            if (error.type === 'muted') {
+                const expiresAt = new Date(error.mute.expires_at);
+                alert(`You are muted until ${expiresAt.toLocaleString()}.\n\nReason: ${error.mute.reason}\nMuted by: ${error.mute.muted_by}`);
+                checkModerationStatus();
+            } else if (error.type === 'banned') {
+                alert(`You have been banned from the server.\n\nReason: ${error.ban.reason}\nBanned by: ${error.ban.banned_by}`);
+                window.location.href = '/ban.html';
+            }
+        });
     };
 
     const loginForm = document.getElementById('login-form');
@@ -521,8 +636,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname === '/chat') {
         initializeSockets();
         checkSession();
+        checkModerationStatus();
+        loadNotifications();
         
         document.getElementById('logout-button')?.addEventListener('click', handleLogout);
+        
+        document.getElementById('notifications-button')?.addEventListener('click', () => {
+            loadNotifications();
+            window.openModal('notificationsModal');
+        });
         
         document.getElementById('create-room-confirm-btn')?.addEventListener('click', async () => {
             const roomNameInput = document.getElementById('room-name-input');
