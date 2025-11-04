@@ -325,18 +325,34 @@ app.get("/private-messages/:username", (req, res) => {
 app.post("/update-profile", (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
-    const { bio, status, chat_color } = req.body;
+    const { bio, status, chat_color, email } = req.body;
+    
+    // Validate email format if provided
+    if (email !== undefined && email !== null && email !== '') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: "Invalid email format" });
+        }
+    }
+    
     db.updateUserProfile(
         req.session.user.username,
-        { bio, status, chat_color },
+        { bio, status, chat_color, email },
         (err) => {
-            if (err)
+            if (err) {
+                if (err.code === 'EMAIL_DUPLICATE') {
+                    return res.status(409).json({ message: "Email already in use" });
+                }
                 return res
                     .status(500)
                     .json({ message: "Failed to update profile" });
+            }
             req.session.user.bio = bio;
             req.session.user.status = status;
             req.session.user.color = chat_color;
+            if (email !== undefined) {
+                req.session.user.email = email || null;
+            }
             req.session.save((saveErr) => {
                 if (saveErr)
                     return res
