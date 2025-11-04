@@ -3,7 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
 const session = require("express-session");
-const FileStore = require("session-file-store")(session);
+const ReplitDBStore = require("./replit-session-store");
 const multer = require("multer");
 const fs = require("fs");
 const db = require("./database.js");
@@ -49,7 +49,7 @@ const upload = multer({
 });
 
 const sessionMiddleware = session({
-    store: new FileStore({ path: "./sessions", ttl: 86400 }),
+    store: new ReplitDBStore({ prefix: "vybez_session:", ttl: 86400 }),
     secret:
         process.env.SESSION_SECRET ||
         require("crypto").randomBytes(32).toString("hex"),
