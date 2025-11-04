@@ -493,6 +493,88 @@ app.put("/api/support/tickets/:id", requireAdminAPI, async (req, res) => {
     }
 });
 
+app.get("/api/admin/announcements", requireAdminAPI, (req, res) => {
+    db.getAllAnnouncements((err, announcements) => {
+        if (err) {
+            console.error("Error fetching announcements:", err);
+            return res.status(500).json({ message: "Failed to fetch announcements" });
+        }
+        res.json({ announcements });
+    });
+});
+
+app.get("/api/announcements", (req, res) => {
+    db.getAllAnnouncements((err, announcements) => {
+        if (err) {
+            console.error("Error fetching announcements:", err);
+            return res.status(500).json({ message: "Failed to fetch announcements" });
+        }
+        res.json({ announcements });
+    });
+});
+
+app.post("/api/admin/announcements", requireAdminAPI, (req, res) => {
+    const { title, content } = req.body;
+    const postedBy = req.session.user.username;
+    
+    if (!title || !content) {
+        return res.status(400).json({ message: "Title and content are required" });
+    }
+    
+    db.createAnnouncement(title, content, postedBy, (err, announcement) => {
+        if (err) {
+            console.error("Error creating announcement:", err);
+            serverLogger.error('ANNOUNCEMENTS', 'Failed to create announcement', { username: postedBy, error: err.message });
+            return res.status(500).json({ message: "Failed to create announcement" });
+        }
+        
+        io.emit("newAnnouncement", announcement);
+        
+        discordWebhook.sendDiscordWebhook(
+            '📢 New Announcement',
+            `**${postedBy}** posted: **${title}**\n${content.substring(0, 200)}${content.length > 200 ? '...' : ''}`,
+            0xff3f8f
+        );
+        
+        serverLogger.system('Announcement created', { title, postedBy, id: announcement.id });
+        res.json({ success: true, announcement });
+    });
+});
+
+app.delete("/api/admin/announcements/:id", requireAdminAPI, (req, res) => {
+    const { id } = req.params;
+    
+    db.deleteAnnouncement(id, (err, announcement) => {
+        if (err) {
+            console.error("Error deleting announcement:", err);
+            serverLogger.error('ANNOUNCEMENTS', 'Failed to delete announcement', { id, error: err.message });
+            return res.status(500).json({ message: "Failed to delete announcement" });
+        }
+        
+        io.emit("announcementDeleted", { id: parseInt(id) });
+        
+        serverLogger.system('Announcement deleted', { id, deletedBy: req.session.user.username });
+        res.json({ success: true });
+    });
+});
+
+app.patch("/api/admin/announcements/:id/pin", requireAdminAPI, (req, res) => {
+    const { id } = req.params;
+    
+    db.togglePinAnnouncement(id, (err, announcement) => {
+        if (err) {
+            console.error("Error toggling pin:", err);
+            serverLogger.error('ANNOUNCEMENTS', 'Failed to toggle pin', { id, error: err.message });
+            return res.status(500).json({ message: "Failed to toggle pin" });
+        }
+        
+        io.emit("announcementUpdated", announcement);
+        
+        serverLogger.system('Announcement pin toggled', { id, isPinned: announcement.is_pinned, user: req.session.user.username });
+        res.json({ success: true, announcement });
+    });
+});
+
 app.use((req, res, next) => {
     console.log(
         `--- SERVER LOG: Request Received! Method: [${req.method}], URL: [${req.url}] ---`,

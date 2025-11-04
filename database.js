@@ -252,6 +252,17 @@ const initializeDatabase = async () => {
             END $$;
         `);
         
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS announcements (
+                id SERIAL PRIMARY KEY,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
+                posted_by TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_pinned BOOLEAN DEFAULT FALSE
+            )
+        `);
+        
         const defaultRooms = ['#general', '#tech', '#random'];
         for (const room of defaultRooms) {
             await client.query(
@@ -1033,6 +1044,59 @@ const deleteApiKey = async (username, keyId, callback) => {
     }
 };
 
+const createAnnouncement = async (title, content, postedBy, callback) => {
+    try {
+        const result = await pool.query(
+            'INSERT INTO announcements (title, content, posted_by) VALUES ($1, $2, $3) RETURNING *',
+            [title, content, postedBy]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getAllAnnouncements = async (callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM announcements ORDER BY is_pinned DESC, created_at DESC'
+        );
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const deleteAnnouncement = async (id, callback) => {
+    try {
+        const result = await pool.query(
+            'DELETE FROM announcements WHERE id = $1 RETURNING *',
+            [id]
+        );
+        if (result.rowCount === 0) {
+            return callback(new Error('Announcement not found'));
+        }
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const togglePinAnnouncement = async (id, callback) => {
+    try {
+        const result = await pool.query(
+            'UPDATE announcements SET is_pinned = NOT is_pinned WHERE id = $1 RETURNING *',
+            [id]
+        );
+        if (result.rowCount === 0) {
+            return callback(new Error('Announcement not found'));
+        }
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -1086,5 +1150,9 @@ module.exports = {
     validateApiKey,
     deactivateApiKey,
     deleteApiKey,
+    createAnnouncement,
+    getAllAnnouncements,
+    deleteAnnouncement,
+    togglePinAnnouncement,
     pool
 };
