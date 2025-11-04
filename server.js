@@ -116,6 +116,138 @@ app.use(express.json());
 
 moderationRoutes(app);
 
+const requireAdmin = (req, res, next) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    if (req.session.user.role !== 'admin') {
+        return res.status(403).json({ message: "Admin access required" });
+    }
+    next();
+};
+
+app.get("/api/admin/stats", requireAdmin, (req, res) => {
+    db.pool.query(`
+        SELECT 
+            (SELECT COUNT(*) FROM users) as total_users,
+            (SELECT COUNT(*) FROM rooms) as total_rooms,
+            (SELECT COUNT(*) FROM messages) as total_messages,
+            (SELECT COUNT(*) FROM bans WHERE is_active = true AND (is_permanent = true OR expires_at > NOW())) as active_bans
+    `, (err, result) => {
+        if (err) {
+            console.error("Error fetching stats:", err);
+            return res.status(500).json({ message: "Failed to fetch stats" });
+        }
+        res.json({
+            totalUsers: parseInt(result.rows[0].total_users),
+            totalRooms: parseInt(result.rows[0].total_rooms),
+            totalMessages: parseInt(result.rows[0].total_messages),
+            activeBans: parseInt(result.rows[0].active_bans)
+        });
+    });
+});
+
+app.get("/api/admin/users", requireAdmin, (req, res) => {
+    db.pool.query(`
+        SELECT 
+            u.username, 
+            u.chat_color, 
+            u.avatar_url, 
+            u.role, 
+            u.email,
+            u.created_at,
+            EXISTS(SELECT 1 FROM bans WHERE username = u.username AND is_active = true AND (is_permanent = true OR expires_at > NOW())) as is_banned,
+            EXISTS(SELECT 1 FROM mutes WHERE username = u.username AND is_active = true AND expires_at > NOW()) as is_muted
+        FROM users u
+        ORDER BY u.created_at DESC
+    `, (err, result) => {
+        if (err) {
+            console.error("Error fetching users:", err);
+            return res.status(500).json({ message: "Failed to fetch users" });
+        }
+        res.json({ users: result.rows });
+    });
+});
+
+app.get("/api/admin/rooms", requireAdmin, (req, res) => {
+    db.pool.query(`
+        SELECT name, created_by, created_at, is_default
+        FROM rooms
+        ORDER BY is_default DESC, created_at DESC
+    `, (err, result) => {
+        if (err) {
+            console.error("Error fetching rooms:", err);
+            return res.status(500).json({ message: "Failed to fetch rooms" });
+        }
+        res.json({ rooms: result.rows });
+    });
+});
+
+app.get("/api/admin/messages", requireAdmin, (req, res) => {
+    db.pool.query(`
+        SELECT m.id, m.room, m.username, m.message_text, m.chat_color, m.timestamp, m.file_url, m.file_type, u.avatar_url
+        FROM messages m
+        LEFT JOIN users u ON m.username = u.username
+        ORDER BY m.timestamp DESC
+        LIMIT 100
+    `, (err, result) => {
+        if (err) {
+            console.error("Error fetching messages:", err);
+            return res.status(500).json({ message: "Failed to fetch messages" });
+        }
+        res.json({ messages: result.rows });
+    });
+});
+
+app.get("/api/admin/files", requireAdmin, (req, res) => {
+    db.pool.query(`
+        SELECT id, room, username, file_url, file_type, timestamp
+        FROM messages
+        WHERE file_url IS NOT NULL
+        ORDER BY timestamp DESC
+        LIMIT 100
+    `, (err, result) => {
+        if (err) {
+            console.error("Error fetching files:", err);
+            return res.status(500).json({ message: "Failed to fetch files" });
+        }
+        res.json({ files: result.rows });
+    });
+});
+
+app.post("/api/admin/toggle-admin", requireAdmin, (req, res) => {
+    const { username, promote } = req.body;
+    
+    if (!username) {
+        return res.status(400).json({ message: "Username is required" });
+    }
+    
+    if (username === req.session.user.username) {
+        return res.status(400).json({ message: "You cannot change your own role" });
+    }
+    
+    const newRole = promote ? 'admin' : 'user';
+    
+    db.pool.query(
+        'UPDATE users SET role = $1 WHERE username = $2',
+        [newRole, username],
+        (err) => {
+            if (err) {
+                console.error("Error updating user role:", err);
+                return res.status(500).json({ message: "Failed to update user role" });
+            }
+            
+            discordWebhook.sendMessage({
+                title: promote ? '⬆️ Admin Promotion' : '⬇️ Admin Demotion',
+                description: `**${req.session.user.username}** ${promote ? 'promoted' : 'demoted'} **${username}** ${promote ? 'to' : 'from'} admin`,
+                color: promote ? 0x5b2bff : 0x808080
+            });
+            
+            res.json({ success: true, message: `User ${promote ? 'promoted to' : 'demoted from'} admin` });
+        }
+    );
+});
+
 app.use((req, res, next) => {
     console.log(
         `--- SERVER LOG: Request Received! Method: [${req.method}], URL: [${req.url}] ---`,
