@@ -912,5 +912,82 @@ document.addEventListener('DOMContentLoaded', () => {
         searchBtn.type = 'button';
         searchBtn.onclick = searchMessages;
         document.querySelector('.card-header .btn-group, .card-header div:last-child')?.prepend(searchBtn);
+        
+        loadAnnouncements();
+        
+        socket.on('newAnnouncement', (announcement) => {
+            loadAnnouncements();
+            updateAnnouncementsBadge();
+        });
+        
+        socket.on('announcementUpdated', (announcement) => {
+            loadAnnouncements();
+        });
+        
+        socket.on('announcementDeleted', ({ id }) => {
+            loadAnnouncements();
+        });
+    }
+    
+    async function loadAnnouncements() {
+        try {
+            const response = await fetch('/api/announcements');
+            if (!response.ok) throw new Error('Failed to load announcements');
+            
+            const data = await response.json();
+            const container = document.getElementById('announcements-container');
+            
+            if (!container) return;
+            
+            if (data.announcements.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">No announcements at this time.</p>';
+                updateAnnouncementsBadge(0);
+                return;
+            }
+            
+            container.innerHTML = data.announcements.map(announcement => {
+                const date = new Date(announcement.created_at).toLocaleString();
+                return `
+                    <div class="bg-gray-50 rounded-lg p-4 border ${announcement.is_pinned ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'}">
+                        <div class="flex items-start gap-3">
+                            ${announcement.is_pinned ? '<i class="fas fa-thumbtack text-yellow-500 mt-1"></i>' : '<i class="fas fa-bullhorn text-magenta-500 mt-1"></i>'}
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg text-gray-900 mb-1">${escapeHtml(announcement.title)}</h4>
+                                <p class="text-gray-700 whitespace-pre-wrap mb-2">${escapeHtml(announcement.content)}</p>
+                                <div class="text-xs text-gray-500">
+                                    Posted by ${escapeHtml(announcement.posted_by)} • ${date}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            updateAnnouncementsBadge(data.announcements.length);
+        } catch (error) {
+            console.error('Error loading announcements:', error);
+            const container = document.getElementById('announcements-container');
+            if (container) {
+                container.innerHTML = '<p class="text-red-500 text-center py-4">Failed to load announcements</p>';
+            }
+        }
+    }
+    
+    function updateAnnouncementsBadge(count) {
+        const badge = document.getElementById('announcements-badge');
+        if (badge) {
+            if (count && count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 });
