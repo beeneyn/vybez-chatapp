@@ -18,6 +18,7 @@ const initializeDatabase = async () => {
                 id SERIAL PRIMARY KEY,
                 username TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
+                email TEXT UNIQUE,
                 chat_color TEXT DEFAULT '#000000',
                 bio TEXT DEFAULT 'No bio yet.',
                 status TEXT DEFAULT 'Online',
@@ -182,7 +183,7 @@ const verifyPassword = (password, user, callback) => {
 const getUserProfile = async (username, callback) => {
     try {
         const result = await pool.query(
-            'SELECT username, chat_color, bio, status FROM users WHERE username = $1',
+            'SELECT username, email, chat_color, bio, status FROM users WHERE username = $1',
             [username]
         );
         callback(null, result.rows[0] || null);
@@ -191,14 +192,47 @@ const getUserProfile = async (username, callback) => {
     }
 };
 
-const updateUserProfile = async (username, { bio, status, chat_color }, callback) => {
+const updateUserProfile = async (username, { bio, status, chat_color, email }, callback) => {
     try {
+        // Build dynamic query to only update provided fields
+        const updates = [];
+        const values = [];
+        let paramCount = 1;
+        
+        if (bio !== undefined) {
+            updates.push(`bio = $${paramCount++}`);
+            values.push(bio);
+        }
+        if (status !== undefined) {
+            updates.push(`status = $${paramCount++}`);
+            values.push(status);
+        }
+        if (chat_color !== undefined) {
+            updates.push(`chat_color = $${paramCount++}`);
+            values.push(chat_color);
+        }
+        if (email !== undefined) {
+            updates.push(`email = $${paramCount++}`);
+            values.push(email || null); // Allow null to remove email
+        }
+        
+        if (updates.length === 0) {
+            return callback(null);
+        }
+        
+        values.push(username);
         await pool.query(
-            'UPDATE users SET bio = $1, status = $2, chat_color = $3 WHERE username = $4',
-            [bio, status, chat_color, username]
+            `UPDATE users SET ${updates.join(', ')} WHERE username = $${paramCount}`,
+            values
         );
         callback(null);
     } catch (err) {
+        // Handle duplicate email error
+        if (err.code === '23505' && err.constraint === 'users_email_key') {
+            const error = new Error('Email already in use');
+            error.code = 'EMAIL_DUPLICATE';
+            return callback(error);
+        }
         callback(err);
     }
 };
