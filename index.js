@@ -693,6 +693,10 @@ app.get("/support", (req, res) => {
     else res.sendFile(path.join(__dirname, "public", "support.html"));
 });
 
+app.get("/maintenance", (req, res) => {
+    res.status(503).sendFile(path.join(__dirname, "public", "maintenance.html"));
+});
+
 app.get("/api-docs", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "api-documentation.html"));
 });
