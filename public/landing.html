@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vybez - Real-Time Chat App | Break Into the Vybe</title>
-    <meta name="description" content="Break into the vybe with Vybez - a modern real-time chat app featuring custom rooms, private messaging, reactions, file sharing, and desktop integration. Free for Windows, Mac & Linux.">
-    <meta name="keywords" content="chat app, real-time messaging, desktop chat, custom chat rooms, private messaging, file sharing, free chat, windows chat app, electron chat">
+    <meta name="description" content="Break into the vybe with Vybez - a modern real-time chat app featuring @mentions, custom rooms, private messaging, reactions, file sharing, moderation tools, and desktop integration. Free for Windows, Mac & Linux.">
+    <meta name="keywords" content="chat app, real-time messaging, desktop chat, custom chat rooms, private messaging, file sharing, mentions, moderation, free chat, windows chat app, electron chat">
     <meta name="author" content="Vybez Team">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.vybez.page/">
     <meta property="og:title" content="Vybez - Real-Time Chat App | Break Into the Vybe">
-    <meta property="og:description" content="Modern real-time chat with custom rooms, private DMs, reactions, and file sharing. Available for Windows, macOS & Linux. 100% free.">
+    <meta property="og:description" content="Modern real-time chat with @mentions, custom rooms, private DMs, reactions, file sharing, and comprehensive moderation. Available for Windows, macOS & Linux. 100% free.">
     <meta property="og:image" content="https://www.vybez.page/favicon.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://www.vybez.page/">
     <meta property="twitter:title" content="Vybez - Real-Time Chat App | Break Into the Vybe">
-    <meta property="twitter:description" content="Modern real-time chat with custom rooms, private DMs, reactions, and file sharing. Available for Windows, macOS & Linux. 100% free.">
+    <meta property="twitter:description" content="Modern real-time chat with @mentions, custom rooms, private DMs, reactions, file sharing, and comprehensive moderation. Available for Windows, macOS & Linux. 100% free.">
     <meta property="twitter:image" content="https://www.vybez.page/favicon.png">
     
     <link rel="icon" type="image/png" href="favicon.png">
@@ -147,7 +147,7 @@
                 Connect with friends, create communities, and chat in real-time.
             </p>
             <p class="text-lg md:text-xl md:w-2/3 mx-auto mb-10 font-light opacity-90">
-                Experience lightning-fast messaging with custom rooms, private DMs, reactions, file sharing, and more.
+                Experience lightning-fast messaging with @mentions, custom rooms, private DMs, reactions, file sharing, and comprehensive moderation tools.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <a id="os-download-btn" href="downloads.html" class="px-10 py-4 bg-white text-[#5b2bff] font-bold text-lg rounded-full hover:bg-gray-100 shadow-2xl transform hover:scale-105 transition-all flex items-center gap-2">
@@ -251,17 +251,26 @@
                     <p class="text-gray-700 text-sm">Share up to 10MB</p>
                 </div>
 
-                <!-- Message Search (Wide card) -->
-                <div class="md:col-span-4 p-8 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-3xl card-hover">
+                <!-- @Mentions (Wide card) -->
+                <div class="md:col-span-4 p-8 bg-gradient-to-br from-violet-50 to-violet-100 rounded-3xl card-hover">
                     <div class="flex items-center gap-6">
-                        <div class="w-16 h-16 bg-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-search text-3xl text-white"></i>
+                        <div class="w-16 h-16 bg-[#5b2bff] rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-at text-3xl text-white"></i>
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold mb-2">Message Search</h3>
-                            <p class="text-gray-700">Find any message instantly with powerful full-text search across all conversations</p>
+                            <h3 class="text-2xl font-bold mb-2">@Mentions</h3>
+                            <p class="text-gray-700">Tag users with @username to get their attention - mentioned users receive instant notifications with blue highlighting</p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Message Search -->
+                <div class="md:col-span-2 p-8 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-3xl card-hover">
+                    <div class="w-16 h-16 bg-indigo-500 rounded-xl flex items-center justify-center mb-4">
+                        <i class="fas fa-search text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Message Search</h3>
+                    <p class="text-gray-700 text-sm">Instant full-text search</p>
                 </div>
 
                 <!-- Typing Indicators -->
@@ -289,6 +298,32 @@
                     </div>
                     <h3 class="text-xl font-bold mb-3">Online Users</h3>
                     <p class="text-gray-700 text-sm">See who's active now</p>
+                </div>
+
+                <!-- Discord-Style Settings (Wide card) -->
+                <div class="md:col-span-3 p-8 bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl card-hover">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-cog text-3xl text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Discord-Style Settings</h3>
+                            <p class="text-gray-700">Full-page settings with Appearance, Profile, Account, Privacy & Safety, and Advanced options</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Moderation System (Wide card) -->
+                <div class="md:col-span-3 p-8 bg-gradient-to-br from-red-50 to-rose-100 rounded-3xl card-hover">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-shield-halved text-3xl text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Three-Tier Moderation</h3>
+                            <p class="text-gray-700">Complete moderation suite with warnings, mutes, and bans - all with real-time notifications and enforcement</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Desktop Integration (Wide bottom card) -->
