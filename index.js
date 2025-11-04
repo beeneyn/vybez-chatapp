@@ -121,6 +121,55 @@ const banCheckMiddleware = async (req, res, next) => {
 
 app.use(banCheckMiddleware);
 
+const maintenanceMiddleware = async (req, res, next) => {
+    const excludedPaths = [
+        '/maintenance',
+        '/admin-panel.html',
+        '/api/admin/maintenance',
+        '/dist/',
+        '/uploads/',
+        '/favicon.png',
+        '/tailwind.css',
+        '/style.css',
+        '.js',
+        '.css',
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.gif',
+        '.svg',
+        '.ico'
+    ];
+    
+    const isExcluded = excludedPaths.some(path => req.path.includes(path));
+    
+    if (isExcluded) {
+        return next();
+    }
+    
+    try {
+        const result = await db.pool.query(
+            "SELECT value FROM system_settings WHERE key = 'maintenance_mode'"
+        );
+        const maintenanceMode = result.rows[0]?.value === 'true';
+        
+        if (maintenanceMode) {
+            const isAdmin = req.session.user && req.session.user.role === 'admin';
+            
+            if (!isAdmin) {
+                return res.status(503).sendFile(path.join(__dirname, "public", "maintenance.html"));
+            }
+        }
+        
+        next();
+    } catch (err) {
+        console.error('Error checking maintenance mode:', err);
+        next();
+    }
+};
+
+app.use(maintenanceMiddleware);
+
 app.use('/api/developer', apiRoutes);
 
 const requireAdmin = (req, res, next) => {
