@@ -63,11 +63,18 @@
                     <p class="text-white" id="ban-issuer">Loading...</p>
                 </div>
                 
-                <div>
+                <div class="mb-4">
                     <h3 class="text-lg font-semibold text-yellow-400 mb-2">
                         <i class="fas fa-calendar-alt"></i> Expires
                     </h3>
                     <p class="text-white" id="ban-expires">Loading...</p>
+                </div>
+                
+                <div id="evidence-container" class="hidden">
+                    <h3 class="text-lg font-semibold text-orange-400 mb-2">
+                        <i class="fas fa-file-alt"></i> Evidence
+                    </h3>
+                    <div id="ban-evidence" class="flex flex-wrap gap-2"></div>
                 </div>
             </div>
             
@@ -149,6 +156,19 @@
                     }
                     
                     document.getElementById('ban-expires').textContent = expiresAt.toLocaleString();
+                }
+                
+                if (ban.message_evidence) {
+                    document.getElementById('evidence-container').classList.remove('hidden');
+                    const evidenceContainer = document.getElementById('ban-evidence');
+                    const messageIds = ban.message_evidence.split(',').map(id => id.trim()).filter(id => id);
+                    
+                    messageIds.forEach(msgId => {
+                        const badge = document.createElement('span');
+                        badge.className = 'px-3 py-1 bg-blue-500 bg-opacity-30 text-blue-300 rounded-full text-sm border border-blue-400';
+                        badge.innerHTML = `<i class="fas fa-comment"></i> Message ID: ${msgId}`;
+                        evidenceContainer.appendChild(badge);
+                    });
                 }
             } catch (error) {
                 console.error('Error loading ban info:', error);
