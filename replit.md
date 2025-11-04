@@ -9,7 +9,7 @@ I prefer detailed explanations and an iterative development approach. Ask before
 ## System Architecture
 
 ### UI/UX Decisions
-The application features a "Neon Nightlife" aesthetic with a "BREAK FREE" slogan. The color palette includes Midnight, Deep Violet, Electric Magenta, Cyber Cyan, and Warm accent. Typography uses Space Grotesk (headings) and Inter (body). The design incorporates glassmorphism, gradients, a unified 4-column footer, and a custom modal system, all built with Tailwind CSS v4.
+The application features a "Neon Nightlife" aesthetic with a "BREAK FREE" slogan. The color palette includes Midnight, Deep Violet, Electric Magenta, Cyber Cyan, and Warm accent. Typography uses Space Grotesk (headings) and Inter (body). The design incorporates glassmorphism, gradients, a unified 4-column footer, and a custom modal system, all built with Tailwind CSS v4. **Dark theme is the default theme** for new users, with a light theme option available in settings. The settings sidebar and all UI elements dynamically change colors based on the selected theme.
 
 ### Technical Implementations
 Vybez is a Node.js application using Express.js for the backend and Socket.IO for real-time communication. User authentication uses bcrypt for password hashing and `express-session` for session management with a file-based store (planned migration to Replit Key-Value storage). PostgreSQL, hosted on Replit's Neon database, is the primary data store. The frontend uses vanilla JavaScript and Tailwind CSS v4.

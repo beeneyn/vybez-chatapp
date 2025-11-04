@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initialize theme
     const initTheme = () => {
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         document.body.setAttribute('data-theme', savedTheme);
         updateThemeUI(savedTheme);
     };
