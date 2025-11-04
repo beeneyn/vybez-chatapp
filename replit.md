@@ -17,6 +17,7 @@ Vybez is a Node.js application using Express.js for the backend and Socket.IO fo
 Key Features include:
 - **User Authentication:** Secure signup/login with bcrypt.
 - **Guest Demo Mode:** Read-only demo showcasing all features without account creation (designed for Microsoft Store reviewers).
+- **Discord-Style Settings:** Full-page settings interface with categorized navigation (Appearance, Profile, My Account, Privacy & Safety, Advanced). Features light/dark theme toggle, profile customization, account management, and advanced options.
 - **Custom Chat Rooms:** Users can create and delete rooms, with real-time updates via Socket.IO.
 - **Real-time Messaging:** Instant message delivery, message history, typing indicators, and message reactions.
 - **User Profiles:** Customizable avatars, bios, status, and chat colors.
