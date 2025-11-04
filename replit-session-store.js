@@ -12,7 +12,9 @@ class ReplitDBStore extends Store {
     async get(sid, callback) {
         try {
             const key = this.prefix + sid;
-            const data = await this.db.get(key);
+            const result = await this.db.get(key);
+            
+            const data = result?.value || result;
             
             if (!data) {
                 return callback(null, null);
@@ -58,7 +60,8 @@ class ReplitDBStore extends Store {
     async touch(sid, session, callback) {
         try {
             const key = this.prefix + sid;
-            const data = await this.db.get(key);
+            const result = await this.db.get(key);
+            const data = result?.value || result;
             
             if (data) {
                 data.expires = Date.now() + (this.ttl * 1000);
@@ -77,7 +80,8 @@ class ReplitDBStore extends Store {
             const sessions = [];
             
             for (const key of keys) {
-                const data = await this.db.get(key);
+                const result = await this.db.get(key);
+                const data = result?.value || result;
                 if (data && (!data.expires || Date.now() <= data.expires)) {
                     sessions.push(data.session);
                 }
