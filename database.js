@@ -221,6 +221,20 @@ const initializeDatabase = async () => {
         `);
         
         await client.query(`
+            CREATE TABLE IF NOT EXISTS system_settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        await client.query(`
+            INSERT INTO system_settings (key, value) 
+            VALUES ('maintenance_mode', 'false') 
+            ON CONFLICT (key) DO NOTHING
+        `);
+        
+        await client.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='support_tickets' AND column_name='confirmation_sent_at') THEN
                     ALTER TABLE support_tickets ADD COLUMN confirmation_sent_at TIMESTAMP DEFAULT NULL;

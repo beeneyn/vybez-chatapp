@@ -629,22 +629,43 @@ app.get("/demo-data", (req, res) => {
     res.json(demoData);
 });
 
-app.get("/health", (req, res) => {
-    const healthcheck = {
-        status: "OK",
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString(),
-        database: "connected"
-    };
-    
-    db.pool.query('SELECT NOW()', (err) => {
-        if (err) {
-            healthcheck.database = "disconnected";
-            healthcheck.status = "ERROR";
-            return res.status(503).json(healthcheck);
+app.get("/health", async (req, res) => {
+    try {
+        const maintenanceResult = await db.pool.query(
+            "SELECT value FROM system_settings WHERE key = 'maintenance_mode'"
+        );
+        const maintenanceMode = maintenanceResult.rows[0]?.value === 'true';
+        
+        if (maintenanceMode) {
+            return res.status(503).json({
+                status: "MAINTENANCE",
+                message: "System is currently under maintenance",
+                timestamp: new Date().toISOString()
+            });
         }
-        res.status(200).json(healthcheck);
-    });
+        
+        const healthcheck = {
+            status: "OK",
+            uptime: process.uptime(),
+            timestamp: new Date().toISOString(),
+            database: "connected"
+        };
+        
+        db.pool.query('SELECT NOW()', (err) => {
+            if (err) {
+                healthcheck.database = "disconnected";
+                healthcheck.status = "ERROR";
+                return res.status(503).json(healthcheck);
+            }
+            res.status(200).json(healthcheck);
+        });
+    } catch (err) {
+        res.status(503).json({
+            status: "ERROR",
+            message: "Health check failed",
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 
 app.post("/signup", (req, res) => {
