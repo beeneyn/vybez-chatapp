@@ -169,11 +169,10 @@ app.get("/api/admin/users", requireAdminAPI, (req, res) => {
             u.avatar_url, 
             u.role, 
             u.email,
-            u.created_at,
             EXISTS(SELECT 1 FROM bans WHERE username = u.username AND is_active = true AND (is_permanent = true OR expires_at > NOW())) as is_banned,
             EXISTS(SELECT 1 FROM mutes WHERE username = u.username AND is_active = true AND expires_at > NOW()) as is_muted
         FROM users u
-        ORDER BY u.created_at DESC
+        ORDER BY u.username ASC
     `, (err, result) => {
         if (err) {
             console.error("Error fetching users:", err);

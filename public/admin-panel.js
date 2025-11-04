@@ -81,7 +81,7 @@ async function loadUsers() {
         tbody.innerHTML = '';
         
         if (data.users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-gray-400">No users found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-400">No users found</td></tr>';
             return;
         }
         
@@ -100,8 +100,6 @@ async function loadUsers() {
                 ? '<span class="px-2 py-1 bg-yellow-500 text-white rounded text-xs">Muted</span>'
                 : '<span class="px-2 py-1 bg-green-500 text-white rounded text-xs">Active</span>';
             
-            const joinedDate = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown';
-            
             row.innerHTML = `
                 <td class="py-3 px-4">
                     <div class="flex items-center">
@@ -113,7 +111,6 @@ async function loadUsers() {
                 <td class="py-3 px-4">${emailDisplay}</td>
                 <td class="py-3 px-4">${roleDisplay}</td>
                 <td class="py-3 px-4">${statusDisplay}</td>
-                <td class="py-3 px-4">${joinedDate}</td>
                 <td class="py-3 px-4">
                     <div class="flex gap-2">
                         ${user.role !== 'admin' ? 
@@ -135,7 +132,7 @@ async function loadUsers() {
         });
     } catch (error) {
         console.error('Error loading users:', error);
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-red-400">Error: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-red-400">Error: ${error.message}</td></tr>`;
     }
 }
 
