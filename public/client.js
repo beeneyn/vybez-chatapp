@@ -27,8 +27,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const userColor = (msg.color || '#EEE').replace('#', '');
         const placeholderUrl = `https://placehold.co/256x256/${userColor}/31343C?font=poppins&text=${initials}`;
         const avatarUrl = msg.avatar || placeholderUrl;
-        const avatarHtml = `<img src="${avatarUrl}" alt="${username}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">`;
-        item.innerHTML = `${avatarHtml}<span class="timestamp">[${time}]</span> <strong style="color: ${msg.color || '#000'}">${isPrivate ? `(private from ${msg.from})` : username}:</strong> `;
+        
+        // Create avatar using DOM APIs to prevent XSS
+        const avatar = document.createElement('img');
+        avatar.src = avatarUrl;
+        avatar.alt = username;
+        avatar.style.cssText = 'width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;';
+        
+        const timestampSpan = document.createElement('span');
+        timestampSpan.className = 'timestamp';
+        timestampSpan.textContent = `[${time}]`;
+        
+        const usernameStrong = document.createElement('strong');
+        usernameStrong.style.color = msg.color || '#000';
+        usernameStrong.textContent = isPrivate ? `(private from ${msg.from})` : username;
+        usernameStrong.textContent += ':';
+        
+        item.appendChild(avatar);
+        item.appendChild(timestampSpan);
+        item.appendChild(document.createTextNode(' '));
+        item.appendChild(usernameStrong);
+        item.appendChild(document.createTextNode(' '));
         
         if (msg.text) {
             const escapeHtml = (text) => {
@@ -245,7 +264,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     div.className = `mb-3 ${msg.from_user === currentUser ? 'text-end' : ''}`;
                     const bubble = document.createElement('div');
                     bubble.className = `inline-block px-4 py-2 rounded-lg max-w-md ${msg.from_user === currentUser ? 'bg-violet-500 text-white' : 'bg-white border border-gray-200'}`;
-                    bubble.innerHTML = `<p class="text-sm font-semibold mb-1">${msg.from_user}</p><p>${msg.message_text}</p>`;
+                    
+                    // Create elements using DOM APIs to prevent XSS
+                    const userP = document.createElement('p');
+                    userP.className = 'text-sm font-semibold mb-1';
+                    userP.textContent = msg.from_user;
+                    
+                    const textP = document.createElement('p');
+                    textP.textContent = msg.message_text;
+                    
+                    bubble.appendChild(userP);
+                    bubble.appendChild(textP);
                     div.appendChild(bubble);
                     container.appendChild(div);
                 });
@@ -265,10 +294,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.className = 'mb-3 text-end';
                 const bubble = document.createElement('div');
                 bubble.className = 'inline-block px-4 py-2 rounded-lg max-w-md bg-violet-500 text-white';
-                bubble.innerHTML = `<p class="text-sm font-semibold mb-1">You</p><p>${input.value}</p>`;
+                
+                // Create elements using DOM APIs to prevent XSS
+                const userP = document.createElement('p');
+                userP.className = 'text-sm font-semibold mb-1';
+                userP.textContent = 'You';
+                
+                const textP = document.createElement('p');
+                textP.textContent = input.value;
+                
+                bubble.appendChild(userP);
+                bubble.appendChild(textP);
                 div.appendChild(bubble);
                 container.appendChild(div);
                 input.value = '';
+                container.scrollTop = container.scrollHeight;
             }
         };
     };
@@ -622,12 +662,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.title = 'Click to send private message';
                 item.onclick = () => openPrivateMessage(user.username);
                 
+                // Create avatar using DOM APIs to prevent XSS
                 const initials = user.username.substring(0, 2).toUpperCase();
                 const userColor = (user.color || '#EEE').replace('#', '');
                 const placeholderUrl = `https://placehold.co/256x256/${userColor}/31343C?font=poppins&text=${initials}`;
                 const avatarUrl = user.avatar || placeholderUrl;
-                const avatarImg = `<img src="${avatarUrl}" alt="${user.username}" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;">`;
-                item.innerHTML = `${avatarImg}<span style="color: ${user.color};">${user.username}</span>`;
+                
+                const avatar = document.createElement('img');
+                avatar.src = avatarUrl;
+                avatar.alt = user.username;
+                avatar.style.cssText = 'width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; vertical-align: middle; object-fit: cover;';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.style.color = user.color || '#000';
+                nameSpan.textContent = user.username;
+                
+                item.appendChild(avatar);
+                item.appendChild(nameSpan);
                 
                 onlineUsersList.appendChild(item); 
             }); 
@@ -664,8 +715,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pmModal && pmModal.classList.contains('show') && recipientName === pm.from) {
                 const container = document.getElementById('pm-messages-container');
                 const div = document.createElement('div');
-                div.className = 'mb-2';
-                div.innerHTML = `<strong>${pm.from}:</strong> ${pm.text}`;
+                div.className = 'mb-3';
+                const bubble = document.createElement('div');
+                bubble.className = 'inline-block px-4 py-2 rounded-lg max-w-md bg-white border border-gray-200';
+                
+                // Create elements using DOM APIs to prevent XSS
+                const userP = document.createElement('p');
+                userP.className = 'text-sm font-semibold mb-1';
+                userP.textContent = pm.from;
+                
+                const textP = document.createElement('p');
+                textP.textContent = pm.text;
+                
+                bubble.appendChild(userP);
+                bubble.appendChild(textP);
+                div.appendChild(bubble);
                 container.appendChild(div);
                 container.scrollTop = container.scrollHeight;
             } else {

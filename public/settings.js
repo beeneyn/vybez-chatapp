@@ -88,22 +88,46 @@ document.addEventListener('DOMContentLoaded', async () => {
                     noBlockedUsers.style.display = 'block';
                 } else {
                     noBlockedUsers.style.display = 'none';
-                    blockedUsersList.innerHTML = blockedUsers.map(user => `
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white font-semibold">
-                                    ${user.blocked_username.substring(0, 2).toUpperCase()}
-                                </div>
-                                <div>
-                                    <p class="font-medium">${user.blocked_username}</p>
-                                    <p class="text-xs text-gray-500">Blocked ${new Date(user.created_at).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                            <button onclick="unblockUser('${user.blocked_username}')" class="px-3 py-1 bg-violet-500 hover:bg-violet-600 text-white text-sm rounded transition">
-                                Unblock
-                            </button>
-                        </div>
-                    `).join('');
+                    blockedUsersList.innerHTML = '';
+                    
+                    // Use DOM APIs to prevent XSS
+                    blockedUsers.forEach(user => {
+                        const container = document.createElement('div');
+                        container.className = 'flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200';
+                        
+                        const leftSection = document.createElement('div');
+                        leftSection.className = 'flex items-center gap-3';
+                        
+                        const avatar = document.createElement('div');
+                        avatar.className = 'w-10 h-10 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white font-semibold';
+                        avatar.textContent = user.blocked_username.substring(0, 2).toUpperCase();
+                        
+                        const userInfo = document.createElement('div');
+                        
+                        const username = document.createElement('p');
+                        username.className = 'font-medium';
+                        username.textContent = user.blocked_username;
+                        
+                        const blockedDate = document.createElement('p');
+                        blockedDate.className = 'text-xs text-gray-500';
+                        blockedDate.textContent = `Blocked ${new Date(user.created_at).toLocaleDateString()}`;
+                        
+                        userInfo.appendChild(username);
+                        userInfo.appendChild(blockedDate);
+                        
+                        leftSection.appendChild(avatar);
+                        leftSection.appendChild(userInfo);
+                        
+                        const unblockBtn = document.createElement('button');
+                        unblockBtn.className = 'px-3 py-1 bg-violet-500 hover:bg-violet-600 text-white text-sm rounded transition';
+                        unblockBtn.textContent = 'Unblock';
+                        unblockBtn.onclick = () => window.unblockUser(user.blocked_username);
+                        
+                        container.appendChild(leftSection);
+                        container.appendChild(unblockBtn);
+                        
+                        blockedUsersList.appendChild(container);
+                    });
                 }
             }
         } catch (error) {
