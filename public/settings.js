@@ -70,6 +70,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    // Load blocked users
+    const loadBlockedUsers = async () => {
+        try {
+            const response = await fetch('/blocked-users');
+            if (response.ok) {
+                const data = await response.json();
+                const blockedUsers = data.blockedUsers || [];
+                const blockedUsersList = document.getElementById('blocked-users-list');
+                const noBlockedUsers = document.getElementById('no-blocked-users');
+                const blockedUsersCount = document.getElementById('blocked-users-count');
+                
+                blockedUsersCount.textContent = `${blockedUsers.length} blocked`;
+                
+                if (blockedUsers.length === 0) {
+                    blockedUsersList.innerHTML = '';
+                    noBlockedUsers.style.display = 'block';
+                } else {
+                    noBlockedUsers.style.display = 'none';
+                    blockedUsersList.innerHTML = blockedUsers.map(user => `
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white font-semibold">
+                                    ${user.blocked_username.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p class="font-medium">${user.blocked_username}</p>
+                                    <p class="text-xs text-gray-500">Blocked ${new Date(user.created_at).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            <button onclick="unblockUser('${user.blocked_username}')" class="px-3 py-1 bg-violet-500 hover:bg-violet-600 text-white text-sm rounded transition">
+                                Unblock
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load blocked users:', error);
+        }
+    };
+
+    // Unblock user
+    window.unblockUser = async (username) => {
+        if (!confirm(`Are you sure you want to unblock ${username}?`)) return;
+        
+        try {
+            const response = await fetch('/unblock-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            
+            if (response.ok) {
+                loadBlockedUsers();
+            } else {
+                const data = await response.json();
+                alert(data.message || 'Failed to unblock user');
+            }
+        } catch (error) {
+            console.error('Failed to unblock user:', error);
+            alert('An error occurred');
+        }
+    };
+
     // Initialize theme
     const initTheme = () => {
         const savedTheme = localStorage.getItem('theme') || 'light';
@@ -101,6 +165,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Show selected section
             document.querySelectorAll('.settings-section').forEach(sec => sec.classList.remove('active'));
             document.getElementById(`${section}-section`).classList.add('active');
+            
+            // Load blocked users when privacy section is shown
+            if (section === 'privacy') {
+                loadBlockedUsers();
+            }
         });
     });
 
