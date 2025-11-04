@@ -20,18 +20,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
+            padding: 2rem 0;
         }
 
         .floating-shapes {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
             z-index: 1;
+            pointer-events: none;
         }
 
         .shape {
@@ -79,6 +81,65 @@
             }
         }
 
+        .demo-controls {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .demo-title {
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .demo-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: #b8b9ba;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .demo-btn.active {
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 100%);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 12px rgba(91, 43, 255, 0.4);
+        }
+
         .invite-container {
             position: relative;
             z-index: 10;
@@ -98,11 +159,65 @@
 
         .server-banner {
             height: 200px;
-            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+        }
+
+        .server-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(10, 1, 24, 0.6) 100%);
+            z-index: 1;
+        }
+
+        /* Banner Styles */
+        .banner-gradient {
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 50%, #1ed5ff 100%);
+        }
+
+        .banner-gaming {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 200"><rect fill="%231ed5ff" opacity="0.1" x="0" y="0" width="1200" height="200"/><circle fill="%23ff3f8f" opacity="0.1" cx="100" cy="100" r="50"/><circle fill="%235b2bff" opacity="0.1" cx="300" cy="50" r="30"/><circle fill="%231ed5ff" opacity="0.1" cx="500" cy="150" r="40"/><circle fill="%23ff3f8f" opacity="0.1" cx="700" cy="75" r="25"/><circle fill="%235b2bff" opacity="0.1" cx="900" cy="120" r="45"/><circle fill="%231ed5ff" opacity="0.1" cx="1100" cy="60" r="35"/></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .banner-nebula {
+            background: radial-gradient(ellipse at top, #5b2bff 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom right, #ff3f8f 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom left, #1ed5ff 0%, transparent 50%),
+                        #0a0118;
+            background-size: cover;
+        }
+
+        .banner-custom {
+            background: linear-gradient(135deg, rgba(91, 43, 255, 0.8) 0%, rgba(255, 63, 143, 0.8) 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 200"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="1200" height="200" fill="url(%23grid)"/></svg>');
+            background-size: cover;
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #0a0118;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
         }
 
         .server-icon {
@@ -110,7 +225,7 @@
             height: 120px;
             border-radius: 50%;
             background: linear-gradient(135deg, #1ed5ff 0%, #5b2bff 100%);
-            border: 6px solid rgba(10, 1, 24, 0.8);
+            border: 6px solid rgba(10, 1, 24, 0.9);
             position: absolute;
             bottom: -60px;
             left: 50%;
@@ -120,6 +235,7 @@
             justify-content: center;
             font-size: 3rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 2;
         }
 
         .invite-content {
@@ -178,6 +294,18 @@
             border-radius: 50%;
             display: inline-block;
             box-shadow: 0 0 10px #3dd68c;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
         }
 
         .invite-info {
@@ -238,6 +366,10 @@
             box-shadow: 0 15px 40px rgba(91, 43, 255, 0.6);
         }
 
+        .join-button:active {
+            transform: translateY(0);
+        }
+
         .invite-code {
             color: #8e8e93;
             font-size: 0.875rem;
@@ -270,13 +402,28 @@
             color: #1ed5ff;
             text-decoration: none;
             font-weight: 600;
+            transition: color 0.3s ease;
         }
 
         .vybez-logo a:hover {
+            color: #5b2bff;
             text-decoration: underline;
         }
 
         @media (max-width: 640px) {
+            .demo-controls {
+                padding: 1rem;
+            }
+
+            .demo-title {
+                font-size: 0.875rem;
+            }
+
+            .demo-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+
             .invite-content {
                 padding: 80px 24px 24px;
             }
@@ -302,71 +449,119 @@
         <div class="shape"></div>
     </div>
 
-    <div class="invite-container">
-        <div class="invite-card">
-            <div class="server-banner">
-                <div class="server-icon">
-                    🎮
-                </div>
+    <div style="position: relative; z-index: 10; width: 100%;">
+        <div class="demo-controls">
+            <div class="demo-title">
+                <i class="fas fa-palette"></i>
+                Custom Banner Styles (Premium Servers)
             </div>
-
-            <div class="invite-content">
-                <h1 class="server-name">Gaming Squad</h1>
-                <p class="server-description">
-                    A vibrant community for gamers to connect, compete, and share epic moments. 
-                    Join us for tournaments, game nights, and endless fun!
-                </p>
-
-                <div class="server-stats">
-                    <div class="stat">
-                        <div class="stat-value">
-                            <span class="online-indicator"></span>
-                            1,247
-                        </div>
-                        <div class="stat-label">Online</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-value">
-                            <i class="fas fa-users" style="color: #5b2bff;"></i>
-                            5,832
-                        </div>
-                        <div class="stat-label">Members</div>
-                    </div>
-                </div>
-
-                <div class="invite-info">
-                    <div class="invited-by">You've been invited by</div>
-                    <div class="inviter">
-                        <div class="inviter-avatar">AJ</div>
-                        <div class="inviter-name">Alex Johnson</div>
-                    </div>
-                </div>
-
-                <button class="join-button">
-                    <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
-                    Join Gaming Squad
+            <div class="demo-buttons">
+                <button class="demo-btn active" data-banner="gradient">
+                    <i class="fas fa-fill-drip"></i> Gradient
                 </button>
-
-                <div class="invite-code">
-                    Invite Code: <span class="code">rAnD0msTrInG</span>
-                </div>
-
-                <div class="expire-info">
-                    <i class="fas fa-clock"></i>
-                    This invite expires in 7 days
-                </div>
+                <button class="demo-btn" data-banner="gaming">
+                    <i class="fas fa-gamepad"></i> Gaming
+                </button>
+                <button class="demo-btn" data-banner="nebula">
+                    <i class="fas fa-star"></i> Nebula
+                </button>
+                <button class="demo-btn" data-banner="custom">
+                    <i class="fas fa-image"></i> Custom Image
+                </button>
             </div>
         </div>
 
-        <div class="vybez-logo">
-            Powered by <a href="/">Vybez</a>
+        <div class="invite-container">
+            <div class="invite-card">
+                <div class="server-banner banner-gradient" id="serverBanner">
+                    <div class="premium-badge">
+                        <i class="fas fa-crown"></i>
+                        PREMIUM
+                    </div>
+                    <div class="server-icon">
+                        🎮
+                    </div>
+                </div>
+
+                <div class="invite-content">
+                    <h1 class="server-name">Gaming Squad</h1>
+                    <p class="server-description">
+                        A vibrant community for gamers to connect, compete, and share epic moments. 
+                        Join us for tournaments, game nights, and endless fun!
+                    </p>
+
+                    <div class="server-stats">
+                        <div class="stat">
+                            <div class="stat-value">
+                                <span class="online-indicator"></span>
+                                1,247
+                            </div>
+                            <div class="stat-label">Online</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">
+                                <i class="fas fa-users" style="color: #5b2bff;"></i>
+                                5,832
+                            </div>
+                            <div class="stat-label">Members</div>
+                        </div>
+                    </div>
+
+                    <div class="invite-info">
+                        <div class="invited-by">You've been invited by</div>
+                        <div class="inviter">
+                            <div class="inviter-avatar">AJ</div>
+                            <div class="inviter-name">Alex Johnson</div>
+                        </div>
+                    </div>
+
+                    <button class="join-button">
+                        <i class="fas fa-sign-in-alt" style="margin-right: 0.5rem;"></i>
+                        Join Gaming Squad
+                    </button>
+
+                    <div class="invite-code">
+                        Invite Code: <span class="code">rAnD0msTrInG</span>
+                    </div>
+
+                    <div class="expire-info">
+                        <i class="fas fa-clock"></i>
+                        This invite expires in 7 days
+                    </div>
+                </div>
+            </div>
+
+            <div class="vybez-logo">
+                Powered by <a href="/">Vybez</a>
+            </div>
         </div>
     </div>
 
     <script>
-        // Mockup interaction
+        // Banner style switching
+        const bannerElement = document.getElementById('serverBanner');
+        const demoButtons = document.querySelectorAll('.demo-btn');
+
+        demoButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                demoButtons.forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Remove all banner classes
+                bannerElement.className = 'server-banner';
+                
+                // Add selected banner class
+                const bannerType = this.getAttribute('data-banner');
+                bannerElement.classList.add(`banner-${bannerType}`);
+            });
+        });
+
+        // Join button interaction
         document.querySelector('.join-button').addEventListener('click', function() {
-            alert('🎉 In the real implementation, this would:\n\n1. Check if user is logged in\n2. Validate the invite code\n3. Add user to the server\n4. Redirect to the server chat room');
+            alert('🎉 In the real implementation, this would:\n\n1. Check if user is logged in\n2. Validate the invite code\n3. Add user to the server/room\n4. Redirect to the server chat room\n\nPremium servers can upload custom banners to make their invites stand out!');
         });
     </script>
 </body>
