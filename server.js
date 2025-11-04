@@ -136,6 +136,11 @@ app.get("/chat", (req, res) => {
     else res.sendFile(path.join(__dirname, "public", "chat.html"));
 });
 
+app.get("/settings", (req, res) => {
+    if (!req.session.user) res.redirect("/");
+    else res.sendFile(path.join(__dirname, "public", "settings.html"));
+});
+
 app.get("/demo-chat", (req, res) => {
     req.session.user = {
         username: 'DemoUser',
