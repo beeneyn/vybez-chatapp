@@ -55,3 +55,125 @@ The application separates server-side logic (`index.js`, `database.js`), client-
 -   **Google Fonts CDN**: For typography.
 -   **Discord Webhook**: For server activity logging and monitoring.
 -   **SendGrid**: For email integration (support tickets).
+
+## Vybez 2.0 Roadmap
+
+### Vision
+Vybez 2.0 will be a complete architectural overhaul, modernizing the entire stack with React, TypeScript, and introducing native mobile apps. The goal is to improve maintainability, developer experience, performance, and expand platform support while preserving the Neon Nightlife aesthetic and all existing features.
+
+### Target Release
+Q2-Q3 2026 (Major Version)
+
+### Technology Stack Upgrade
+
+#### **Frontend (Web)**
+-   **React 18+** with TypeScript - Component-based architecture with type safety
+-   **Vite** - Lightning-fast build tooling and dev server
+-   **React Router v6** - Client-side routing
+-   **Zustand** or **Redux Toolkit** - Centralized state management
+-   **TanStack Query (React Query)** - Server state management and caching
+-   **Socket.IO Client** - Real-time WebSocket connection
+-   **Tailwind CSS v4** - Keep existing design system
+-   **Framer Motion** - Smooth animations and transitions
+-   **React Hook Form + Zod** - Form validation with type safety
+-   **Radix UI** or **Headless UI** - Accessible component primitives
+
+#### **Mobile Apps (iOS & Android)**
+-   **React Native** with TypeScript - Code sharing with web app
+-   **Expo** - Managed workflow for easier development and OTA updates
+-   **Expo Router** - File-based routing for mobile
+-   **React Native Paper** - Material Design components (themed to Neon Nightlife)
+-   **Push Notifications** - Expo Notifications API
+-   **Offline Support** - AsyncStorage + background sync
+-   **Native Features** - Camera, contacts, biometric auth
+
+#### **Backend**
+-   **Node.js + TypeScript** - Fully typed backend
+-   **Express.js** - Keep existing framework knowledge
+-   **tRPC** (Optional) - End-to-end type-safe API alternative to REST
+-   **Socket.IO Server** - Real-time communication
+-   **Drizzle ORM** - Already using, keep for type-safe database queries
+-   **PostgreSQL** - Keep existing database
+-   **Redis** - Session storage, caching, and rate limiting
+-   **BullMQ** - Background job processing (email sending, notifications)
+-   **Helmet** - Security headers
+-   **Compression** - Response compression
+-   **Winston** - Keep existing logging system
+
+#### **File Storage**
+-   **Cloudflare R2** or **AWS S3** - Cloud object storage for files/avatars
+-   Replace local file system storage for better scalability
+
+#### **Authentication**
+-   **JWT with Refresh Tokens** - More scalable than sessions
+-   **OAuth 2.0** - Discord, Google, GitHub login options
+-   **Two-Factor Authentication (2FA)** - TOTP support
+
+#### **Monorepo Structure**
+-   **pnpm Workspaces** or **Turborepo** - Monorepo management
+    ```
+    /packages
+      /web           - React web app
+      /mobile        - React Native app
+      /server        - Node.js backend
+      /shared        - Shared types, utilities, schemas
+      /ui-components - Shared UI components
+    ```
+
+#### **DevOps & Infrastructure**
+-   **Docker** - Development environment consistency
+-   **GitHub Actions** - CI/CD pipelines
+-   **Vitest** - Unit testing (Vite-native)
+-   **Playwright** - E2E testing
+-   **ESLint + Prettier** - Code quality and formatting
+-   **Husky + lint-staged** - Pre-commit hooks
+
+### New Features for 2.0
+-   **Voice Channels** - Real-time voice chat using WebRTC
+-   **Video Calls** - 1-on-1 and group video calls
+-   **Screen Sharing** - Share screen in calls
+-   **Rich Message Embeds** - Link previews, media embeds
+-   **Message Threading** - Organized conversations
+-   **Server Boost System** - Premium server features
+-   **Custom Emojis** - User-uploaded emojis per server
+-   **Role Permissions System** - Granular permission controls
+-   **Webhooks** - Incoming webhooks for integrations
+-   **Bot Support** - API for bot developers
+-   **Mobile Push Notifications** - Real-time alerts on mobile
+-   **Offline Mode** - Message queue for offline use
+-   **End-to-End Encryption (E2EE)** - Optional encrypted DMs
+
+### Migration Strategy
+1. **Phase 1**: Build 2.0 in parallel, maintain 1.0
+2. **Phase 2**: Beta release with opt-in for testing
+3. **Phase 3**: Data migration tools and scripts
+4. **Phase 4**: Gradual rollout with feature parity
+5. **Phase 5**: Deprecate 1.0, full 2.0 launch
+
+### Backward Compatibility
+-   Database schema migration scripts
+-   API versioning (v1 and v2 endpoints)
+-   Data export/import tools
+-   User notification and migration guides
+
+### Design Consistency
+-   Preserve **Neon Nightlife** aesthetic across all platforms
+-   Maintain **BREAK FREE** branding
+-   Responsive design system for web, mobile, and desktop
+-   Consistent animations and interactions
+-   Dark theme remains default
+
+### Performance Goals
+-   **First Contentful Paint (FCP)**: < 1.5s
+-   **Time to Interactive (TTI)**: < 3.5s
+-   **Lighthouse Score**: 90+ on all metrics
+-   **Mobile App Size**: < 50MB
+-   **Real-time Latency**: < 100ms for messages
+
+### Success Metrics
+-   95% feature parity with 1.0 at launch
+-   50% reduction in bundle size
+-   100% TypeScript coverage
+-   90%+ code test coverage
+-   Support for iOS 14+, Android 10+
+-   App Store and Google Play approval
