@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Security Warning in Console
+    console.log('%c⚡ HOLD UP! ⚡', 'color: #E94EFF; font-size: 72px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);');
+    console.log('%cIf someone told you to copy/paste something here, you have an 11/10 chance you\'re being scammed.', 'color: #fff; font-size: 18px; font-weight: normal; line-height: 1.5;');
+    console.log('%c⚠️ PASTING ANYTHING IN HERE COULD GIVE ATTACKERS ACCESS TO YOUR VYBEZ ACCOUNT. ⚠️', 'color: #ff4444; font-size: 20px; font-weight: bold; line-height: 1.8; background-color: rgba(255,68,68,0.1); padding: 10px;');
+    console.log('%cUnless you understand exactly what you are doing, close this window and stay safe.', 'color: #fff; font-size: 16px; font-weight: normal; line-height: 1.5;');
+    console.log('%cIf you DO understand what you\'re doing, you should come work with us! Visit https://vybez.page/about', 'color: #00E5FF; font-size: 14px; font-weight: normal; font-style: italic;');
+    console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #7C3AED;');
+    
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.body.setAttribute('data-theme', savedTheme);
 
