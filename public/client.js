@@ -3,12 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.setAttribute('data-theme', savedTheme);
 
     let currentUser = null;
+    let currentUserRole = null;
     let currentRoom = '';
     const socket = io({ autoConnect: false });
     let typingTimeout = null;
 
     const showChatUI = (user) => { 
-        currentUser = user.username; 
+        currentUser = user.username;
+        currentUserRole = user.role;
         if (window.location.pathname !== '/chat') window.location.href = '/chat'; 
         else document.getElementById('app-container')?.classList.remove('hidden'); 
     };
