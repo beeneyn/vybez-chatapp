@@ -478,6 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const handleSignup = async (e) => {
         e.preventDefault();
         const username = document.getElementById("signup-username").value;
+        const display_name = document.getElementById("signup-display-name").value;
         const password = document.getElementById("signup-password").value;
         const color = document.getElementById("signup-color").value;
         const statusEl = document.getElementById("signup-status");
@@ -487,7 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch("/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password, chat_color: color }),
+                body: JSON.stringify({ username, password, chat_color: color, display_name }),
             });
             if (response.ok) {
                 statusEl.className =

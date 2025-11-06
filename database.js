@@ -17,6 +17,7 @@ const initializeDatabase = async () => {
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 username TEXT UNIQUE NOT NULL,
+                display_name TEXT,
                 password TEXT NOT NULL,
                 email TEXT UNIQUE,
                 chat_color TEXT DEFAULT '#000000',
@@ -25,6 +26,11 @@ const initializeDatabase = async () => {
                 avatar_url TEXT DEFAULT NULL,
                 role TEXT DEFAULT 'user'
             )
+        `);
+        
+        // Add display_name column if it doesn't exist (migration for existing databases)
+        await client.query(`
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name TEXT
         `);
         
         await client.query(`
@@ -287,14 +293,14 @@ const initializeDatabase = async () => {
 
 initializeDatabase();
 
-const addUser = (username, password, chat_color, callback) => {
+const addUser = (username, password, chat_color, display_name, callback) => {
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, async (err, hash) => {
         if (err) return callback(err);
         try {
             const result = await pool.query(
-                'INSERT INTO users (username, password, chat_color) VALUES ($1, $2, $3) RETURNING id',
-                [username, hash, chat_color]
+                'INSERT INTO users (username, password, chat_color, display_name) VALUES ($1, $2, $3, $4) RETURNING id',
+                [username, hash, chat_color, display_name || username]
             );
             callback(null, { id: result.rows[0].id });
         } catch (error) {

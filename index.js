@@ -876,10 +876,39 @@ app.get("/health", async (req, res) => {
 });
 
 app.post("/signup", (req, res) => {
-    const { username, password, chat_color } = req.body;
-    db.addUser(username, password, chat_color, (err) => {
+    let { username, password, chat_color, display_name } = req.body;
+    
+    // Convert username to lowercase automatically
+    username = username.toLowerCase();
+    
+    // Username validation
+    const usernameRegex = /^[a-z0-9_.]+$/;
+    if (!usernameRegex.test(username)) {
+        return res.status(400).json({ 
+            message: "Username can only contain lowercase letters, numbers, underscores, and periods." 
+        });
+    }
+    
+    if (username.length > 15) {
+        return res.status(400).json({ 
+            message: "Username must be 15 characters or less." 
+        });
+    }
+    
+    if (username.length < 3) {
+        return res.status(400).json({ 
+            message: "Username must be at least 3 characters." 
+        });
+    }
+    
+    // If no display name provided, use username
+    if (!display_name || display_name.trim() === '') {
+        display_name = username;
+    }
+    
+    db.addUser(username, password, chat_color, display_name, (err) => {
         if (err) {
-            if (err.code === "SQLITE_CONSTRAINT")
+            if (err.code === "SQLITE_CONSTRAINT" || err.code === "23505")
                 return res
                     .status(409)
                     .json({ message: "Username already exists." });

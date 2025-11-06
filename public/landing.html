@@ -579,10 +579,26 @@
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
                             id="signup-username" 
                             type="text" 
-                            placeholder="Choose a username"
+                            placeholder="lowercase, numbers, _ and . only"
                             required
                             autocomplete="username"
+                            maxlength="15"
+                            pattern="[a-z0-9_.]+"
                         >
+                        <p class="text-xs text-gray-500 mt-1">Only lowercase letters, numbers, underscores, and periods (max 15 characters)</p>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-display-name">
+                            Display Name
+                        </label>
+                        <input 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b2bff]" 
+                            id="signup-display-name" 
+                            type="text" 
+                            placeholder="How you appear in chat (optional)"
+                            autocomplete="off"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">You can use capitals, spaces, and special characters here</p>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="signup-password">
