@@ -132,19 +132,19 @@ Q2-Q3 2026 (Major Version)
 -   **Husky + lint-staged** - Pre-commit hooks
 
 ### New Features for 2.0
--   **Rich Message Embeds** - Link previews, media embeds
--   **Message Threading** - Organized conversations
--   **Server Boost System** - Premium server features
--   **Custom Emojis** - User-uploaded emojis per server
--   **Role Permissions System** - Granular permission controls
--   **Webhooks** - Incoming webhooks for integrations
--   **Bot Support** - API for bot developers
 -   **Mobile Push Notifications** - Real-time alerts on mobile
 -   **Offline Mode** - Message queue for offline use
 
 ### Features Already Planned for Earlier Updates
--   **Voice Channels & Video Calls** - Coming in 1.5 update (WebRTC-based)
--   **Screen Sharing** - Coming in 1.5 update
+-   **Custom Emojis** - Coming in v1.2 update
+-   **Role Permissions System** - Coming in v1.2 update
+-   **Bot Support/API** - Coming in v1.3 update
+-   **Voice Channels & Video Calls** - Coming in v1.5 update (WebRTC-based)
+-   **Screen Sharing** - Coming in v1.5 update
+-   **Rich Message Embeds** - Coming in v1.6 update
+-   **Message Threading** - Coming in v1.7 update
+-   **Server Boost System** - Coming in v1.8 update
+-   **Webhooks** - Coming in v1.9 update
 -   **End-to-End Encryption (E2EE)** - Part of PM (Private Messaging) overhaul
 
 ### Migration Strategy
