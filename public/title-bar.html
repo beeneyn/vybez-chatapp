@@ -1,0 +1,388 @@
+<style>
+    .custom-title-bar {
+        -webkit-app-region: drag;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        height: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        border-bottom: 1px solid rgba(231, 78, 255, 0.2);
+        position: relative;
+        z-index: 9999;
+        user-select: none;
+    }
+
+    .title-bar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .title-bar-logo {
+        width: 24px;
+        height: 24px;
+        filter: drop-shadow(0 0 8px rgba(231, 78, 255, 0.6));
+    }
+
+    .title-bar-title {
+        font-size: 13px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #E94EFF 0%, #00E5FF 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.5px;
+    }
+
+    .title-bar-menu {
+        -webkit-app-region: no-drag;
+        display: flex;
+        gap: 2px;
+        margin-left: 8px;
+    }
+
+    .title-bar-menu-item {
+        padding: 6px 12px;
+        font-size: 12px;
+        color: #a0a0b8;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .title-bar-menu-item:hover {
+        background: rgba(231, 78, 255, 0.15);
+        color: #E94EFF;
+    }
+
+    .title-bar-right {
+        -webkit-app-region: no-drag;
+        display: flex;
+        align-items: center;
+        gap: 0;
+    }
+
+    .title-bar-control {
+        width: 45px;
+        height: 40px;
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #a0a0b8;
+        font-size: 14px;
+    }
+
+    .title-bar-control:hover {
+        background: rgba(231, 78, 255, 0.15);
+        color: #E94EFF;
+    }
+
+    .title-bar-control.close:hover {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .title-bar-control i {
+        pointer-events: none;
+    }
+
+    /* Dropdown menu styles */
+    .menu-dropdown {
+        position: absolute;
+        top: 40px;
+        background: #1a1a2e;
+        border: 1px solid rgba(231, 78, 255, 0.3);
+        border-radius: 8px;
+        min-width: 200px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        display: none;
+        z-index: 10000;
+        overflow: hidden;
+    }
+
+    .menu-dropdown.show {
+        display: block;
+    }
+
+    .menu-dropdown-item {
+        padding: 10px 16px;
+        font-size: 13px;
+        color: #e0e0e8;
+        background: transparent;
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .menu-dropdown-item:hover {
+        background: rgba(231, 78, 255, 0.15);
+        color: #E94EFF;
+    }
+
+    .menu-dropdown-divider {
+        height: 1px;
+        background: rgba(231, 78, 255, 0.2);
+        margin: 4px 0;
+    }
+
+    .menu-dropdown-item .shortcut {
+        font-size: 11px;
+        color: #6b7280;
+        margin-left: 12px;
+    }
+
+    .menu-dropdown-item i {
+        margin-right: 10px;
+        width: 16px;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    /* Platform-specific adjustments */
+    .platform-darwin .custom-title-bar {
+        padding-left: 75px; /* Space for macOS traffic lights */
+    }
+
+    .platform-darwin .title-bar-control {
+        display: none; /* Hide custom controls on macOS, use native traffic lights */
+    }
+
+    @media (max-width: 768px) {
+        .title-bar-menu {
+            display: none;
+        }
+    }
+</style>
+
+<div class="custom-title-bar">
+    <div class="title-bar-left">
+        <img src="/favicon.png" alt="Vybez" class="title-bar-logo">
+        <span class="title-bar-title">Vybez</span>
+        
+        <div class="title-bar-menu">
+            <button class="title-bar-menu-item" id="menu-file">File</button>
+            <button class="title-bar-menu-item" id="menu-view">View</button>
+            <button class="title-bar-menu-item" id="menu-window">Window</button>
+            <button class="title-bar-menu-item" id="menu-help">Help</button>
+        </div>
+    </div>
+
+    <div class="title-bar-right">
+        <button class="title-bar-control minimize" id="btn-minimize" title="Minimize">
+            <i class="fas fa-window-minimize"></i>
+        </button>
+        <button class="title-bar-control maximize" id="btn-maximize" title="Maximize">
+            <i class="fas fa-window-maximize"></i>
+        </button>
+        <button class="title-bar-control close" id="btn-close" title="Close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- File Menu Dropdown -->
+    <div class="menu-dropdown" id="dropdown-file">
+        <button class="menu-dropdown-item" id="menu-always-on-top">
+            <span><i class="fas fa-thumbtack"></i>Always on Top</span>
+            <span class="shortcut">Ctrl+T</span>
+        </button>
+        <div class="menu-dropdown-divider"></div>
+        <button class="menu-dropdown-item" id="menu-settings">
+            <span><i class="fas fa-cog"></i>Settings</span>
+        </button>
+        <div class="menu-dropdown-divider"></div>
+        <button class="menu-dropdown-item" id="menu-quit">
+            <span><i class="fas fa-sign-out-alt"></i>Quit</span>
+            <span class="shortcut">Ctrl+Q</span>
+        </button>
+    </div>
+
+    <!-- View Menu Dropdown -->
+    <div class="menu-dropdown" id="dropdown-view">
+        <button class="menu-dropdown-item" id="menu-reload">
+            <span><i class="fas fa-sync"></i>Reload</span>
+            <span class="shortcut">Ctrl+R</span>
+        </button>
+        <button class="menu-dropdown-item" id="menu-force-reload">
+            <span><i class="fas fa-sync-alt"></i>Force Reload</span>
+            <span class="shortcut">Ctrl+Shift+R</span>
+        </button>
+        <div class="menu-dropdown-divider"></div>
+        <button class="menu-dropdown-item" id="menu-zoom-in">
+            <span><i class="fas fa-search-plus"></i>Zoom In</span>
+            <span class="shortcut">Ctrl++</span>
+        </button>
+        <button class="menu-dropdown-item" id="menu-zoom-out">
+            <span><i class="fas fa-search-minus"></i>Zoom Out</span>
+            <span class="shortcut">Ctrl+-</span>
+        </button>
+        <button class="menu-dropdown-item" id="menu-reset-zoom">
+            <span><i class="fas fa-expand"></i>Reset Zoom</span>
+            <span class="shortcut">Ctrl+0</span>
+        </button>
+        <div class="menu-dropdown-divider"></div>
+        <button class="menu-dropdown-item" id="menu-fullscreen">
+            <span><i class="fas fa-expand-arrows-alt"></i>Toggle Fullscreen</span>
+            <span class="shortcut">F11</span>
+        </button>
+    </div>
+
+    <!-- Window Menu Dropdown -->
+    <div class="menu-dropdown" id="dropdown-window">
+        <button class="menu-dropdown-item" id="menu-minimize">
+            <span><i class="fas fa-window-minimize"></i>Minimize</span>
+        </button>
+        <button class="menu-dropdown-item" id="menu-maximize">
+            <span><i class="fas fa-window-maximize"></i>Maximize</span>
+        </button>
+        <div class="menu-dropdown-divider"></div>
+        <button class="menu-dropdown-item" id="menu-hide-to-tray">
+            <span><i class="fas fa-eye-slash"></i>Hide to Tray</span>
+            <span class="shortcut">Ctrl+H</span>
+        </button>
+    </div>
+
+    <!-- Help Menu Dropdown -->
+    <div class="menu-dropdown" id="dropdown-help">
+        <button class="menu-dropdown-item" id="menu-documentation">
+            <span><i class="fas fa-book"></i>Documentation</span>
+        </button>
+        <button class="menu-dropdown-item" id="menu-check-updates">
+            <span><i class="fas fa-download"></i>Check for Updates</span>
+        </button>
+        <div class="menu-dropdown-divider"></div>
+        <button class="menu-dropdown-item" id="menu-about">
+            <span><i class="fas fa-info-circle"></i>About Vybez</span>
+        </button>
+    </div>
+</div>
+
+<script>
+if (window.electronAPI) {
+    // Platform detection
+    const platform = navigator.platform.toLowerCase();
+    if (platform.includes('mac')) {
+        document.querySelector('.custom-title-bar').classList.add('platform-darwin');
+    }
+
+    // Window controls
+    const btnMinimize = document.getElementById('btn-minimize');
+    const btnMaximize = document.getElementById('btn-maximize');
+    const btnClose = document.getElementById('btn-close');
+
+    if (btnMinimize) {
+        btnMinimize.addEventListener('click', () => {
+            window.electronAPI.windowMinimize();
+        });
+    }
+
+    if (btnMaximize) {
+        btnMaximize.addEventListener('click', async () => {
+            window.electronAPI.windowMaximize();
+            const isMax = await window.electronAPI.isMaximized();
+            btnMaximize.querySelector('i').className = isMax ? 'fas fa-window-restore' : 'fas fa-window-maximize';
+        });
+    }
+
+    if (btnClose) {
+        btnClose.addEventListener('click', () => {
+            window.electronAPI.windowClose();
+        });
+    }
+
+    // Menu dropdown functionality
+    const menuItems = document.querySelectorAll('.title-bar-menu-item');
+    const dropdowns = document.querySelectorAll('.menu-dropdown');
+
+    menuItems.forEach(menuItem => {
+        menuItem.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const menuId = menuItem.id;
+            const dropdownId = 'dropdown-' + menuId.replace('menu-', '');
+            const dropdown = document.getElementById(dropdownId);
+
+            // Close all other dropdowns
+            dropdowns.forEach(dd => {
+                if (dd.id !== dropdownId) {
+                    dd.classList.remove('show');
+                }
+            });
+
+            // Toggle current dropdown
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+                
+                // Position dropdown below button
+                const rect = menuItem.getBoundingClientRect();
+                dropdown.style.left = rect.left + 'px';
+            }
+        });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        dropdowns.forEach(dd => dd.classList.remove('show'));
+    });
+
+    // Menu action handlers
+    document.getElementById('menu-always-on-top')?.addEventListener('click', () => {
+        window.electronAPI.toggleAlwaysOnTop();
+        dropdowns.forEach(dd => dd.classList.remove('show'));
+    });
+
+    document.getElementById('menu-settings')?.addEventListener('click', () => {
+        // Navigate to settings if not already there
+        dropdowns.forEach(dd => dd.classList.remove('show'));
+    });
+
+    document.getElementById('menu-quit')?.addEventListener('click', () => {
+        window.electronAPI.windowClose();
+    });
+
+    document.getElementById('menu-reload')?.addEventListener('click', () => {
+        window.location.reload();
+    });
+
+    document.getElementById('menu-force-reload')?.addEventListener('click', () => {
+        window.location.reload(true);
+    });
+
+    document.getElementById('menu-minimize')?.addEventListener('click', () => {
+        window.electronAPI.windowMinimize();
+        dropdowns.forEach(dd => dd.classList.remove('show'));
+    });
+
+    document.getElementById('menu-maximize')?.addEventListener('click', () => {
+        window.electronAPI.windowMaximize();
+        dropdowns.forEach(dd => dd.classList.remove('show'));
+    });
+
+    document.getElementById('menu-check-updates')?.addEventListener('click', () => {
+        window.electronAPI.checkForUpdates();
+        dropdowns.forEach(dd => dd.classList.remove('show'));
+    });
+
+    document.getElementById('menu-documentation')?.addEventListener('click', () => {
+        window.open('https://vybez.page/docs', '_blank');
+        dropdowns.forEach(dd => dd.classList.remove('show'));
+    });
+
+    document.getElementById('menu-about')?.addEventListener('click', () => {
+        alert('Vybez Chat v1.1\nModern real-time chat application\n\nDeveloped with ❤️ using Electron');
+        dropdowns.forEach(dd => dd.classList.remove('show'));
+    });
+}
+</script>

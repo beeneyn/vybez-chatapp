@@ -55,5 +55,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     installUpdate: () => {
         ipcRenderer.send('install-update');
+    },
+
+    // Window controls for custom title bar
+    windowMinimize: () => {
+        ipcRenderer.send('window-minimize');
+    },
+
+    windowMaximize: () => {
+        ipcRenderer.send('window-maximize');
+    },
+
+    windowClose: () => {
+        ipcRenderer.send('window-close');
+    },
+
+    isMaximized: () => {
+        return ipcRenderer.invoke('is-maximized');
     }
 });

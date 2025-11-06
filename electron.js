@@ -158,8 +158,11 @@ function createWindow() {
             preload: path.join(__dirname, "preload.js"),
         },
         title: "Vybez Chat",
-        backgroundColor: "#f3f4f6",
+        backgroundColor: "#1a1a2e",
         show: false,
+        frame: false,
+        titleBarStyle: 'hidden',
+        trafficLightPosition: { x: 10, y: 10 },
     };
 
     if (savedBounds.x !== undefined && savedBounds.y !== undefined) {
@@ -486,6 +489,33 @@ nativeTheme.on("updated", () => {
         const theme = nativeTheme.shouldUseDarkColors ? "dark" : "light";
         mainWindow.webContents.send("theme-changed", theme);
     }
+});
+
+// Window control IPC handlers for custom title bar
+ipcMain.on("window-minimize", () => {
+    if (mainWindow) {
+        mainWindow.minimize();
+    }
+});
+
+ipcMain.on("window-maximize", () => {
+    if (mainWindow) {
+        if (mainWindow.isMaximized()) {
+            mainWindow.unmaximize();
+        } else {
+            mainWindow.maximize();
+        }
+    }
+});
+
+ipcMain.on("window-close", () => {
+    if (mainWindow) {
+        mainWindow.close();
+    }
+});
+
+ipcMain.handle("is-maximized", () => {
+    return mainWindow ? mainWindow.isMaximized() : false;
 });
 
 app.on("ready", () => {
