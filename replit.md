@@ -134,6 +134,7 @@ Q2-Q3 2026 (Major Version)
 ### New Features for 2.0
 -   **Mobile Push Notifications** - Real-time alerts on mobile
 -   **Offline Mode** - Message queue for offline use
+-   **Brand Kit Refresh** - Updated visual identity and UI refresh while maintaining Neon Nightlife core aesthetic
 
 ### Features Already Planned for Earlier Updates
 -   **Custom Emojis** - Coming in v1.2 update
