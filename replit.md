@@ -70,7 +70,7 @@ Q2-Q3 2026 (Major Version)
 -   **React 18+** with TypeScript - Component-based architecture with type safety
 -   **Vite** - Lightning-fast build tooling and dev server
 -   **React Router v6** - Client-side routing
--   **Zustand** or **Redux Toolkit** - Centralized state management
+-   **Redux Toolkit** - Centralized state management (SELECTED)
 -   **TanStack Query (React Query)** - Server state management and caching
 -   **Socket.IO Client** - Real-time WebSocket connection
 -   **Tailwind CSS v4** - Keep existing design system
@@ -78,7 +78,7 @@ Q2-Q3 2026 (Major Version)
 -   **React Hook Form + Zod** - Form validation with type safety
 -   **Radix UI** or **Headless UI** - Accessible component primitives
 
-#### **Mobile Apps (iOS & Android)**
+#### **Mobile Apps (Android Priority, iOS Later)**
 -   **React Native** with TypeScript - Code sharing with web app
 -   **Expo** - Managed workflow for easier development and OTA updates
 -   **Expo Router** - File-based routing for mobile
@@ -86,6 +86,7 @@ Q2-Q3 2026 (Major Version)
 -   **Push Notifications** - Expo Notifications API
 -   **Offline Support** - AsyncStorage + background sync
 -   **Native Features** - Camera, contacts, biometric auth
+-   **Platform Priority**: Android first (existing Play Console account), iOS later (Apple Developer Program $99/year)
 
 #### **Backend**
 -   **Node.js + TypeScript** - Fully typed backend
@@ -101,8 +102,9 @@ Q2-Q3 2026 (Major Version)
 -   **Winston** - Keep existing logging system
 
 #### **File Storage**
--   **Cloudflare R2** or **AWS S3** - Cloud object storage for files/avatars
+-   **AWS S3** - Cloud object storage for files/avatars (SELECTED)
 -   Replace local file system storage for better scalability
+-   S3 bucket configuration with CloudFront CDN for fast global delivery
 
 #### **Authentication**
 -   **JWT with Refresh Tokens** - More scalable than sessions
@@ -110,11 +112,12 @@ Q2-Q3 2026 (Major Version)
 -   **Two-Factor Authentication (2FA)** - TOTP support
 
 #### **Monorepo Structure**
--   **pnpm Workspaces** or **Turborepo** - Monorepo management
+-   **Turborepo** - Monorepo management with blazing fast builds (SELECTED)
+-   **pnpm** - Fast, disk space efficient package manager
     ```
     /packages
       /web           - React web app
-      /mobile        - React Native app
+      /mobile        - React Native app (Android priority)
       /server        - Node.js backend
       /shared        - Shared types, utilities, schemas
       /ui-components - Shared UI components
@@ -129,9 +132,6 @@ Q2-Q3 2026 (Major Version)
 -   **Husky + lint-staged** - Pre-commit hooks
 
 ### New Features for 2.0
--   **Voice Channels** - Real-time voice chat using WebRTC
--   **Video Calls** - 1-on-1 and group video calls
--   **Screen Sharing** - Share screen in calls
 -   **Rich Message Embeds** - Link previews, media embeds
 -   **Message Threading** - Organized conversations
 -   **Server Boost System** - Premium server features
@@ -141,7 +141,11 @@ Q2-Q3 2026 (Major Version)
 -   **Bot Support** - API for bot developers
 -   **Mobile Push Notifications** - Real-time alerts on mobile
 -   **Offline Mode** - Message queue for offline use
--   **End-to-End Encryption (E2EE)** - Optional encrypted DMs
+
+### Features Already Planned for Earlier Updates
+-   **Voice Channels & Video Calls** - Coming in 1.5 update (WebRTC-based)
+-   **Screen Sharing** - Coming in 1.5 update
+-   **End-to-End Encryption (E2EE)** - Part of PM (Private Messaging) overhaul
 
 ### Migration Strategy
 1. **Phase 1**: Build 2.0 in parallel, maintain 1.0
