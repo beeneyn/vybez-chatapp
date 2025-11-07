@@ -170,6 +170,19 @@ document.addEventListener("DOMContentLoaded", () => {
         item.appendChild(timestampSpan);
         item.appendChild(document.createTextNode(" "));
         item.appendChild(usernameStrong);
+
+        // Add shield icon for admins
+        if (msg.role === 'admin') {
+            const shieldIcon = document.createElement("span");
+            shieldIcon.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-left: 4px;">
+                    <path d="M12 2L4 6V12C4 16.5 7 20.5 12 22C17 20.5 20 16.5 20 12V6L12 2Z" fill="#FF10F0" stroke="#FF10F0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            `;
+            shieldIcon.title = "Administrator";
+            item.appendChild(shieldIcon);
+        }
+
         item.appendChild(document.createTextNode(" "));
 
         if (msg.text) {

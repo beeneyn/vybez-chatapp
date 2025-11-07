@@ -1831,6 +1831,7 @@ io.on("connection", (socket) => {
                     fileUrl: msg.file_url,
                     fileType: msg.file_type,
                     avatar: msg.avatar_url,
+                    role: msg.role,
                 }));
                 socket.emit("loadHistory", {
                     room: defaultRoom,
@@ -1856,6 +1857,7 @@ io.on("connection", (socket) => {
                     fileUrl: msg.file_url,
                     fileType: msg.file_type,
                     avatar: msg.avatar_url,
+                    role: msg.role,
                 }));
                 socket.emit("loadHistory", {
                     room: newRoom,
@@ -1903,6 +1905,7 @@ io.on("connection", (socket) => {
                         fileUrl: msg.fileUrl,
                         fileType: msg.fileType,
                         avatar: user.avatar,
+                        role: user.role,
                         mentions: mentions,
                     };
                     discordWebhook.logChatMessage(user.username, socket.currentRoom, sanitizedText, !!msg.fileUrl, clientType);
