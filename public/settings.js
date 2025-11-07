@@ -53,7 +53,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('avatar-placeholder').style.background = `#${userColor}`;
             }
             
-            // Set bio and status
+            // Set display name, bio, and status
+            document.getElementById('settings-display-name').value = user.display_name || '';
             document.getElementById('settings-bio').value = user.bio || '';
             document.getElementById('settings-status').value = user.status || 'Online';
             
@@ -250,6 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Save profile settings
     document.getElementById('save-profile-btn').addEventListener('click', async () => {
+        const displayName = document.getElementById('settings-display-name').value.trim();
         const bio = document.getElementById('settings-bio').value;
         const status = document.getElementById('settings-status').value;
         const chatColor = document.getElementById('chat-color-picker').value;
@@ -258,7 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch('/update-profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bio, status, chat_color: chatColor })
+                body: JSON.stringify({ display_name: displayName || null, bio, status, chat_color: chatColor })
             });
 
             if (response.ok) {

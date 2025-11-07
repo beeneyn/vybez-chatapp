@@ -78,10 +78,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const usernameStrong = document.createElement("strong");
         usernameStrong.style.color = msg.color || "#000";
-        usernameStrong.textContent = isPrivate
-            ? `(private from ${msg.from})`
-            : username;
-        usernameStrong.textContent += ":";
+        
+        if (isPrivate) {
+            usernameStrong.textContent = `(private from ${msg.from}):`;
+        } else if (msg.display_name) {
+            const displayNameText = document.createTextNode(msg.display_name);
+            usernameStrong.appendChild(displayNameText);
+            const usernameSpan = document.createElement("span");
+            usernameSpan.style.opacity = "0.6";
+            usernameSpan.style.fontSize = "0.85em";
+            usernameSpan.textContent = ` (@${username})`;
+            usernameStrong.appendChild(usernameSpan);
+            usernameStrong.appendChild(document.createTextNode(":"));
+        } else {
+            usernameStrong.textContent = `${username}:`;
+        }
 
         item.appendChild(avatar);
         item.appendChild(timestampSpan);

@@ -351,7 +351,7 @@ const getUserProfile = async (username, callback) => {
     }
 };
 
-const updateUserProfile = async (username, { bio, status, chat_color, email }, callback) => {
+const updateUserProfile = async (username, { bio, status, chat_color, email, display_name }, callback) => {
     try {
         // Build dynamic query to only update provided fields
         const updates = [];
@@ -373,6 +373,10 @@ const updateUserProfile = async (username, { bio, status, chat_color, email }, c
         if (email !== undefined) {
             updates.push(`email = $${paramCount++}`);
             values.push(email || null); // Allow null to remove email
+        }
+        if (display_name !== undefined) {
+            updates.push(`display_name = $${paramCount++}`);
+            values.push(display_name || null); // Allow null to remove display name
         }
         
         if (updates.length === 0) {
@@ -424,7 +428,7 @@ const addMessage = async (room, username, message_text, chat_color, timestamp, f
 const getRecentMessages = async (room, callback) => {
     try {
         const result = await pool.query(
-            `SELECT messages.*, users.avatar_url 
+            `SELECT messages.*, users.avatar_url, users.display_name 
              FROM messages 
              LEFT JOIN users ON messages.username = users.username 
              WHERE room = $1 

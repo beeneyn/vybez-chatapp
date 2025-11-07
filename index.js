@@ -1276,7 +1276,7 @@ app.get("/private-messages/:username", (req, res) => {
 app.post("/update-profile", (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
-    const { bio, status, chat_color, email } = req.body;
+    const { bio, status, chat_color, email, display_name } = req.body;
     
     // Validate email format if provided
     if (email !== undefined && email !== null && email !== '') {
@@ -1286,9 +1286,14 @@ app.post("/update-profile", (req, res) => {
         }
     }
     
+    // Validate display name length if provided
+    if (display_name && display_name.length > 32) {
+        return res.status(400).json({ message: "Display name must be 32 characters or less" });
+    }
+    
     db.updateUserProfile(
         req.session.user.username,
-        { bio, status, chat_color, email },
+        { bio, status, chat_color, email, display_name },
         (err) => {
             if (err) {
                 if (err.code === 'EMAIL_DUPLICATE') {
@@ -1303,6 +1308,9 @@ app.post("/update-profile", (req, res) => {
             req.session.user.color = chat_color;
             if (email !== undefined) {
                 req.session.user.email = email || null;
+            }
+            if (display_name !== undefined) {
+                req.session.user.display_name = display_name || null;
             }
             
             const updatedFields = [];
@@ -1729,6 +1737,7 @@ io.on("connection", (socket) => {
                 const history = messages.map((msg) => ({
                     id: msg.id,
                     user: msg.username,
+                    display_name: msg.display_name,
                     text: msg.message_text,
                     color: msg.chat_color,
                     timestamp: msg.timestamp,
@@ -1753,6 +1762,7 @@ io.on("connection", (socket) => {
                 const history = messages.map((msg) => ({
                     id: msg.id,
                     user: msg.username,
+                    display_name: msg.display_name,
                     text: msg.message_text,
                     color: msg.chat_color,
                     timestamp: msg.timestamp,
@@ -1799,6 +1809,7 @@ io.on("connection", (socket) => {
                     const messageToSend = {
                         id: result.id,
                         user: user.username,
+                        display_name: user.display_name,
                         text: sanitizedText,
                         color: user.color,
                         timestamp: timestamp,
