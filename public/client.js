@@ -742,6 +742,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const notificationBadge =
                 document.getElementById("notification-badge");
 
+            // Check if elements exist before manipulating them
+            if (!notificationsList || !notificationBadge) {
+                return;
+            }
+
             const unreadCount = data.notifications.filter(
                 (n) => !n.read_at,
             ).length;
@@ -793,8 +798,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 .join("");
         } catch (error) {
             console.error("Error loading notifications:", error);
-            document.getElementById("notifications-list").innerHTML =
-                '<p class="text-red-500 text-center py-8">Failed to load notifications</p>';
+            const notificationsList = document.getElementById("notifications-list");
+            if (notificationsList) {
+                notificationsList.innerHTML =
+                    '<p class="text-red-500 text-center py-8">Failed to load notifications</p>';
+            }
         }
     };
 
@@ -1049,6 +1057,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 item.appendChild(avatarWrapper);
                 item.appendChild(nameSpan);
+
+                // Add shield icon for admins
+                if (user.role === 'admin') {
+                    const shieldIcon = document.createElement("span");
+                    shieldIcon.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-left: 6px;">
+                            <path d="M12 2L4 6V12C4 16.5 7 20.5 12 22C17 20.5 20 16.5 20 12V6L12 2Z" fill="#FF10F0" stroke="#FF10F0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    `;
+                    shieldIcon.title = "Administrator";
+                    item.appendChild(shieldIcon);
+                }
 
                 onlineUsersList.appendChild(item);
             });
