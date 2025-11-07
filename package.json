@@ -7,6 +7,7 @@
   "scripts": {
     "start": "npm run build:css && node index.js",
     "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/tailwind.css --minify",
+    "dev": "npm run build:css && node index.js & sleep 3 && cross-env NODE_ENV=development electron .",
     "electron": "cross-env NODE_ENV=development electron .",
     "electron-dev": "cross-env NODE_ENV=development electron . --inspect",
     "pack": "electron-builder --dir",
