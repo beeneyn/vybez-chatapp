@@ -13,6 +13,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (modal) modal.style.display = 'none';
     };
 
+    // Character counter helper
+    const updateCharacterCounter = (inputId, counterId, maxLength) => {
+        const input = document.getElementById(inputId);
+        const counter = document.getElementById(counterId);
+        if (input && counter) {
+            const currentLength = input.value.length;
+            counter.textContent = `${currentLength} / ${maxLength}`;
+            
+            // Change color based on usage
+            if (currentLength >= maxLength) {
+                counter.style.color = '#ef4444'; // Red
+            } else if (currentLength >= maxLength * 0.9) {
+                counter.style.color = '#f59e0b'; // Orange
+            } else {
+                counter.style.color = '#9ca3af'; // Gray
+            }
+        }
+    };
+
     // Check authentication
     const checkAuth = async () => {
         try {
@@ -57,6 +76,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('settings-display-name').value = user.display_name || '';
             document.getElementById('settings-bio').value = user.bio || '';
             document.getElementById('settings-status').value = user.status || 'Online';
+            
+            // Update character counters
+            updateCharacterCounter('settings-display-name', 'display-name-counter', 32);
+            updateCharacterCounter('settings-bio', 'bio-counter', 500);
             
             // Set chat color
             const chatColor = user.chat_color || '#5b2bff';
@@ -644,6 +667,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('save-data-prefs-btn')?.addEventListener('click', () => {
         showMessage('Data preferences saved!', 'success');
+    });
+
+    // Character counter event listeners
+    document.getElementById('settings-display-name')?.addEventListener('input', () => {
+        updateCharacterCounter('settings-display-name', 'display-name-counter', 32);
+    });
+
+    document.getElementById('settings-bio')?.addEventListener('input', () => {
+        updateCharacterCounter('settings-bio', 'bio-counter', 500);
     });
 
     // Initialize

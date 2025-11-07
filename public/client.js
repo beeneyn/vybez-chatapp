@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentRoom = "";
     const socket = io({ autoConnect: false });
     let typingTimeout = null;
+    let lastMessageDate = null;
 
     const showChatUI = (user) => {
         currentUser = user.username;
@@ -45,10 +46,80 @@ document.addEventListener("DOMContentLoaded", () => {
                 ?.classList.remove("hidden");
     };
 
+    const formatDateSeparator = (date) => {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        const messageDate = new Date(date);
+        
+        // Check if it's today
+        if (messageDate.toDateString() === today.toDateString()) {
+            return 'Today';
+        }
+        
+        // Check if it's yesterday
+        if (messageDate.toDateString() === yesterday.toDateString()) {
+            return 'Yesterday';
+        }
+        
+        // Otherwise, show full date
+        return messageDate.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    };
+
+    const insertDateSeparator = (messageContainer, date) => {
+        const separator = document.createElement('li');
+        separator.className = 'date-separator';
+        separator.style.cssText = `
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            list-style: none;
+        `;
+        
+        const line1 = document.createElement('div');
+        line1.style.cssText = 'flex: 1; height: 1px; background: #e5e7eb;';
+        
+        const dateText = document.createElement('span');
+        dateText.style.cssText = `
+            padding: 4px 12px;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 12px;
+            margin: 0 12px;
+        `;
+        dateText.textContent = formatDateSeparator(date);
+        
+        const line2 = document.createElement('div');
+        line2.style.cssText = 'flex: 1; height: 1px; background: #e5e7eb;';
+        
+        separator.appendChild(line1);
+        separator.appendChild(dateText);
+        separator.appendChild(line2);
+        
+        messageContainer.appendChild(separator);
+    };
+
     const renderMessage = (msg, isPrivate = false) => {
         const chatWindow = document.getElementById("chat-window");
         const messageContainer = document.getElementById("message-container");
         if (!chatWindow || !messageContainer) return;
+        
+        // Check if we need to insert a date separator
+        const messageDate = new Date(msg.timestamp);
+        const messageDateString = messageDate.toDateString();
+        
+        if (lastMessageDate !== messageDateString) {
+            insertDateSeparator(messageContainer, messageDate);
+            lastMessageDate = messageDateString;
+        }
         const shouldScroll =
             chatWindow.scrollHeight - chatWindow.clientHeight <=
             chatWindow.scrollTop + 50;
@@ -743,6 +814,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         socket.on("loadHistory", ({ room, messages }) => {
             currentRoom = room;
+            lastMessageDate = null; // Reset date separator when loading new room
             if (welcomeMessage)
                 welcomeMessage.textContent = `Welcome, ${currentUser}! | Room: ${room}`;
             document.querySelectorAll("#room-list li").forEach((li) => {
@@ -1217,5 +1289,52 @@ document.addEventListener("DOMContentLoaded", () => {
         const div = document.createElement("div");
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    // Member search functionality
+    const memberSearch = document.getElementById('member-search');
+    if (memberSearch) {
+        memberSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const userItems = document.querySelectorAll('#online-users-list li');
+            
+            userItems.forEach(item => {
+                const username = item.textContent.toLowerCase();
+                if (username.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Scroll to bottom button functionality
+    const chatWindow = document.getElementById('chat-window');
+    const scrollToBottomBtn = document.getElementById('scroll-to-bottom');
+
+    if (chatWindow && scrollToBottomBtn) {
+        // Function to check if user is at bottom
+        const isAtBottom = () => {
+            const threshold = 100; // pixels from bottom
+            return chatWindow.scrollHeight - chatWindow.clientHeight - chatWindow.scrollTop < threshold;
+        };
+
+        // Show/hide button based on scroll position
+        chatWindow.addEventListener('scroll', () => {
+            if (isAtBottom()) {
+                scrollToBottomBtn.classList.add('hidden');
+            } else {
+                scrollToBottomBtn.classList.remove('hidden');
+            }
+        });
+
+        // Scroll to bottom when button is clicked
+        scrollToBottomBtn.addEventListener('click', () => {
+            chatWindow.scrollTo({
+                top: chatWindow.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
     }
 });
