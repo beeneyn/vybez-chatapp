@@ -644,6 +644,77 @@ app.patch("/api/admin/announcements/:id/pin", requireAdminAPI, (req, res) => {
     });
 });
 
+app.post("/api/announcements/:id/mark-read", (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+    
+    const { id } = req.params;
+    const username = req.session.user.username;
+    
+    db.markAnnouncementAsRead(username, id, (err) => {
+        if (err) {
+            console.error("Error marking announcement as read:", err);
+            return res.status(500).json({ message: "Failed to mark announcement as read" });
+        }
+        res.json({ success: true });
+    });
+});
+
+app.get("/api/announcements/unread", (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+    
+    db.getUnreadAnnouncementIds(req.session.user.username, (err, unreadIds) => {
+        if (err) {
+            console.error("Error fetching unread announcements:", err);
+            return res.status(500).json({ message: "Failed to fetch unread announcements" });
+        }
+        res.json({ unreadIds });
+    });
+});
+
+app.get("/api/unread-counts", (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+    
+    db.getUnreadCounts(req.session.user.username, (err, counts) => {
+        if (err) {
+            console.error("Error fetching unread counts:", err);
+            return res.status(500).json({ message: "Failed to fetch unread counts" });
+        }
+        res.json({ counts });
+    });
+});
+
+app.post("/api/rooms/:room/mark-read", (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+    
+    const { room } = req.params;
+    const { messageId } = req.body;
+    const username = req.session.user.username;
+    
+    if (!messageId) {
+        return res.status(400).json({ message: "Message ID is required" });
+    }
+    
+    db.updateRoomReadPosition(username, room, messageId, (err) => {
+        if (err) {
+            console.error("Error updating read position:", err);
+            return res.status(500).json({ message: "Failed to update read position" });
+        }
+        res.json({ success: true });
+    });
+});
+
+app.post("/api/notifications/mark-all-read", (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+    
+    db.markAllNotificationsRead(req.session.user.username, (err) => {
+        if (err) {
+            console.error("Error marking notifications as read:", err);
+            return res.status(500).json({ message: "Failed to mark notifications as read" });
+        }
+        res.json({ success: true });
+    });
+});
+
 app.get("/api/admin/maintenance", requireAdminAPI, async (req, res) => {
     try {
         const result = await db.pool.query(

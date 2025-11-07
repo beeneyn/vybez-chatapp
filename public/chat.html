@@ -208,12 +208,17 @@
                 <h5 class="text-lg font-semibold">
                     <i class="fas fa-bell text-yellow-500"></i> Notifications
                 </h5>
-                <button onclick="window.closeModal('notificationsModal')" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="mark-all-read-btn" class="px-3 py-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-sm rounded font-semibold transition" title="Mark all as read">
+                        <i class="fas fa-check-double mr-1"></i>Mark All Read
+                    </button>
+                    <button onclick="window.closeModal('notificationsModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
-            <div id="notifications-list" class="max-h-[500px] overflow-y-auto space-y-2">
-                <p class="text-gray-500 text-center py-8">Loading notifications...</p>
+            <div id="notifications-container" class="max-h-[500px] overflow-y-auto space-y-2">
+                <p class="text-gray-500 text-center py-4">Loading notifications...</p>
             </div>
         </div>
     </div>

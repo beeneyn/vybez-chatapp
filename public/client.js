@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const socket = io({ autoConnect: false });
     let typingTimeout = null;
     let lastMessageDate = null;
+    let unreadCounts = {};
 
     const showChatUI = (user) => {
         currentUser = user.username;
@@ -623,6 +624,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.loggedIn) {
                 showChatUI(data.user);
                 socket.connect();
+                
+                // Initialize unread counts after socket connects
+                setTimeout(() => {
+                    if (window.fetchUnreadCounts) {
+                        window.fetchUnreadCounts();
+                    }
+                }, 1000);
 
                 if (data.user.role === "admin") {
                     const headerButtons = document.querySelector(
@@ -812,7 +820,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const onlineUsersList = document.getElementById("online-users-list");
         const typingIndicator = document.getElementById("typing-indicator");
 
-        socket.on("loadHistory", ({ room, messages }) => {
+        socket.on("loadHistory", async ({ room, messages }) => {
             currentRoom = room;
             lastMessageDate = null; // Reset date separator when loading new room
             if (welcomeMessage)
@@ -822,7 +830,40 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             document.getElementById("message-container").innerHTML = "";
             messages.forEach((msg) => renderMessage(msg));
+            
+            // Mark room as read up to the latest message
+            if (messages.length > 0) {
+                const latestMessageId = messages[messages.length - 1].id;
+                try {
+                    await fetch(`/api/rooms/${encodeURIComponent(room)}/mark-read`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ messageId: latestMessageId })
+                    });
+                    await fetchUnreadCounts();
+                } catch (error) {
+                    console.error("Error marking room as read:", error);
+                }
+            }
         });
+
+        const fetchUnreadCounts = async () => {
+            try {
+                const response = await fetch("/api/unread-counts");
+                if (!response.ok) return;
+                const data = await response.json();
+                unreadCounts = {};
+                data.counts.forEach(count => {
+                    unreadCounts[count.room] = parseInt(count.unread_count);
+                });
+                renderRoomList();
+            } catch (error) {
+                console.error("Failed to fetch unread counts:", error);
+            }
+        };
+        
+        // Expose globally so it can be called from checkSession
+        window.fetchUnreadCounts = fetchUnreadCounts;
 
         const renderRoomList = async () => {
             if (!roomList) return;
@@ -843,15 +884,36 @@ document.addEventListener("DOMContentLoaded", () => {
                         "items-center",
                     );
 
+                    const roomContainer = document.createElement("div");
+                    roomContainer.classList.add("flex", "items-center", "gap-2", "flex-1");
+                    
                     const roomName = document.createElement("span");
                     roomName.textContent = room.name;
-                    roomName.classList.add("flex-1");
                     roomName.addEventListener("click", () => {
                         if (room.name !== currentRoom)
                             socket.emit("switchRoom", room.name);
                     });
 
-                    item.appendChild(roomName);
+                    roomContainer.appendChild(roomName);
+
+                    if (unreadCounts[room.name] && room.name !== currentRoom) {
+                        const badge = document.createElement("span");
+                        badge.classList.add(
+                            "bg-red-500",
+                            "text-white",
+                            "text-xs",
+                            "font-bold",
+                            "rounded-full",
+                            "px-2",
+                            "py-0.5",
+                            "min-w-[20px]",
+                            "text-center"
+                        );
+                        badge.textContent = unreadCounts[room.name] > 99 ? '99+' : unreadCounts[room.name];
+                        roomContainer.appendChild(badge);
+                    }
+
+                    item.appendChild(roomContainer);
 
                     // Only show delete button to room creator or admins
                     if (!room.is_default && (room.created_by === currentUser || currentUserRole === 'admin')) {
@@ -896,7 +958,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         socket.on("roomList", renderRoomList);
 
-        socket.on("chatMessage", (msg) => {
+        socket.on("chatMessage", async (msg) => {
             if (msg.user !== currentUser) {
                 const audio = new Audio("/notification.mp3");
                 audio.play().catch((e) => console.log("Audio play failed:", e));
@@ -908,8 +970,30 @@ document.addEventListener("DOMContentLoaded", () => {
                         room: currentRoom,
                     });
                 }
+                
+                // If message is in a different room, update unread counts
+                if (msg.room && msg.room !== currentRoom) {
+                    fetchUnreadCounts();
+                }
             }
             renderMessage(msg);
+            
+            // Mark current room as read when receiving a message in it
+            if (msg.room === currentRoom && msg.id) {
+                try {
+                    const response = await fetch(`/api/rooms/${encodeURIComponent(currentRoom)}/mark-read`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ messageId: msg.id })
+                    });
+                    if (response.ok) {
+                        // Update unread counts to clear badge for current room
+                        await fetchUnreadCounts();
+                    }
+                } catch (e) {
+                    console.error("Error marking room as read:", e);
+                }
+            }
         });
 
         socket.on("updateUserList", (users) => {
@@ -1099,6 +1183,21 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         document
+            .getElementById("mark-all-read-btn")
+            ?.addEventListener("click", async () => {
+                try {
+                    const response = await fetch("/api/notifications/mark-all-read", {
+                        method: "POST"
+                    });
+                    if (response.ok) {
+                        await loadNotifications();
+                    }
+                } catch (error) {
+                    console.error("Error marking all notifications as read:", error);
+                }
+            });
+
+        document
             .getElementById("create-room-confirm-btn")
             ?.addEventListener("click", async () => {
                 const roomNameInput =
@@ -1222,10 +1321,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadAnnouncements() {
         try {
-            const response = await fetch("/api/announcements");
-            if (!response.ok) throw new Error("Failed to load announcements");
+            const [announcementsResponse, unreadResponse] = await Promise.all([
+                fetch("/api/announcements"),
+                fetch("/api/announcements/unread")
+            ]);
+            
+            if (!announcementsResponse.ok) throw new Error("Failed to load announcements");
 
-            const data = await response.json();
+            const data = await announcementsResponse.json();
+            const unreadData = unreadResponse.ok ? await unreadResponse.json() : { unreadIds: [] };
+            const unreadIds = new Set(unreadData.unreadIds);
+            
             const container = document.getElementById(
                 "announcements-container",
             );
@@ -1244,15 +1350,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     const date = new Date(
                         announcement.created_at,
                     ).toLocaleString();
+                    const isUnread = unreadIds.has(announcement.id);
                     return `
-                    <div class="bg-gray-50 rounded-lg p-4 border ${announcement.is_pinned ? "border-yellow-400 bg-yellow-50" : "border-gray-200"}">
+                    <div class="bg-gray-50 rounded-lg p-4 border ${announcement.is_pinned ? "border-yellow-400 bg-yellow-50" : "border-gray-200"} ${isUnread ? 'announcement-unread' : ''}" data-announcement-id="${announcement.id}">
                         <div class="flex items-start gap-3">
                             ${announcement.is_pinned ? '<i class="fas fa-thumbtack text-yellow-500 mt-1"></i>' : '<i class="fas fa-bullhorn text-magenta-500 mt-1"></i>'}
+                            ${isUnread ? '<span class="inline-block w-2 h-2 bg-red-500 rounded-full mt-2"></span>' : ''}
                             <div class="flex-1">
                                 <h4 class="font-bold text-lg text-gray-900 mb-1">${escapeHtml(announcement.title)}</h4>
                                 <p class="text-gray-700 whitespace-pre-wrap mb-2">${escapeHtml(announcement.content)}</p>
-                                <div class="text-xs text-gray-500">
-                                    Posted by ${escapeHtml(announcement.posted_by)} • ${date}
+                                <div class="flex justify-between items-center">
+                                    <div class="text-xs text-gray-500">
+                                        Posted by ${escapeHtml(announcement.posted_by)} • ${date}
+                                    </div>
+                                    ${isUnread ? '<button class="mark-announcement-read-btn text-xs text-cyan-500 hover:text-cyan-700 font-semibold" onclick="markAnnouncementRead(' + announcement.id + ')"><i class="fas fa-check mr-1"></i>Mark as Read</button>' : ''}
                                 </div>
                             </div>
                         </div>
@@ -1261,7 +1372,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .join("");
 
-            updateAnnouncementsBadge(data.announcements.length);
+            updateAnnouncementsBadge(unreadIds.size);
         } catch (error) {
             console.error("Error loading announcements:", error);
             const container = document.getElementById(
@@ -1273,6 +1384,19 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     }
+    
+    window.markAnnouncementRead = async function(announcementId) {
+        try {
+            const response = await fetch(`/api/announcements/${announcementId}/mark-read`, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                await loadAnnouncements();
+            }
+        } catch (error) {
+            console.error("Error marking announcement as read:", error);
+        }
+    };
 
     function updateAnnouncementsBadge(count) {
         const badge = document.getElementById("announcements-badge");

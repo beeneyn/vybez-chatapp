@@ -146,6 +146,27 @@ const initializeDatabase = async () => {
         `);
         
         await client.query(`
+            CREATE TABLE IF NOT EXISTS room_read_positions (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                room TEXT NOT NULL,
+                last_read_message_id INTEGER,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(username, room)
+            )
+        `);
+        
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS announcement_reads (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                announcement_id INTEGER NOT NULL,
+                read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(username, announcement_id)
+            )
+        `);
+        
+        await client.query(`
             CREATE TABLE IF NOT EXISTS support_tickets (
                 id SERIAL PRIMARY KEY,
                 username TEXT NOT NULL,
@@ -1130,6 +1151,79 @@ const togglePinAnnouncement = async (id, callback) => {
     }
 };
 
+const updateRoomReadPosition = async (username, room, messageId, callback) => {
+    try {
+        await pool.query(
+            `INSERT INTO room_read_positions (username, room, last_read_message_id, updated_at)
+             VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+             ON CONFLICT (username, room)
+             DO UPDATE SET last_read_message_id = $3, updated_at = CURRENT_TIMESTAMP`,
+            [username, room, messageId]
+        );
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getUnreadCounts = async (username, callback) => {
+    try {
+        const result = await pool.query(
+            `SELECT m.room, COUNT(*) as unread_count
+             FROM messages m
+             LEFT JOIN room_read_positions rp ON rp.username = $1 AND rp.room = m.room
+             WHERE m.username != $1
+             AND (rp.last_read_message_id IS NULL OR m.id > rp.last_read_message_id)
+             GROUP BY m.room`,
+            [username]
+        );
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const markAnnouncementAsRead = async (username, announcementId, callback) => {
+    try {
+        await pool.query(
+            `INSERT INTO announcement_reads (username, announcement_id, read_at)
+             VALUES ($1, $2, CURRENT_TIMESTAMP)
+             ON CONFLICT (username, announcement_id) DO NOTHING`,
+            [username, announcementId]
+        );
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getUnreadAnnouncementIds = async (username, callback) => {
+    try {
+        const result = await pool.query(
+            `SELECT a.id
+             FROM announcements a
+             LEFT JOIN announcement_reads ar ON ar.announcement_id = a.id AND ar.username = $1
+             WHERE ar.id IS NULL`,
+            [username]
+        );
+        callback(null, result.rows.map(row => row.id));
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const markAllNotificationsRead = async (username, callback) => {
+    try {
+        await pool.query(
+            'UPDATE user_notifications SET read_at = CURRENT_TIMESTAMP WHERE username = $1 AND read_at IS NULL',
+            [username]
+        );
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -1188,5 +1282,10 @@ module.exports = {
     getAllAnnouncements,
     deleteAnnouncement,
     togglePinAnnouncement,
+    updateRoomReadPosition,
+    getUnreadCounts,
+    markAnnouncementAsRead,
+    getUnreadAnnouncementIds,
+    markAllNotificationsRead,
     pool
 };
