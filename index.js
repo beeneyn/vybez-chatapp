@@ -1640,15 +1640,31 @@ app.delete("/rooms/:name", (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
     const roomName = req.params.name;
-    db.deleteRoom(roomName, (err) => {
-        if (err) {
-            if (err.message.includes("Cannot delete"))
-                return res.status(403).json({ message: err.message });
-            return res.status(500).json({ message: "Failed to delete room" });
+    
+    // Check if user has permission to delete this room
+    db.getAllRooms((err, rooms) => {
+        if (err) return res.status(500).json({ message: "Failed to get room info" });
+        
+        const room = rooms.find(r => r.name === roomName);
+        if (!room) return res.status(404).json({ message: "Room not found" });
+        
+        const isCreator = room.created_by === req.session.user.username;
+        const isAdmin = req.session.user.role === 'admin';
+        
+        if (!isCreator && !isAdmin) {
+            return res.status(403).json({ message: "Only the room creator or admins can delete this room" });
         }
-        discordWebhook.logRoomDeleted(roomName, req.session.user.username);
-        io.emit("roomDeleted", { name: roomName });
-        res.status(200).json({ message: "Room deleted successfully" });
+        
+        db.deleteRoom(roomName, (err) => {
+            if (err) {
+                if (err.message.includes("Cannot delete"))
+                    return res.status(403).json({ message: err.message });
+                return res.status(500).json({ message: "Failed to delete room" });
+            }
+            discordWebhook.logRoomDeleted(roomName, req.session.user.username);
+            io.emit("roomDeleted", { name: roomName });
+            res.status(200).json({ message: "Room deleted successfully" });
+        });
     });
 });
 

@@ -853,7 +853,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     item.appendChild(roomName);
 
-                    if (!room.is_default) {
+                    // Only show delete button to room creator or admins
+                    if (!room.is_default && (room.created_by === currentUser || currentUserRole === 'admin')) {
                         const deleteBtn = document.createElement("button");
                         deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
                         deleteBtn.classList.add(
