@@ -17,7 +17,7 @@ Vybez is a Node.js application using Express.js for the backend and Socket.IO fo
 **Key Features:**
 -   **User Authentication & Guest Demo:** Secure login/signup and a read-only guest mode.
 -   **Discord-Style Settings:** Full-page settings for Appearance, Profile, Account, Privacy & Safety, and Advanced options.
--   **Custom Chat Rooms:** User-creatable and deletable rooms with real-time updates.
+-   **Custom Chat Rooms:** User-creatable and deletable rooms with real-time updates. Rooms list now takes full height matching chat/members panels for visual consistency. Room deletion restricted to creator and admins with both frontend and backend permission enforcement.
 -   **Real-time Messaging:** Instant messages, history, typing indicators, reactions, @mentions (with notifications), and message deletion.
 -   **Discord-Style Members List:** Shows all registered users with online users sorted to the top. Online users have a green status indicator, offline users are dimmed with a gray indicator.
 -   **Support Ticket System:** Users can submit priority-based tickets; admins can manage and respond. Includes SendGrid integration for email notifications.
