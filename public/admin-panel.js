@@ -65,6 +65,12 @@ function switchTab(tab) {
         case 'maintenance':
             loadMaintenanceStatus();
             break;
+        case 'database':
+            loadDatabaseStats();
+            break;
+        case 'activity':
+            loadActivityGraphs();
+            break;
     }
 }
 
@@ -923,6 +929,133 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+let activityCharts = {};
+
+async function loadDatabaseStats() {
+    try {
+        const response = await fetch('/api/admin/database-stats');
+        if (!response.ok) throw new Error('Failed to load database stats');
+        
+        const data = await response.json();
+        
+        document.getElementById('db-size').textContent = data.databaseSize.database_size;
+        document.getElementById('db-tables').textContent = data.tables.length;
+        
+        const totalRecords = data.rowCounts.reduce((sum, table) => sum + parseInt(table.row_count), 0);
+        document.getElementById('db-records').textContent = totalRecords.toLocaleString();
+        
+        const tablesHtml = data.tables.map(table => {
+            const fullTableName = `${table.schemaname}.${table.tablename}`;
+            const rowData = data.rowCounts.find(r => r.table_name === fullTableName);
+            const rowCount = rowData ? parseInt(rowData.row_count).toLocaleString() : '0';
+            return `
+                <tr class="border-b border-gray-700 hover:bg-gray-800/30">
+                    <td class="py-3 px-4 font-mono text-cyan-400">${escapeHtml(table.tablename)}</td>
+                    <td class="py-3 px-4">${rowCount}</td>
+                    <td class="py-3 px-4">${table.column_count}</td>
+                    <td class="py-3 px-4 text-purple-400">${table.size}</td>
+                </tr>
+            `;
+        }).join('');
+        
+        document.getElementById('db-tables-list').innerHTML = tablesHtml;
+        
+        const indexesHtml = data.indexes.map(index => `
+            <tr class="border-b border-gray-700 hover:bg-gray-800/30">
+                <td class="py-3 px-4 font-mono text-cyan-400">${escapeHtml(index.tablename)}</td>
+                <td class="py-3 px-4 text-yellow-400">${escapeHtml(index.indexname)}</td>
+                <td class="py-3 px-4 text-purple-400">${index.index_size}</td>
+            </tr>
+        `).join('');
+        
+        document.getElementById('db-indexes-list').innerHTML = indexesHtml || '<tr><td colspan="3" class="text-center py-4 text-gray-400">No indexes found</td></tr>';
+    } catch (error) {
+        console.error('Error loading database stats:', error);
+        showAlert('Failed to load database statistics', 'error');
+    }
+}
+
+async function loadActivityGraphs() {
+    try {
+        const days = document.getElementById('activity-timeframe').value;
+        const response = await fetch(`/api/admin/activity-data?days=${days}`);
+        if (!response.ok) throw new Error('Failed to load activity data');
+        
+        const data = await response.json();
+        
+        Object.values(activityCharts).forEach(chart => chart.destroy());
+        activityCharts = {};
+        
+        const chartConfig = {
+            type: 'line',
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#9ca3af',
+                            precision: 0
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#9ca3af'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        };
+        
+        function createChart(canvasId, data, label, borderColor, backgroundColor) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+            
+            const labels = data.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            const values = data.map(d => parseInt(d.count));
+            
+            activityCharts[canvasId] = new Chart(ctx, {
+                ...chartConfig,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: values,
+                        borderColor: borderColor,
+                        backgroundColor: backgroundColor,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                }
+            });
+        }
+        
+        createChart('chart-signups', data.userSignups, 'User Signups', '#a855f7', 'rgba(168, 85, 247, 0.1)');
+        createChart('chart-messages', data.messages, 'Messages', '#06b6d4', 'rgba(6, 182, 212, 0.1)');
+        createChart('chart-pms', data.privateMessages, 'Private Messages', '#e94eff', 'rgba(233, 78, 255, 0.1)');
+        createChart('chart-rooms', data.roomsCreated, 'Rooms Created', '#10b981', 'rgba(16, 185, 129, 0.1)');
+        createChart('chart-tickets', data.supportTickets, 'Support Tickets', '#eab308', 'rgba(234, 179, 8, 0.1)');
+        createChart('chart-api', data.apiRequests, 'API Requests', '#3b82f6', 'rgba(59, 130, 246, 0.1)');
+        
+    } catch (error) {
+        console.error('Error loading activity graphs:', error);
+        showAlert('Failed to load activity data', 'error');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

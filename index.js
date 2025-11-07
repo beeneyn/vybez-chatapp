@@ -675,6 +675,139 @@ app.post("/api/admin/maintenance", requireAdminAPI, async (req, res) => {
     }
 });
 
+app.get("/api/admin/database-stats", requireAdminAPI, async (req, res) => {
+    try {
+        const tableStatsQuery = `
+            SELECT 
+                schemaname,
+                tablename,
+                pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size,
+                pg_total_relation_size(schemaname||'.'||tablename) AS size_bytes,
+                (SELECT COUNT(*) FROM information_schema.columns WHERE table_name = tablename AND table_schema = schemaname) AS column_count
+            FROM pg_tables
+            WHERE schemaname = 'public'
+            ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC
+        `;
+        
+        const rowCountsQuery = `
+            SELECT 
+                schemaname || '.' || relname as table_name,
+                n_live_tup as row_count
+            FROM pg_stat_user_tables
+            WHERE schemaname = 'public'
+            ORDER BY relname
+        `;
+        
+        const databaseSizeQuery = `
+            SELECT pg_size_pretty(pg_database_size(current_database())) as database_size,
+                   pg_database_size(current_database()) as database_size_bytes
+        `;
+        
+        const indexStatsQuery = `
+            SELECT 
+                tablename,
+                indexname,
+                pg_size_pretty(pg_relation_size(indexname::regclass)) as index_size
+            FROM pg_indexes
+            WHERE schemaname = 'public'
+            ORDER BY pg_relation_size(indexname::regclass) DESC
+            LIMIT 10
+        `;
+        
+        const [tableStats, rowCounts, dbSize, indexStats] = await Promise.all([
+            db.pool.query(tableStatsQuery),
+            db.pool.query(rowCountsQuery),
+            db.pool.query(databaseSizeQuery),
+            db.pool.query(indexStatsQuery)
+        ]);
+        
+        res.json({
+            tables: tableStats.rows,
+            rowCounts: rowCounts.rows,
+            databaseSize: dbSize.rows[0],
+            indexes: indexStats.rows
+        });
+    } catch (err) {
+        serverLogger.error('DATABASE', 'Failed to fetch database statistics', { error: err.message });
+        res.status(500).json({ message: 'Failed to fetch database statistics' });
+    }
+});
+
+app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
+    try {
+        const days = parseInt(req.query.days) || 30;
+        
+        const userSignupsQuery = `
+            SELECT DATE(created_at) as date, COUNT(*) as count
+            FROM users
+            WHERE created_at >= NOW() - INTERVAL '${days} days'
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        `;
+        
+        const messagesQuery = `
+            SELECT DATE(timestamp) as date, COUNT(*) as count
+            FROM messages
+            WHERE timestamp >= NOW() - INTERVAL '${days} days'
+            GROUP BY DATE(timestamp)
+            ORDER BY date ASC
+        `;
+        
+        const privateMessagesQuery = `
+            SELECT DATE(timestamp) as date, COUNT(*) as count
+            FROM private_messages
+            WHERE timestamp >= NOW() - INTERVAL '${days} days'
+            GROUP BY DATE(timestamp)
+            ORDER BY date ASC
+        `;
+        
+        const roomsCreatedQuery = `
+            SELECT DATE(created_at) as date, COUNT(*) as count
+            FROM rooms
+            WHERE created_at >= NOW() - INTERVAL '${days} days' AND is_default = false
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        `;
+        
+        const supportTicketsQuery = `
+            SELECT DATE(created_at) as date, COUNT(*) as count
+            FROM support_tickets
+            WHERE created_at >= NOW() - INTERVAL '${days} days'
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        `;
+        
+        const apiRequestsQuery = `
+            SELECT DATE(created_at) as date, COUNT(*) as count
+            FROM api_logs
+            WHERE created_at >= NOW() - INTERVAL '${days} days'
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        `;
+        
+        const [userSignups, messages, privateMessages, roomsCreated, supportTickets, apiRequests] = await Promise.all([
+            db.pool.query(userSignupsQuery),
+            db.pool.query(messagesQuery),
+            db.pool.query(privateMessagesQuery),
+            db.pool.query(roomsCreatedQuery),
+            db.pool.query(supportTicketsQuery),
+            db.pool.query(apiRequestsQuery)
+        ]);
+        
+        res.json({
+            userSignups: userSignups.rows,
+            messages: messages.rows,
+            privateMessages: privateMessages.rows,
+            roomsCreated: roomsCreated.rows,
+            supportTickets: supportTickets.rows,
+            apiRequests: apiRequests.rows
+        });
+    } catch (err) {
+        serverLogger.error('DATABASE', 'Failed to fetch activity data', { error: err.message });
+        res.status(500).json({ message: 'Failed to fetch activity data' });
+    }
+});
+
 app.use((req, res, next) => {
     console.log(
         `--- SERVER LOG: Request Received! Method: [${req.method}], URL: [${req.url}] ---`,
