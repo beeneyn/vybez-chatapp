@@ -22,7 +22,7 @@ Vybez is a Node.js application using Express.js for the backend and Socket.IO fo
 -   **Discord-Style Members List:** Shows all registered users with online users sorted to the top. Online users have a green status indicator, offline users are dimmed with a gray indicator.
 -   **Support Ticket System:** Users can submit priority-based tickets; admins can manage and respond. Includes SendGrid integration for email notifications.
 -   **Developer Portal:** API management system with API key creation, scopes, tiered rate limiting, API logs, and built-in documentation.
--   **Admin Panel:** Comprehensive dashboard for live stats, user management (including deletion), moderation (warnings, mutes, bans with evidence tracking), room management, message logs, file tracking, support ticket management, API/Server logs, and maintenance mode toggle.
+-   **Admin Panel:** Comprehensive dashboard for live stats, user management (including deletion), moderation (warnings, mutes, bans with evidence tracking), room management, message logs, file tracking, support ticket management, API/Server logs, maintenance mode toggle, database management (table statistics, row counts, indexes), and activity graphs (Chart.js-powered visualizations for messages, private messages, rooms, tickets, and API requests over time).
 -   **Logging System:** Structured server logging (Winston) to console and database, with category-based server logs and automatic API request tracking.
 -   **User Profiles:** Customizable avatars, bios, status, and chat colors.
 -   **File Sharing:** Uploads up to 10MB with secure filenames and image previews.
@@ -31,7 +31,7 @@ Vybez is a Node.js application using Express.js for the backend and Socket.IO fo
 -   **User Roles:** Admin and standard user permission system.
 -   **Moderation System:** Three-tier enforcement (warnings, mutes, bans) with evidence tracking, real-time enforcement, and dedicated management pages.
 -   **Custom Error Pages:** Branded 404 (Page Not Found) and 401 (Access Denied) pages with Neon Nightlife aesthetic, glassmorphism design, animated floating shapes, and helpful navigation buttons.
--   **Electron Desktop Client:** Offers desktop notifications, system tray integration, badge counts, global shortcuts, native dark mode, offline detection, auto-updater, auto-launch, native file picker, and secure IPC.
+-   **Electron Desktop Client:** Offers desktop notifications, system tray integration, badge counts, global shortcuts, native dark mode, offline detection, auto-updater, auto-launch, native file picker, borderless window with custom title bar, and secure IPC.
 
 ### System Design Choices
 The application separates server-side logic (`index.js`, `database.js`), client-side logic (`public/client.js`), and Electron components. The main server file is `index.js` with `server.js` as a symbolic link for deployment compatibility. Database interactions use `pg` for PostgreSQL. A file-based session store manages user sessions (migrating to Replit key-value store). Frontend styles are compiled with `@tailwindcss/cli`. Database schema uses username-based relationships with transactional integrity for user actions. Custom error handling middleware serves branded 404 and 401 pages while preserving API JSON responses.

@@ -74,7 +74,7 @@ io.engine.use(sessionMiddleware);
 
 const banCheckMiddleware = async (req, res, next) => {
     const allowedForBannedUsers = ['/ban.html', '/support', '/support.html', '/api/moderation/check-status', '/check-session', '/logout'];
-    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health', '/404.html', '/401.html', '/403.html', '/500.html', '/502.html', '/maintenance.html', '/invite-mockup.html'];
+    const allowedForAnonymous = ['/', '/signup', '/login', '/desktop-login', '/health', '/404.html', '/401.html', '/403.html', '/500.html', '/502.html', '/maintenance.html', '/invite-mockup.html', '/roadmap.html'];
     
     const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.mp3', '.wav'];
     const isStaticAsset = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext)) ||
@@ -737,14 +737,6 @@ app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
     try {
         const days = parseInt(req.query.days) || 30;
         
-        const userSignupsQuery = `
-            SELECT DATE(created_at) as date, COUNT(*) as count
-            FROM users
-            WHERE created_at >= NOW() - INTERVAL '${days} days'
-            GROUP BY DATE(created_at)
-            ORDER BY date ASC
-        `;
-        
         const messagesQuery = `
             SELECT DATE(timestamp) as date, COUNT(*) as count
             FROM messages
@@ -785,17 +777,22 @@ app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
             ORDER BY date ASC
         `;
         
-        const [userSignups, messages, privateMessages, roomsCreated, supportTickets, apiRequests] = await Promise.all([
-            db.pool.query(userSignupsQuery),
+        const totalUsersQuery = `
+            SELECT COUNT(*) as count FROM users
+        `;
+        
+        const [messages, privateMessages, roomsCreated, supportTickets, apiRequests, totalUsers] = await Promise.all([
             db.pool.query(messagesQuery),
             db.pool.query(privateMessagesQuery),
             db.pool.query(roomsCreatedQuery),
             db.pool.query(supportTicketsQuery),
-            db.pool.query(apiRequestsQuery)
+            db.pool.query(apiRequestsQuery),
+            db.pool.query(totalUsersQuery)
         ]);
         
         res.json({
-            userSignups: userSignups.rows,
+            userSignups: [],
+            totalUsers: parseInt(totalUsers.rows[0].count),
             messages: messages.rows,
             privateMessages: privateMessages.rows,
             roomsCreated: roomsCreated.rows,

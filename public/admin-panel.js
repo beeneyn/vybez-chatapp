@@ -985,6 +985,8 @@ async function loadActivityGraphs() {
         
         const data = await response.json();
         
+        document.getElementById('activity-total-users').textContent = data.totalUsers.toLocaleString();
+        
         Object.values(activityCharts).forEach(chart => chart.destroy());
         activityCharts = {};
         
@@ -1045,7 +1047,6 @@ async function loadActivityGraphs() {
             });
         }
         
-        createChart('chart-signups', data.userSignups, 'User Signups', '#a855f7', 'rgba(168, 85, 247, 0.1)');
         createChart('chart-messages', data.messages, 'Messages', '#06b6d4', 'rgba(6, 182, 212, 0.1)');
         createChart('chart-pms', data.privateMessages, 'Private Messages', '#e94eff', 'rgba(233, 78, 255, 0.1)');
         createChart('chart-rooms', data.roomsCreated, 'Rooms Created', '#10b981', 'rgba(16, 185, 129, 0.1)');
