@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Hosting Guide - Vybez</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="landing.css">
+    <style>
+        pre {
+            background: #0b1220;
+            color: #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+        code {
+            background: #1f2937;
+            color: #60a5fa;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+        .step-number {
+            background: linear-gradient(135deg, #5b2bff 0%, #ff3f8f 100%);
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md py-4 sticky top-0 z-50 backdrop-blur-sm bg-opacity-95">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="landing.html" class="flex items-center space-x-3">
+                <img src="favicon.png" alt="Vybez Logo" class="h-10 w-10">
+                <span class="text-2xl font-bold gradient-text">Vybez</span>
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="landing.html#features" class="text-gray-700 hover:text-[#5b2bff] font-medium transition-colors">Features</a>
+                <a href="landing.html#technology" class="text-gray-700 hover:text-[#ff3f8f] font-medium transition-colors">Technology</a>
+                <a href="downloads.html" class="text-gray-700 hover:text-[#1ed5ff] font-medium transition-colors">Downloads</a>
+                <a href="api-documentation.html" class="text-gray-700 hover:text-[#5b2bff] font-medium transition-colors">API Docs</a>
+                <a href="about.html" class="text-gray-700 hover:text-[#ff3f8f] font-medium transition-colors">About</a>
+            </div>
+            <a href="landing.html" class="px-6 py-2 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold rounded-lg hover:shadow-xl shadow-lg transform hover:scale-105 transition-all">
+                Launch Chat
+            </a>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="hero-bg text-white py-20 text-center">
+        <div class="container mx-auto px-4">
+            <h1 class="text-5xl md:text-6xl font-black mb-4">Self-Hosting Guide</h1>
+            <p class="text-xl md:text-2xl opacity-90 font-light">
+                Deploy Vybez on your own infrastructure
+            </p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-12 max-w-6xl">
+        
+        <!-- Introduction -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-4 gradient-text">Why Self-Host Vybez?</h2>
+            <p class="text-gray-700 mb-4 text-lg">Self-hosting Vybez gives you complete control over your chat infrastructure, data privacy, and customization options. This guide walks you through deploying Vybez on your own server.</p>
+            
+            <div class="grid md:grid-cols-3 gap-4 mt-6">
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <i class="fas fa-shield-alt text-purple-600 text-2xl mb-2"></i>
+                    <h3 class="font-bold text-purple-900">Full Control</h3>
+                    <p class="text-sm text-purple-800">Own your data and infrastructure</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <i class="fas fa-lock text-blue-600 text-2xl mb-2"></i>
+                    <h3 class="font-bold text-blue-900">Privacy First</h3>
+                    <p class="text-sm text-blue-800">Keep all messages on your servers</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <i class="fas fa-code text-green-600 text-2xl mb-2"></i>
+                    <h3 class="font-bold text-green-900">Customizable</h3>
+                    <p class="text-sm text-green-800">Modify and extend as needed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Requirements -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-4 gradient-text">System Requirements</h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Minimum Specifications</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><strong>OS:</strong> Ubuntu 22.04 LTS or later (recommended), Debian 11+, or CentOS 8+</li>
+                        <li><strong>CPU:</strong> 2 cores</li>
+                        <li><strong>RAM:</strong> 2 GB minimum, 4 GB recommended</li>
+                        <li><strong>Storage:</strong> 10 GB minimum (SSD recommended for database performance)</li>
+                        <li><strong>Network:</strong> Static IP or domain name, ports 80 and 443 open</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Software Dependencies</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><strong>Node.js:</strong> v20.x or later</li>
+                        <li><strong>PostgreSQL:</strong> v14 or later</li>
+                        <li><strong>npm:</strong> v9.x or later (comes with Node.js)</li>
+                        <li><strong>Git:</strong> For cloning the repository</li>
+                        <li><strong>PM2:</strong> Process manager (optional but recommended for production)</li>
+                        <li><strong>Nginx:</strong> Reverse proxy (recommended for production)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Installation Steps -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-6 gradient-text">Installation Steps</h2>
+
+            <!-- Step 1 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">1</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Install Node.js and npm</h3>
+                    <p class="text-gray-700 mb-3">Install Node.js 20.x using NodeSource repository:</p>
+                    <pre><code>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs</code></pre>
+                    <p class="text-gray-700 mt-3 mb-2">Verify installation:</p>
+                    <pre><code>node --version
+npm --version</code></pre>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">2</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Install and Setup PostgreSQL</h3>
+                    <p class="text-gray-700 mb-3">Install PostgreSQL database:</p>
+                    <pre><code>sudo apt-get update
+sudo apt-get install -y postgresql postgresql-contrib</code></pre>
+                    <p class="text-gray-700 mt-3 mb-2">Create a database and user for Vybez:</p>
+                    <pre><code>sudo -u postgres psql
+CREATE DATABASE vybez;
+CREATE USER vybez_user WITH ENCRYPTED PASSWORD 'your_secure_password';
+GRANT ALL PRIVILEGES ON DATABASE vybez TO vybez_user;
+\q</code></pre>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">3</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Clone Vybez Repository</h3>
+                    <p class="text-gray-700 mb-3">Clone the repository and install dependencies:</p>
+                    <pre><code>cd /var/www
+git clone https://github.com/yourusername/vybez.git
+cd vybez
+npm install</code></pre>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">4</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Configure Environment Variables</h3>
+                    <p class="text-gray-700 mb-3">Create a <code>.env</code> file in the project root:</p>
+                    <pre><code># Database Configuration
+DATABASE_URL=postgresql://vybez_user:your_secure_password@localhost:5432/vybez
+PGHOST=localhost
+PGPORT=5432
+PGUSER=vybez_user
+PGPASSWORD=your_secure_password
+PGDATABASE=vybez
+
+# Application Settings
+NODE_ENV=production
+PORT=5000
+SESSION_SECRET=your_random_session_secret_here
+
+# Security
+JWT_SECRET=your_random_jwt_secret_here
+
+# Optional: Email Configuration (SendGrid)
+SENDGRID_API_KEY=your_sendgrid_key_here
+SENDGRID_FROM_EMAIL=noreply@yourdomain.com
+
+# Optional: Discord Webhook for Logging
+DISCORD_WEBHOOK_URL=your_discord_webhook_url</code></pre>
+                    <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                        <p class="text-sm text-gray-700">
+                            <strong>⚠️ Security Note:</strong> Generate secure random strings for <code>SESSION_SECRET</code> and <code>JWT_SECRET</code> using: <code>openssl rand -base64 32</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">5</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Initialize Database Tables</h3>
+                    <p class="text-gray-700 mb-3">The database tables will be created automatically on first run, or you can manually initialize them:</p>
+                    <pre><code>npm run db:push</code></pre>
+                    <p class="text-gray-700 mt-3">This creates all necessary tables: users, messages, rooms, notifications, API keys, etc.</p>
+                </div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">6</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Build CSS Assets</h3>
+                    <p class="text-gray-700 mb-3">Compile Tailwind CSS for production:</p>
+                    <pre><code>npm run build:css</code></pre>
+                </div>
+            </div>
+
+            <!-- Step 7 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">7</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Install PM2 Process Manager</h3>
+                    <p class="text-gray-700 mb-3">PM2 keeps your app running and restarts it on crashes:</p>
+                    <pre><code>sudo npm install -g pm2</code></pre>
+                    <p class="text-gray-700 mt-3 mb-2">Create PM2 ecosystem file <code>ecosystem.config.js</code>:</p>
+                    <pre><code>module.exports = {
+  apps: [{
+    name: 'vybez',
+    script: './index.js',
+    instances: 'max',
+    exec_mode: 'cluster',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 5000
+    },
+    error_file: './logs/err.log',
+    out_file: './logs/out.log',
+    time: true
+  }]
+};</code></pre>
+                    <p class="text-gray-700 mt-3 mb-2">Start the application:</p>
+                    <pre><code>pm2 start ecosystem.config.js
+pm2 save
+pm2 startup</code></pre>
+                </div>
+            </div>
+
+            <!-- Step 8 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">8</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Setup Nginx Reverse Proxy</h3>
+                    <p class="text-gray-700 mb-3">Install Nginx:</p>
+                    <pre><code>sudo apt-get install -y nginx</code></pre>
+                    <p class="text-gray-700 mt-3 mb-2">Create Nginx configuration <code>/etc/nginx/sites-available/vybez</code>:</p>
+                    <pre><code>upstream vybez_backend {
+    server 127.0.0.1:5000;
+    keepalive 64;
+}
+
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+
+    location / {
+        proxy_pass http://vybez_backend;
+        proxy_http_version 1.1;
+        
+        # WebSocket support
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        
+        # Headers
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Static file caching
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+        proxy_pass http://vybez_backend;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}</code></pre>
+                    <p class="text-gray-700 mt-3 mb-2">Enable the site and restart Nginx:</p>
+                    <pre><code>sudo ln -s /etc/nginx/sites-available/vybez /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx</code></pre>
+                </div>
+            </div>
+
+            <!-- Step 9 -->
+            <div class="flex gap-4 mb-8">
+                <div class="step-number flex-shrink-0">9</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Setup SSL with Let's Encrypt</h3>
+                    <p class="text-gray-700 mb-3">Install Certbot and get SSL certificate:</p>
+                    <pre><code>sudo apt-get install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com</code></pre>
+                    <p class="text-gray-700 mt-3">Certbot will automatically configure Nginx for HTTPS and setup auto-renewal.</p>
+                </div>
+            </div>
+
+            <!-- Step 10 -->
+            <div class="flex gap-4">
+                <div class="step-number flex-shrink-0">10</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Create Admin Account</h3>
+                    <p class="text-gray-700 mb-3">Access your Vybez instance at <code>https://yourdomain.com</code> and create your first account. To make it an admin account, connect to your database:</p>
+                    <pre><code>sudo -u postgres psql vybez
+UPDATE users SET role = 'admin' WHERE username = 'your_username';
+\q</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firewall Configuration -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-4 gradient-text">Firewall Configuration</h2>
+            <p class="text-gray-700 mb-4">Configure UFW firewall to allow necessary ports:</p>
+            <pre><code>sudo ufw enable
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 80/tcp    # HTTP
+sudo ufw allow 443/tcp   # HTTPS
+sudo ufw status</code></pre>
+            <div class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded">
+                <p class="text-sm text-gray-700">
+                    <strong>⚠️ Important:</strong> Make sure to allow SSH (port 22) before enabling the firewall to avoid locking yourself out!
+                </p>
+            </div>
+        </div>
+
+        <!-- Maintenance & Updates -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-4 gradient-text">Maintenance & Updates</h2>
+            
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Updating Vybez</h3>
+                    <pre><code>cd /var/www/vybez
+git pull origin main
+npm install
+npm run build:css
+pm2 reload vybez</code></pre>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Viewing Logs</h3>
+                    <pre><code>pm2 logs vybez           # View real-time logs
+pm2 logs vybez --lines 100  # View last 100 lines</code></pre>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Monitoring</h3>
+                    <pre><code>pm2 status    # View app status
+pm2 monit     # Real-time monitoring dashboard</code></pre>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Database Backup</h3>
+                    <pre><code>pg_dump -U vybez_user vybez > backup_$(date +%Y%m%d).sql</code></pre>
+                    <p class="text-gray-700 mt-2">Automate backups with a cron job for daily backups.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-4 gradient-text">Troubleshooting</h2>
+            
+            <div class="space-y-4">
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <h3 class="font-bold text-gray-800 mb-1">App won't start</h3>
+                    <p class="text-gray-700 text-sm mb-2">Check PM2 logs for errors:</p>
+                    <code class="text-xs">pm2 logs vybez --err</code>
+                    <p class="text-gray-700 text-sm mt-2">Verify environment variables are set correctly in <code>.env</code></p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 pl-4">
+                    <h3 class="font-bold text-gray-800 mb-1">Database connection errors</h3>
+                    <p class="text-gray-700 text-sm mb-2">Verify PostgreSQL is running:</p>
+                    <code class="text-xs">sudo systemctl status postgresql</code>
+                    <p class="text-gray-700 text-sm mt-2">Check DATABASE_URL in <code>.env</code> matches your database credentials</p>
+                </div>
+
+                <div class="border-l-4 border-green-500 pl-4">
+                    <h3 class="font-bold text-gray-800 mb-1">WebSocket not connecting</h3>
+                    <p class="text-gray-700 text-sm">Ensure Nginx is configured with WebSocket headers (Upgrade, Connection)</p>
+                </div>
+
+                <div class="border-l-4 border-yellow-500 pl-4">
+                    <h3 class="font-bold text-gray-800 mb-1">Port already in use</h3>
+                    <p class="text-gray-700 text-sm mb-2">Find and kill the process using port 5000:</p>
+                    <code class="text-xs">sudo lsof -ti:5000 | xargs kill -9</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Best Practices -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+            <h2 class="text-3xl font-black mb-4 gradient-text">Security Best Practices</h2>
+            <ul class="list-disc list-inside text-gray-700 space-y-3">
+                <li>Always use HTTPS with valid SSL certificates</li>
+                <li>Keep Node.js, npm, and system packages up to date</li>
+                <li>Use strong passwords for database and session secrets</li>
+                <li>Regularly backup your database</li>
+                <li>Monitor logs for suspicious activity</li>
+                <li>Implement rate limiting (already built into Vybez)</li>
+                <li>Use SSH keys instead of password authentication</li>
+                <li>Configure firewall to only allow necessary ports</li>
+                <li>Consider using fail2ban to prevent brute force attacks</li>
+                <li>Keep your <code>.env</code> file secure and never commit it to version control</li>
+            </ul>
+        </div>
+
+        <!-- Support -->
+        <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl shadow-xl p-8 border border-purple-200">
+            <h2 class="text-3xl font-black mb-4 gradient-text">Need Help?</h2>
+            <p class="text-gray-700 mb-4">If you encounter any issues during self-hosting, we're here to help!</p>
+            <div class="flex gap-4 flex-wrap">
+                <a href="/developer" class="px-6 py-3 bg-gradient-to-r from-[#5b2bff] to-[#ff3f8f] text-white font-bold rounded-lg hover:shadow-xl transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Developer Portal
+                </a>
+                <a href="mailto:vybezchatapp@gmail.com" class="px-6 py-3 bg-white text-gray-800 font-bold rounded-lg border-2 border-gray-300 hover:shadow-lg transition">
+                    <i class="fas fa-envelope mr-2"></i>Contact Support
+                </a>
+                <a href="/api-docs" class="px-6 py-3 bg-white text-gray-800 font-bold rounded-lg border-2 border-gray-300 hover:shadow-lg transition">
+                    <i class="fas fa-book mr-2"></i>API Documentation
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Vybez. Open source real-time chat platform.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

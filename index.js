@@ -992,6 +992,10 @@ app.get("/developer-terms", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "developer-terms.html"));
 });
 
+app.get("/self-hosting", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "self-hosting.html"));
+});
+
 app.get("/invite-mockup.html", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "invite-mockup.html"));
 });
