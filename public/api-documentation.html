@@ -470,14 +470,24 @@
     "room": "#general",
     "messages": [
         { 
-            "user": "...", 
-            "text": "...", 
-            "color": "#...",
-            "timestamp": "...",
-            "avatar": "..."
+            "id": 12345,
+            "user": "admin_user",
+            "display_name": "Admin User",
+            "text": "Welcome to the room!",
+            "color": "#ff0000",
+            "timestamp": "2025-10-06T...",
+            "avatar": "/uploads/...",
+            "role": "admin",  // "admin" or "user"
+            "fileUrl": "/uploads/...",  // optional
+            "fileType": "image/jpeg"    // optional
         }
     ]
 }</code></pre>
+                        <div class="mt-4 p-4 bg-purple-50 border-l-4 border-purple-500 rounded">
+                            <p class="text-sm text-gray-700">
+                                <strong>🛡️ Admin Indicator:</strong> Historical messages from users with <code class="bg-white px-2 py-1 rounded text-sm font-mono">role: "admin"</code> display with an Electric Magenta shield icon next to their username in the chat UI.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -489,12 +499,23 @@
                         <p class="text-gray-700 mb-4">Broadcasts a new public message to all clients in a room.</p>
                         <strong class="text-gray-800">Payload:</strong>
                         <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>{
+    "id": 12345,
     "user": "test_user",
+    "display_name": "Test User",
     "text": "Hello everyone!",
     "color": "#ff0000",
     "timestamp": "2025-10-06T...",
-    "avatar": "/uploads/..."
+    "avatar": "/uploads/...",
+    "role": "admin",  // "admin" or "user"
+    "mentions": ["user1", "user2"],
+    "fileUrl": "/uploads/...",  // optional
+    "fileType": "image/jpeg"    // optional
 }</code></pre>
+                        <div class="mt-4 p-4 bg-purple-50 border-l-4 border-purple-500 rounded">
+                            <p class="text-sm text-gray-700">
+                                <strong>🛡️ Admin Indicator:</strong> Messages from users with <code class="bg-white px-2 py-1 rounded text-sm font-mono">role: "admin"</code> display with an Electric Magenta shield icon next to their username in the chat UI for easy role identification.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -506,9 +527,22 @@
                         <p class="text-gray-700 mb-4">Broadcasts the updated list of all online users.</p>
                         <strong class="text-gray-800">Payload:</strong>
                         <pre class="bg-[#0b1220] text-gray-100 p-4 rounded-lg mt-3 overflow-x-auto"><code>[
-    { "username": "...", "color": "#...", "avatar": "..." },
+    { 
+        "username": "admin_user",
+        "color": "#ff0000",
+        "avatar": "/uploads/...",
+        "bio": "Server administrator",
+        "status": "online",
+        "role": "admin",    // "admin" or "user"
+        "isOnline": true
+    },
     ...
 ]</code></pre>
+                        <div class="mt-4 p-4 bg-purple-50 border-l-4 border-purple-500 rounded">
+                            <p class="text-sm text-gray-700">
+                                <strong>🛡️ Admin Indicator:</strong> Users with <code class="bg-white px-2 py-1 rounded text-sm font-mono">role: "admin"</code> display with an Electric Magenta shield icon next to their username in the members list UI.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
