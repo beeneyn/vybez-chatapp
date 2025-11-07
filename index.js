@@ -22,6 +22,9 @@ const io = new Server(server);
 const uploadsDir = path.join(__dirname, "public", "uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
+const sessionsDir = path.join(__dirname, "sessions");
+if (!fs.existsSync(sessionsDir)) fs.mkdirSync(sessionsDir, { recursive: true });
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, uploadsDir),
     filename: (req, file, cb) => {
@@ -54,7 +57,7 @@ const upload = multer({
 });
 
 const sessionMiddleware = session({
-    store: new FileStore({ path: "./sessions", ttl: 86400 }),
+    store: new FileStore({ path: sessionsDir, ttl: 86400, retries: 0 }),
     secret:
         process.env.SESSION_SECRET ||
         require("crypto").randomBytes(32).toString("hex"),
