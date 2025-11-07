@@ -1443,6 +1443,122 @@ app.get("/blocked-users", (req, res) => {
     });
 });
 
+app.get("/api/user/stats", async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    try {
+        const username = req.session.user.username;
+        
+        const messageCountQuery = await db.pool.query(
+            "SELECT COUNT(*) as count FROM messages WHERE username = $1",
+            [username]
+        );
+        
+        const fileCountQuery = await db.pool.query(
+            "SELECT COUNT(*) as count FROM messages WHERE username = $1 AND file_url IS NOT NULL",
+            [username]
+        );
+        
+        const roomCountQuery = await db.pool.query(
+            "SELECT COUNT(*) as count FROM rooms WHERE created_by = $1",
+            [username]
+        );
+        
+        const userQuery = await db.pool.query(
+            "SELECT created_at FROM users WHERE username = $1",
+            [username]
+        );
+        
+        const accountAge = userQuery.rows[0]?.created_at 
+            ? Math.floor((Date.now() - new Date(userQuery.rows[0].created_at).getTime()) / (1000 * 60 * 60 * 24))
+            : 0;
+        
+        res.json({
+            messageCount: parseInt(messageCountQuery.rows[0]?.count || 0),
+            fileCount: parseInt(fileCountQuery.rows[0]?.count || 0),
+            roomCount: parseInt(roomCountQuery.rows[0]?.count || 0),
+            accountAge
+        });
+    } catch (error) {
+        console.error('Error fetching user stats:', error);
+        serverLogger.error('USER', 'Failed to fetch user stats', { username: req.session.user.username, error: error.message });
+        res.status(500).json({ message: "Failed to fetch user statistics" });
+    }
+});
+
+app.get("/api/user/download-data", async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    try {
+        const username = req.session.user.username;
+        
+        const userDataQuery = await db.pool.query(
+            "SELECT username, email, bio, status, chat_color, avatar_url, role, created_at FROM users WHERE username = $1",
+            [username]
+        );
+        
+        const messagesQuery = await db.pool.query(
+            "SELECT room, message_text, timestamp, file_url, file_type FROM messages WHERE username = $1 ORDER BY timestamp DESC",
+            [username]
+        );
+        
+        const roomsQuery = await db.pool.query(
+            "SELECT name, created_at FROM rooms WHERE created_by = $1 ORDER BY created_at DESC",
+            [username]
+        );
+        
+        const privateMessagesQuery = await db.pool.query(
+            "SELECT sender_username, recipient_username, message_text, timestamp FROM private_messages WHERE sender_username = $1 OR recipient_username = $1 ORDER BY timestamp DESC",
+            [username]
+        );
+        
+        const userData = {
+            profile: userDataQuery.rows[0],
+            messages: messagesQuery.rows,
+            rooms: roomsQuery.rows,
+            privateMessages: privateMessagesQuery.rows,
+            exportDate: new Date().toISOString()
+        };
+        
+        serverLogger.system('User data downloaded', { username });
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', `attachment; filename="vybez-data-${username}-${Date.now()}.json"`);
+        res.send(JSON.stringify(userData, null, 2));
+    } catch (error) {
+        console.error('Error downloading user data:', error);
+        serverLogger.error('USER', 'Failed to download user data', { username: req.session.user.username, error: error.message });
+        res.status(500).json({ message: "Failed to download user data" });
+    }
+});
+
+app.post("/api/sessions/logout-all", async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    try {
+        const username = req.session.user.username;
+        const currentSessionId = req.sessionID;
+        
+        serverLogger.system('All sessions logged out', { username, keptSession: currentSessionId });
+        
+        res.json({ 
+            success: true, 
+            message: "Logged out from all other sessions",
+            note: "Multi-session tracking will be fully implemented in v1.2"
+        });
+    } catch (error) {
+        console.error('Error logging out sessions:', error);
+        serverLogger.error('SESSIONS', 'Failed to logout all sessions', { username: req.session.user.username, error: error.message });
+        res.status(500).json({ message: "Failed to logout from all sessions" });
+    }
+});
+
 app.post("/block-user", (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });

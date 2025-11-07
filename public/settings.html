@@ -144,6 +144,9 @@
                     <div class="settings-nav-item active" data-section="appearance">
                         <i class="fas fa-palette mr-2"></i> Appearance
                     </div>
+                    <div class="settings-nav-item" data-section="accessibility">
+                        <i class="fas fa-universal-access mr-2"></i> Accessibility
+                    </div>
                     <div class="settings-nav-item" data-section="profile">
                         <i class="fas fa-user mr-2"></i> Profile
                     </div>
@@ -157,8 +160,29 @@
                 
                 <hr class="settings-nav-divider my-2 border-gray-300">
                 
-                <div>
+                <div class="mb-4">
                     <p class="settings-nav-label text-xs font-semibold text-gray-500 uppercase mb-2 px-3">App Settings</p>
+                    <div class="settings-nav-item" data-section="notifications">
+                        <i class="fas fa-bell mr-2"></i> Notifications
+                    </div>
+                    <div class="settings-nav-item" data-section="chat">
+                        <i class="fas fa-comments mr-2"></i> Chat Preferences
+                    </div>
+                    <div class="settings-nav-item" data-section="language">
+                        <i class="fas fa-globe mr-2"></i> Language & Region
+                    </div>
+                    <div class="settings-nav-item" data-section="sessions">
+                        <i class="fas fa-desktop mr-2"></i> Active Sessions
+                    </div>
+                    <div class="settings-nav-item" data-section="data">
+                        <i class="fas fa-database mr-2"></i> Data & Privacy
+                    </div>
+                </div>
+                
+                <hr class="settings-nav-divider my-2 border-gray-300">
+                
+                <div>
+                    <p class="settings-nav-label text-xs font-semibold text-gray-500 uppercase mb-2 px-3">Danger Zone</p>
                     <div class="settings-nav-item" data-section="advanced">
                         <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i> Advanced
                     </div>
@@ -336,6 +360,439 @@
                             <!-- Blocked users will be loaded here -->
                         </div>
                         <p id="no-blocked-users" class="text-sm text-gray-500 italic text-center py-4">You haven't blocked anyone yet</p>
+                    </div>
+                </div>
+
+                <!-- Accessibility Section -->
+                <div id="accessibility-section" class="settings-section">
+                    <h1 class="text-2xl font-bold mb-2">Accessibility</h1>
+                    <p class="text-gray-600 mb-6">Customize your experience for better accessibility</p>
+                    
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Font Size</h3>
+                        <p class="text-sm text-gray-600 mb-4">Adjust the size of text in the chat</p>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-gray-600">Small</span>
+                            <input type="range" id="font-size-slider" min="12" max="20" value="14" step="1" class="flex-1">
+                            <span class="text-sm text-gray-600">Large</span>
+                        </div>
+                        <div class="mt-3 p-3 bg-gray-50 rounded">
+                            <p id="font-size-preview" style="font-size: 14px;">This is how your chat text will look</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold mb-1">Reduce Motion</h3>
+                                <p class="text-sm text-gray-600">Minimize animations and transitions</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="reduce-motion" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold mb-1">High Contrast Mode</h3>
+                                <p class="text-sm text-gray-600">Increase color contrast for better visibility</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="high-contrast" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button id="save-accessibility-btn" class="px-6 py-2 btn-brand-gradient text-white rounded font-semibold">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notifications Section -->
+                <div id="notifications-section" class="settings-section">
+                    <h1 class="text-2xl font-bold mb-2">Notifications</h1>
+                    <p class="text-gray-600 mb-6">Configure how you receive notifications</p>
+                    
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Desktop Notifications</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Enable Desktop Notifications</p>
+                                    <p class="text-sm text-gray-600">Get notifications even when Vybez is in the background</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="desktop-notifications" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Notification Triggers</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Direct Messages</p>
+                                    <p class="text-sm text-gray-600">Notify me when someone sends a private message</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="notify-dms" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">@Mentions</p>
+                                    <p class="text-sm text-gray-600">Notify me when someone mentions me in chat</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="notify-mentions" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Room Invites</p>
+                                    <p class="text-sm text-gray-600">Notify me when I'm invited to a room</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="notify-invites" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold mb-4">Email Notifications</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Weekly Summary</p>
+                                    <p class="text-sm text-gray-600">Receive a weekly email with your activity</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="email-weekly" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Product Updates</p>
+                                    <p class="text-sm text-gray-600">Get notified about new features and updates</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="email-updates" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button id="save-notifications-btn" class="px-6 py-2 btn-brand-gradient text-white rounded font-semibold">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Preferences Section -->
+                <div id="chat-section" class="settings-section">
+                    <h1 class="text-2xl font-bold mb-2">Chat Preferences</h1>
+                    <p class="text-gray-600 mb-6">Customize your chat experience</p>
+                    
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Display Settings</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Show Timestamps</p>
+                                    <p class="text-sm text-gray-600">Display message timestamps in chat</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="show-timestamps" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Compact Mode</p>
+                                    <p class="text-sm text-gray-600">Reduce spacing between messages</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="compact-mode" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Group Consecutive Messages</p>
+                                    <p class="text-sm text-gray-600">Combine messages from the same user</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="group-messages" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Show User Avatars</p>
+                                    <p class="text-sm text-gray-600">Display profile pictures in chat</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="show-avatars" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Sound Effects</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Message Sounds</p>
+                                    <p class="text-sm text-gray-600">Play a sound when you receive a message</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="message-sounds" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Typing Sounds</p>
+                                    <p class="text-sm text-gray-600">Play a sound when typing</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="typing-sounds" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold mb-4">Enter Key Behavior</h3>
+                        <p class="text-sm text-gray-600 mb-4">Choose what happens when you press Enter</p>
+                        <select id="enter-behavior" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500">
+                            <option value="send">Send message (Shift+Enter for new line)</option>
+                            <option value="newline">New line (Ctrl+Enter to send)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button id="save-chat-prefs-btn" class="px-6 py-2 btn-brand-gradient text-white rounded font-semibold">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Language & Region Section -->
+                <div id="language-section" class="settings-section">
+                    <h1 class="text-2xl font-bold mb-2">Language & Region</h1>
+                    <p class="text-gray-600 mb-6">Customize language and regional settings</p>
+                    
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Language</h3>
+                        <p class="text-sm text-gray-600 mb-4">Select your preferred language</p>
+                        <select id="app-language" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500">
+                            <option value="en">English (US)</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                            <option value="ja">日本語</option>
+                            <option value="zh">中文 (简体)</option>
+                            <option value="ko">한국어</option>
+                            <option value="pt">Português</option>
+                            <option value="ru">Русский</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Some translations may be incomplete
+                        </p>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Time Format</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="radio" name="time-format" value="12" class="text-violet-500 focus:ring-violet-500" checked>
+                                <span>12-hour (3:45 PM)</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="radio" name="time-format" value="24" class="text-violet-500 focus:ring-violet-500">
+                                <span>24-hour (15:45)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold mb-4">Date Format</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="radio" name="date-format" value="mdy" class="text-violet-500 focus:ring-violet-500" checked>
+                                <span>MM/DD/YYYY (11/07/2025)</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="radio" name="date-format" value="dmy" class="text-violet-500 focus:ring-violet-500">
+                                <span>DD/MM/YYYY (07/11/2025)</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="radio" name="date-format" value="ymd" class="text-violet-500 focus:ring-violet-500">
+                                <span>YYYY-MM-DD (2025-11-07)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button id="save-language-btn" class="px-6 py-2 btn-brand-gradient text-white rounded font-semibold">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sessions Section -->
+                <div id="sessions-section" class="settings-section">
+                    <h1 class="text-2xl font-bold mb-2">Active Sessions</h1>
+                    <p class="text-gray-600 mb-6">Manage devices and sessions connected to your account</p>
+                    
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Your Active Sessions</h3>
+                        <p class="text-sm text-gray-600 mb-4">These devices are currently signed in to your account</p>
+                        
+                        <div id="sessions-list" class="space-y-3">
+                            <!-- Sessions will be loaded here -->
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-desktop text-violet-600 text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">Current Session</p>
+                                        <p class="text-sm text-gray-600">Web Browser • Active now</p>
+                                        <p class="text-xs text-gray-500 mt-1">Location: Unknown • IP: *.*.*.* </p>
+                                    </div>
+                                </div>
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                                    ACTIVE
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-sm text-blue-800">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Session management and multi-device tracking coming soon in v1.2
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold mb-4">Session Security</h3>
+                        <button id="logout-all-btn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-semibold">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            Logout All Other Sessions
+                        </button>
+                        <p class="text-xs text-gray-500 mt-2">
+                            This will sign you out of all devices except this one
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Data & Privacy Section -->
+                <div id="data-section" class="settings-section">
+                    <h1 class="text-2xl font-bold mb-2">Data & Privacy</h1>
+                    <p class="text-gray-600 mb-6">Manage your data and privacy settings</p>
+                    
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Your Data</h3>
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="p-4 bg-violet-50 rounded-lg">
+                                <p class="text-2xl font-bold text-violet-600" id="message-count-stat">-</p>
+                                <p class="text-sm text-gray-600">Messages Sent</p>
+                            </div>
+                            <div class="p-4 bg-cyan-50 rounded-lg">
+                                <p class="text-2xl font-bold text-cyan-600" id="file-count-stat">-</p>
+                                <p class="text-sm text-gray-600">Files Shared</p>
+                            </div>
+                            <div class="p-4 bg-magenta-50 rounded-lg">
+                                <p class="text-2xl font-bold text-pink-600" id="room-count-stat">-</p>
+                                <p class="text-sm text-gray-600">Rooms Created</p>
+                            </div>
+                            <div class="p-4 bg-amber-50 rounded-lg">
+                                <p class="text-2xl font-bold text-amber-600" id="account-age-stat">-</p>
+                                <p class="text-sm text-gray-600">Days Active</p>
+                            </div>
+                        </div>
+
+                        <button id="download-data-btn" class="w-full px-4 py-2 bg-violet-500 hover:bg-violet-600 text-white rounded font-semibold">
+                            <i class="fas fa-download mr-2"></i>
+                            Download My Data
+                        </button>
+                        <p class="text-xs text-gray-500 mt-2">
+                            Get a copy of all your data including messages, profile, and settings
+                        </p>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6 mb-6">
+                        <h3 class="font-semibold mb-4">Data Collection</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Analytics & Usage Data</p>
+                                    <p class="text-sm text-gray-600">Help improve Vybez by sharing anonymous usage data</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="analytics-consent" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                            <hr class="border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-medium">Personalized Recommendations</p>
+                                    <p class="text-sm text-gray-600">Use my activity to suggest rooms and users</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="personalization-consent" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-content-card bg-white rounded-lg shadow p-6">
+                        <h3 class="font-semibold mb-2">Privacy Policy</h3>
+                        <p class="text-sm text-gray-600 mb-4">
+                            Learn how we collect, use, and protect your data
+                        </p>
+                        <a href="/privacy-policy.html" class="inline-flex items-center gap-2 text-violet-600 hover:text-violet-700 font-medium">
+                            View Privacy Policy
+                            <i class="fas fa-external-link-alt text-sm"></i>
+                        </a>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button id="save-data-prefs-btn" class="px-6 py-2 btn-brand-gradient text-white rounded font-semibold">
+                            Save Changes
+                        </button>
                     </div>
                 </div>
 

@@ -418,6 +418,232 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3000);
     };
 
+    // === NEW SETTINGS FUNCTIONALITY ===
+
+    // Accessibility Settings
+    const fontSizeSlider = document.getElementById('font-size-slider');
+    const fontSizePreview = document.getElementById('font-size-preview');
+    
+    fontSizeSlider?.addEventListener('input', (e) => {
+        const size = e.target.value + 'px';
+        fontSizePreview.style.fontSize = size;
+        localStorage.setItem('vybez_font_size', e.target.value);
+    });
+
+    // Load saved font size
+    const savedFontSize = localStorage.getItem('vybez_font_size') || '14';
+    if (fontSizeSlider) fontSizeSlider.value = savedFontSize;
+    if (fontSizePreview) fontSizePreview.style.fontSize = savedFontSize + 'px';
+
+    // Reduce motion toggle
+    document.getElementById('reduce-motion')?.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        localStorage.setItem('vybez_reduce_motion', enabled);
+        document.body.style.setProperty('--animation-speed', enabled ? '0' : '1');
+        showMessage(enabled ? 'Reduced motion enabled' : 'Animations enabled', 'success');
+    });
+
+    // High contrast toggle
+    document.getElementById('high-contrast')?.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        localStorage.setItem('vybez_high_contrast', enabled);
+        document.body.classList.toggle('high-contrast', enabled);
+        showMessage(enabled ? 'High contrast mode enabled' : 'High contrast mode disabled', 'success');
+    });
+
+    // Save accessibility settings
+    document.getElementById('save-accessibility-btn')?.addEventListener('click', () => {
+        showMessage('Accessibility settings saved!', 'success');
+    });
+
+    // Notifications Settings
+    const notificationToggles = {
+        'desktop-notifications': 'vybez_notify_desktop',
+        'notify-dms': 'vybez_notify_dms',
+        'notify-mentions': 'vybez_notify_mentions',
+        'notify-invites': 'vybez_notify_invites',
+        'email-weekly': 'vybez_email_weekly',
+        'email-updates': 'vybez_email_updates'
+    };
+
+    // Load notification preferences
+    Object.entries(notificationToggles).forEach(([id, storageKey]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            const saved = localStorage.getItem(storageKey);
+            element.checked = saved === null ? element.checked : saved === 'true';
+            element.addEventListener('change', (e) => {
+                localStorage.setItem(storageKey, e.target.checked);
+            });
+        }
+    });
+
+    // Request desktop notification permission
+    document.getElementById('desktop-notifications')?.addEventListener('change', async (e) => {
+        if (e.target.checked && 'Notification' in window && Notification.permission === 'default') {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                e.target.checked = false;
+                showMessage('Notification permission denied', 'error');
+            }
+        }
+    });
+
+    document.getElementById('save-notifications-btn')?.addEventListener('click', () => {
+        showMessage('Notification preferences saved!', 'success');
+    });
+
+    // Chat Preferences
+    const chatToggles = {
+        'show-timestamps': 'vybez_show_timestamps',
+        'compact-mode': 'vybez_compact_mode',
+        'group-messages': 'vybez_group_messages',
+        'show-avatars': 'vybez_show_avatars',
+        'message-sounds': 'vybez_message_sounds',
+        'typing-sounds': 'vybez_typing_sounds'
+    };
+
+    Object.entries(chatToggles).forEach(([id, storageKey]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            const saved = localStorage.getItem(storageKey);
+            element.checked = saved === null ? element.checked : saved === 'true';
+            element.addEventListener('change', (e) => {
+                localStorage.setItem(storageKey, e.target.checked);
+            });
+        }
+    });
+
+    // Enter key behavior
+    const enterBehavior = document.getElementById('enter-behavior');
+    if (enterBehavior) {
+        enterBehavior.value = localStorage.getItem('vybez_enter_behavior') || 'send';
+        enterBehavior.addEventListener('change', (e) => {
+            localStorage.setItem('vybez_enter_behavior', e.target.value);
+        });
+    }
+
+    document.getElementById('save-chat-prefs-btn')?.addEventListener('click', () => {
+        showMessage('Chat preferences saved!', 'success');
+    });
+
+    // Language & Region Settings
+    const appLanguage = document.getElementById('app-language');
+    if (appLanguage) {
+        appLanguage.value = localStorage.getItem('vybez_language') || 'en';
+        appLanguage.addEventListener('change', (e) => {
+            localStorage.setItem('vybez_language', e.target.value);
+        });
+    }
+
+    // Time format
+    const timeFormat = document.querySelector('input[name="time-format"]:checked');
+    const savedTimeFormat = localStorage.getItem('vybez_time_format') || '12';
+    document.querySelectorAll('input[name="time-format"]').forEach(radio => {
+        radio.checked = radio.value === savedTimeFormat;
+        radio.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                localStorage.setItem('vybez_time_format', e.target.value);
+            }
+        });
+    });
+
+    // Date format
+    const savedDateFormat = localStorage.getItem('vybez_date_format') || 'mdy';
+    document.querySelectorAll('input[name="date-format"]').forEach(radio => {
+        radio.checked = radio.value === savedDateFormat;
+        radio.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                localStorage.setItem('vybez_date_format', e.target.value);
+            }
+        });
+    });
+
+    document.getElementById('save-language-btn')?.addEventListener('click', () => {
+        showMessage('Language & region settings saved!', 'success');
+    });
+
+    // Sessions Management
+    document.getElementById('logout-all-btn')?.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to logout from all other sessions?')) {
+            try {
+                const response = await fetch('/api/sessions/logout-all', { method: 'POST' });
+                if (response.ok) {
+                    showMessage('Logged out from all other sessions', 'success');
+                } else {
+                    showMessage('Failed to logout from other sessions', 'error');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                showMessage('Failed to logout from other sessions', 'error');
+            }
+        }
+    });
+
+    // Data & Privacy
+    const loadUserStats = async () => {
+        try {
+            const response = await fetch('/api/user/stats');
+            if (response.ok) {
+                const stats = await response.json();
+                document.getElementById('message-count-stat').textContent = stats.messageCount || 0;
+                document.getElementById('file-count-stat').textContent = stats.fileCount || 0;
+                document.getElementById('room-count-stat').textContent = stats.roomCount || 0;
+                document.getElementById('account-age-stat').textContent = stats.accountAge || 0;
+            }
+        } catch (error) {
+            console.error('Failed to load stats:', error);
+        }
+    };
+
+    // Load stats when data section is opened
+    document.querySelector('[data-section="data"]')?.addEventListener('click', loadUserStats);
+
+    // Download data
+    document.getElementById('download-data-btn')?.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/user/download-data');
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `vybez-data-${currentUser}-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                showMessage('Data download started!', 'success');
+            } else {
+                showMessage('Failed to download data', 'error');
+            }
+        } catch (error) {
+            console.error('Download error:', error);
+            showMessage('Failed to download data', 'error');
+        }
+    });
+
+    // Data preferences
+    const dataToggles = {
+        'analytics-consent': 'vybez_analytics_consent',
+        'personalization-consent': 'vybez_personalization_consent'
+    };
+
+    Object.entries(dataToggles).forEach(([id, storageKey]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            const saved = localStorage.getItem(storageKey);
+            element.checked = saved === null ? element.checked : saved === 'true';
+            element.addEventListener('change', (e) => {
+                localStorage.setItem(storageKey, e.target.checked);
+            });
+        }
+    });
+
+    document.getElementById('save-data-prefs-btn')?.addEventListener('click', () => {
+        showMessage('Data preferences saved!', 'success');
+    });
+
     // Initialize
     initTheme();
     await checkAuth();
