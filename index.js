@@ -1001,6 +1001,44 @@ app.get("/invite-mockup.html", (req, res) => {
 });
 
 // Developer API Key Management Routes
+app.get("/api/developer/stats", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    // Get API usage statistics for the user
+    const username = req.session.user.username;
+    
+    // Count total API requests in the last 30 days
+    db.pool.query(
+        `SELECT COUNT(*) as total FROM api_logs WHERE username = $1 AND created_at >= NOW() - INTERVAL '30 days'`,
+        [username],
+        (err, requestsResult) => {
+            if (err) {
+                console.error("Failed to get API stats:", err);
+                return res.status(500).json({ message: "Failed to retrieve stats" });
+            }
+            
+            // Count active API keys
+            db.pool.query(
+                `SELECT COUNT(*) as active FROM api_keys WHERE username = $1 AND is_active = true`,
+                [username],
+                (err, keysResult) => {
+                    if (err) {
+                        console.error("Failed to get active keys count:", err);
+                        return res.status(500).json({ message: "Failed to retrieve stats" });
+                    }
+                    
+                    res.status(200).json({
+                        totalRequests: parseInt(requestsResult.rows[0].total) || 0,
+                        activeKeys: parseInt(keysResult.rows[0].active) || 0
+                    });
+                }
+            );
+        }
+    );
+});
+
 app.get("/api/developer/keys", (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ message: "Unauthorized" });

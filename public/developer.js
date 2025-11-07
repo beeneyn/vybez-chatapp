@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data.loggedIn) {
                 document.getElementById('username-display').textContent = data.user.username;
                 loadApiKeys();
+                loadApiStats();
             } else {
                 window.location.href = '/';
             }
@@ -18,6 +19,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/';
     }
 });
+
+// Code tab switching
+function showCodeTab(language) {
+    // Hide all code examples
+    document.querySelectorAll('.code-example').forEach(el => el.classList.add('hidden'));
+    
+    // Remove active state from all tabs
+    document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+        tab.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
+        tab.classList.add('text-gray-500');
+    });
+    
+    // Show selected code example
+    document.getElementById(`code-${language}`).classList.remove('hidden');
+    
+    // Activate selected tab
+    const activeTab = document.getElementById(`tab-${language}`);
+    activeTab.classList.remove('text-gray-500');
+    activeTab.classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
+}
+
+// Load API statistics
+async function loadApiStats() {
+    try {
+        const response = await fetch('/api/developer/stats');
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Update stats if elements exist
+            const totalRequestsEl = document.getElementById('total-requests');
+            const activeKeysEl = document.getElementById('active-keys');
+            
+            if (totalRequestsEl) {
+                totalRequestsEl.textContent = data.totalRequests?.toLocaleString() || '0';
+            }
+            if (activeKeysEl) {
+                activeKeysEl.textContent = data.activeKeys || '0';
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load API stats:', error);
+    }
+}
 
 async function loadApiKeys() {
     try {
