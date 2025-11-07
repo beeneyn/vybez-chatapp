@@ -980,10 +980,15 @@ async function loadDatabaseStats() {
 async function loadActivityGraphs() {
     try {
         const days = document.getElementById('activity-timeframe').value;
-        const response = await fetch(`/api/admin/activity-data?days=${days}`);
-        if (!response.ok) throw new Error('Failed to load activity data');
+        const [activityResponse, healthResponse] = await Promise.all([
+            fetch(`/api/admin/activity-data?days=${days}`),
+            fetch(`/api/admin/health-check-data?days=${days}`)
+        ]);
         
-        const data = await response.json();
+        if (!activityResponse.ok || !healthResponse.ok) throw new Error('Failed to load activity data');
+        
+        const data = await activityResponse.json();
+        const healthData = await healthResponse.json();
         
         document.getElementById('activity-total-users').textContent = data.totalUsers.toLocaleString();
         
@@ -1047,6 +1052,76 @@ async function loadActivityGraphs() {
             });
         }
         
+        function createHealthChart(canvasId, healthData) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+            
+            const labels = healthData.map(h => new Date(h.checked_at).toLocaleString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            }));
+            const values = healthData.map(h => parseInt(h.response_time_ms));
+            
+            activityCharts[canvasId] = new Chart(ctx, {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' ms';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#9ca3af',
+                                callback: function(value) {
+                                    return value + ' ms';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#9ca3af',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                },
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Response Time',
+                        data: values,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                }
+            });
+        }
+        
+        createHealthChart('chart-health', healthData.healthChecks);
         createChart('chart-messages', data.messages, 'Messages', '#06b6d4', 'rgba(6, 182, 212, 0.1)');
         createChart('chart-pms', data.privateMessages, 'Private Messages', '#e94eff', 'rgba(233, 78, 255, 0.1)');
         createChart('chart-rooms', data.roomsCreated, 'Rooms Created', '#10b981', 'rgba(16, 185, 129, 0.1)');

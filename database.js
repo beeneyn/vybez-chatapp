@@ -269,6 +269,18 @@ const initializeDatabase = async () => {
             )
         `);
         
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS health_checks (
+                id SERIAL PRIMARY KEY,
+                response_time_ms INTEGER NOT NULL,
+                checked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_health_checks_checked_at ON health_checks(checked_at DESC)
+        `);
+        
         const defaultRooms = ['#general', '#tech', '#random'];
         for (const room of defaultRooms) {
             await client.query(

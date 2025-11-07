@@ -733,6 +733,60 @@ app.get("/api/admin/database-stats", requireAdminAPI, async (req, res) => {
     }
 });
 
+app.get("/health-check", async (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        timestamp: new Date().toISOString() 
+    });
+});
+
+async function performHealthCheck() {
+    try {
+        const port = process.env.PORT || 5000;
+        const start = Date.now();
+        const response = await fetch(`http://localhost:${port}/health-check`);
+        const responseTime = Date.now() - start;
+        
+        if (response.ok) {
+            await db.pool.query(
+                'INSERT INTO health_checks (response_time_ms) VALUES ($1)',
+                [responseTime]
+            );
+            serverLogger.system('Health check completed', { responseTime });
+        } else {
+            serverLogger.error('HEALTH', 'Health check returned non-OK status', { status: response.status, responseTime });
+        }
+    } catch (err) {
+        serverLogger.error('HEALTH', 'Health check failed', { error: err.message });
+    }
+}
+
+setInterval(performHealthCheck, 3 * 60 * 60 * 1000);
+
+setTimeout(performHealthCheck, 5000);
+
+app.get("/api/admin/health-check-data", requireAdminAPI, async (req, res) => {
+    try {
+        const days = parseInt(req.query.days) || 30;
+        
+        const query = `
+            SELECT 
+                checked_at,
+                response_time_ms
+            FROM health_checks
+            WHERE checked_at >= NOW() - INTERVAL '${days} days'
+            ORDER BY checked_at ASC
+            LIMIT 1000
+        `;
+        
+        const result = await db.pool.query(query);
+        res.json({ healthChecks: result.rows });
+    } catch (err) {
+        serverLogger.error('DATABASE', 'Failed to fetch health check data', { error: err.message });
+        res.status(500).json({ message: 'Failed to fetch health check data' });
+    }
+});
+
 app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
     try {
         const days = parseInt(req.query.days) || 30;
