@@ -1137,10 +1137,14 @@ app.get("/demo-data", (req, res) => {
 });
 
 app.get("/health", async (req, res) => {
+    const startTime = Date.now();
+    
     try {
-        const maintenanceResult = await db.pool.query(
-            "SELECT value FROM system_settings WHERE key = 'maintenance_mode'"
-        );
+        const maintenanceResult = await Promise.race([
+            db.pool.query("SELECT value FROM system_settings WHERE key = 'maintenance_mode'"),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Query timeout')), 5000))
+        ]);
+        
         const maintenanceMode = maintenanceResult.rows[0]?.value === 'true';
         
         if (maintenanceMode) {
@@ -1151,26 +1155,32 @@ app.get("/health", async (req, res) => {
             });
         }
         
+        const dbCheckResult = await Promise.race([
+            db.pool.query('SELECT NOW()'),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('DB check timeout')), 3000))
+        ]);
+        
+        const responseTime = Date.now() - startTime;
+        
         const healthcheck = {
             status: "OK",
             uptime: process.uptime(),
             timestamp: new Date().toISOString(),
-            database: "connected"
+            database: "connected",
+            responseTime: `${responseTime}ms`
         };
         
-        db.pool.query('SELECT NOW()', (err) => {
-            if (err) {
-                healthcheck.database = "disconnected";
-                healthcheck.status = "ERROR";
-                return res.status(503).json(healthcheck);
-            }
-            res.status(200).json(healthcheck);
-        });
+        res.status(200).json(healthcheck);
     } catch (err) {
+        const responseTime = Date.now() - startTime;
+        serverLogger.error('HEALTH', 'Health check failed', { error: err.message, responseTime });
+        
         res.status(503).json({
             status: "ERROR",
-            message: "Health check failed",
-            timestamp: new Date().toISOString()
+            message: err.message || "Health check failed",
+            database: "disconnected",
+            timestamp: new Date().toISOString(),
+            responseTime: `${responseTime}ms`
         });
     }
 });
