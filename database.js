@@ -6,16 +6,43 @@ const pool = new Pool({
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
-    query_timeout: 10000
+    connectionTimeoutMillis: 30000,
+    query_timeout: 30000,
+    application_name: 'vybez_chat_app',
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000
 });
 
 pool.on('error', (err) => {
     console.error('❌ Unexpected error on idle database client:', err.message);
 });
 
-const initializeDatabase = async () => {
-    const client = await pool.connect();
+const initializeDatabase = async (retries = 3, delay = 5000) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            console.log(`🔌 Attempting database connection (attempt ${attempt}/${retries})...`);
+            const client = await pool.connect();
+            
+            console.log('✅ Database connection established, initializing tables...');
+            await initializeTables(client);
+            client.release();
+            console.log('✅ Database initialization complete');
+            return;
+        } catch (err) {
+            console.error(`❌ Database connection attempt ${attempt} failed:`, err.message);
+            
+            if (attempt === retries) {
+                console.error('❌ All database connection attempts failed. Server will continue but database operations may fail.');
+                throw err;
+            }
+            
+            console.log(`⏳ Retrying in ${delay/1000} seconds...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+};
+
+const initializeTables = async (client) => {
     try {
         await client.query(`
             CREATE TABLE IF NOT EXISTS users (
@@ -316,15 +343,10 @@ const initializeDatabase = async () => {
             );
         }
         
-        console.log('✅ Connected to PostgreSQL database and tables initialized.');
+        console.log('✅ Database tables initialized successfully.');
     } catch (err) {
-        console.error('❌ Error initializing database:', err.message);
-        console.error('   Full error:', err);
-        if (!process.env.DATABASE_URL) {
-            console.error('   DATABASE_URL environment variable is not set!');
-        }
-    } finally {
-        client.release();
+        console.error('❌ Error creating database tables:', err.message);
+        throw err;
     }
 };
 
