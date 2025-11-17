@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vybez.page 1.2 - Rooms Overhaul</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: white;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .banner-wrapper {
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+            grid-auto-rows: 140px;
+        }
+
+        .card {
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            will-change: transform;
+        }
+
+        .card.animate-in {
+            animation: fadeInScale 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .icon-wrapper {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Specific card styles */
+        .card-server {
+            grid-column: span 2;
+            grid-row: span 2;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            justify-content: space-between;
+        }
+
+        .card-server .icon-wrapper {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .card-server h3 {
+            color: #1e293b;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-server p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .card-badge {
+            grid-column: span 2;
+            grid-row: span 2;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #fb923c 100%);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card-badge .title {
+            color: white;
+            font-size: 2.25rem;
+            font-weight: 600;
+        }
+
+        .card-categories {
+            grid-column: span 2;
+            grid-row: span 2;
+            background: linear-gradient(135deg, #6366f1 0%, #9333ea 100%);
+            justify-content: space-between;
+        }
+
+        .card-categories .icon {
+            width: 2rem;
+            height: 2rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .card-categories h3 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-categories p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+
+        .card-compact {
+            grid-column: span 2;
+            grid-row: span 1;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .card-compact .icon-wrapper {
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .card-discovery {
+            background: linear-gradient(135deg, #34d399 0%, #14b8a6 100%);
+        }
+
+        .card-discovery .icon-wrapper {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .card-discovery span {
+            color: white;
+        }
+
+        .card-hero {
+            grid-column: span 2;
+            grid-row: span 3;
+            padding: 0;
+            background: #e2e8f0;
+        }
+
+        .card-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-performance {
+            background: linear-gradient(135deg, #fb923c 0%, #ef4444 100%);
+        }
+
+        .card-performance .icon-wrapper {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .card-performance span {
+            color: white;
+        }
+
+        .card-message {
+            background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+        }
+
+        .card-message .icon-wrapper {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .card-message span {
+            color: white;
+        }
+
+        .card-management {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        }
+
+        .card-management .icon-wrapper {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .card-management span {
+            color: white;
+        }
+
+        .card-permissions {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+
+        .card-permissions .icon-wrapper {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .card-permissions span {
+            color: #1e293b;
+        }
+
+        .card-soon {
+            background: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card-soon .emoji {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-soon span {
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        /* Feature Details Section */
+        .details-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+            background: linear-gradient(to bottom, white, #f8fafc);
+        }
+
+        .details-header {
+            text-align: center;
+            margin-bottom: 5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .details-header.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ede9fe;
+            color: #7c3aed;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .details-header h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: #1e293b;
+        }
+
+        .details-header p {
+            font-size: 1.25rem;
+            color: #64748b;
+            max-width: 42rem;
+            margin: 0 auto;
+        }
+
+        .feature-item {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.6s ease;
+        }
+
+        .feature-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-content h3 {
+            font-size: 1.875rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .feature-content p {
+            font-size: 1.125rem;
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-points {
+            list-style: none;
+        }
+
+        .feature-points li {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: #334155;
+        }
+
+        .check-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+
+        .feature-visual {
+            height: 20rem;
+            border-radius: 1.5rem;
+            padding: 2px;
+            position: relative;
+        }
+
+        .feature-visual-inner {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-icon-large {
+            width: 8rem;
+            height: 8rem;
+            opacity: 0.1;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 8rem;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.6s ease;
+        }
+
+        .cta-section.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .cta-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .cta-glow {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, #a855f7, #ec4899, #fb923c);
+            border-radius: 1.5rem;
+            filter: blur(3rem);
+            opacity: 0.2;
+        }
+
+        .cta-content {
+            position: relative;
+            background: linear-gradient(to right, #a855f7, #ec4899, #fb923c);
+            border-radius: 1.5rem;
+            padding: 3rem;
+        }
+
+        .cta-content .emoji {
+            font-size: 3.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-content h3 {
+            font-size: 2.25rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .cta-content p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+            max-width: 28rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            background: white;
+            color: #7c3aed;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 6rem;
+            color: #94a3b8;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .footer.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: 120px;
+            }
+
+            .card {
+                grid-column: span 2 !important;
+                grid-row: span 1 !important;
+            }
+
+            .card-hero {
+                grid-row: span 2 !important;
+            }
+
+            .feature-item {
+                grid-template-columns: 1fr;
+            }
+
+            .details-header h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner Section -->
+    <div class="container">
+        <div class="banner-wrapper">
+            <div class="bento-grid" id="bentoGrid">
+                <!-- Server Organization -->
+                <div class="card card-server" data-animation-delay="0.1">
+                    <div>
+                        <div class="icon-wrapper">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                                <line x1="6" y1="6" x2="6.01" y2="6"/>
+                                <line x1="6" y1="18" x2="6.01" y2="18"/>
+                            </svg>
+                        </div>
+                        <h3>Group rooms into servers</h3>
+                    </div>
+                    <p>Organize your communities</p>
+                </div>
+
+                <!-- Rooms Overhaul Badge -->
+                <div class="card card-badge" data-animation-delay="0.2">
+                    <div class="title">Rooms Overhaul</div>
+                </div>
+
+                <!-- Categories -->
+                <div class="card card-categories" data-animation-delay="0.3">
+                    <div>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <h3>Channel categories</h3>
+                    </div>
+                    <p>Organize within servers</p>
+                </div>
+
+                <!-- Discovery -->
+                <div class="card card-compact card-discovery" data-animation-delay="0.4">
+                    <div class="icon-wrapper">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                        </svg>
+                    </div>
+                    <span>Server discovery</span>
+                </div>
+
+                <!-- Hero Image -->
+                <div class="card card-hero" data-animation-delay="0.5">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=1200&fit=crop" alt="Version 1.2">
+                </div>
+
+                <!-- Performance -->
+                <div class="card card-compact card-performance" data-animation-delay="0.6">
+                    <div class="icon-wrapper">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                    <span>Performance updates</span>
+                </div>
+
+                <!-- Message Editing -->
+                <div class="card card-compact card-message" data-animation-delay="0.7">
+                    <div class="icon-wrapper">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </div>
+                    <span>Message editing</span>
+                </div>
+
+                <!-- Management -->
+                <div class="card card-compact card-management" data-animation-delay="0.8">
+                    <div class="icon-wrapper">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <span>Server management</span>
+                </div>
+
+                <!-- Permissions -->
+                <div class="card card-compact card-permissions" data-animation-delay="0.9">
+                    <div class="icon-wrapper">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <span>Roles & permissions</span>
+                </div>
+
+                <!-- Coming Soon -->
+                <div class="card card-compact card-soon" data-animation-delay="1.0">
+                    <div>
+                        <div class="emoji">🔜</div>
+                        <span>Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Details Section -->
+    <div class="details-section">
+        <div class="details-header" id="detailsHeader">
+            <span class="badge">Version 1.2</span>
+            <h2>What's New in Rooms Overhaul</h2>
+            <p>A complete transformation of how you organize and manage your communities. Here's everything you need to know about the exciting new features.</p>
+        </div>
+
+        <!-- Features -->
+        <div id="featuresContainer"></div>
+
+        <!-- CTA -->
+        <div class="cta-section" id="ctaSection">
+            <div class="cta-wrapper">
+                <div class="cta-glow"></div>
+                <div class="cta-content">
+                    <div class="emoji">🔜</div>
+                    <h3>Coming Soon</h3>
+                    <p>These features are currently in development and will be rolling out soon. Stay tuned for updates!</p>
+                    <button class="cta-button">Join the Waitlist</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer" id="footer">
+            <p>Vybez.page • Building the future of community spaces</p>
+        </div>
+    </div>
+
+    <script>
+        // Animation on scroll
+        const bentoGrid = document.getElementById('bentoGrid');
+        const cards = bentoGrid.querySelectorAll('.card');
+
+        // Animate cards on load
+        cards.forEach((card, index) => {
+            const delay = parseFloat(card.dataset.animationDelay) * 1000;
+            setTimeout(() => {
+                card.classList.add('animate-in');
+            }, delay);
+        });
+
+        // Scroll-based animations
+        let lastScrollY = 0;
+
+        function updateCardPositions() {
+            const scrollY = window.scrollY;
+            const maxScroll = 500;
+            const progress = Math.min(scrollY / maxScroll, 1);
+
+            cards.forEach((card, index) => {
+                let transformX = 0;
+                let transformY = 0;
+                let scale = 1;
+                let opacity = 1;
+
+                // Different animations for different positions
+                if (card.classList.contains('card-server')) {
+                    transformX = -600 * progress;
+                    transformY = -400 * progress;
+                } else if (card.classList.contains('card-badge')) {
+                    transformY = -600 * progress;
+                } else if (card.classList.contains('card-categories')) {
+                    transformX = 600 * progress;
+                    transformY = -400 * progress;
+                } else if (card.classList.contains('card-discovery')) {
+                    transformX = -800 * progress;
+                } else if (card.classList.contains('card-hero')) {
+                    scale = 1 - (0.7 * progress);
+                    opacity = 1 - progress;
+                } else if (card.classList.contains('card-performance')) {
+                    transformX = 800 * progress;
+                } else if (card.classList.contains('card-message')) {
+                    transformX = -800 * progress;
+                } else if (card.classList.contains('card-management')) {
+                    transformX = 800 * progress;
+                } else if (card.classList.contains('card-permissions')) {
+                    transformX = -600 * progress;
+                    transformY = 600 * progress;
+                } else if (card.classList.contains('card-soon')) {
+                    transformY = 700 * progress;
+                }
+
+                card.style.transform = `translate(${transformX}px, ${transformY}px) scale(${scale})`;
+                card.style.opacity = opacity;
+            });
+
+            lastScrollY = scrollY;
+        }
+
+        window.addEventListener('scroll', updateCardPositions);
+
+        // Feature data
+        const features = [
+            {
+                icon: `<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>`,
+                title: "Server Organization",
+                gradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
+                description: "Transform your community with Discord-style servers. Group multiple rooms together, create dedicated spaces for different topics, and give your community the structure it deserves.",
+                points: [
+                    "Create unlimited servers for different communities",
+                    "Seamlessly organize rooms within each server",
+                    "Customizable server icons and names",
+                    "Server-wide settings and preferences"
+                ]
+            },
+            {
+                icon: `<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`,
+                title: "Roles & Permissions",
+                gradient: "linear-gradient(135deg, #fbbf24 0%, #f97316 100%)",
+                description: "Take full control of your community with granular permission management. Create custom roles, set specific permissions, and ensure the right people have the right access.",
+                points: [
+                    "Custom role creation with color coding",
+                    "Fine-grained permission controls",
+                    "Role hierarchy and priority system",
+                    "Member role assignment and management"
+                ]
+            },
+            {
+                icon: `<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>`,
+                title: "Channel Categories",
+                gradient: "linear-gradient(135deg, #6366f1 0%, #9333ea 100%)",
+                description: "Keep your server organized with channel categories. Group related channels together, collapse categories to reduce clutter, and create a clean, navigable structure.",
+                points: [
+                    "Organize channels into logical groups",
+                    "Collapsible category sections",
+                    "Custom category names and ordering",
+                    "Category-level permissions"
+                ]
+            },
+            {
+                icon: `<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>`,
+                title: "Server Discovery",
+                gradient: "linear-gradient(135deg, #34d399 0%, #14b8a6 100%)",
+                description: "Help your community grow with powerful discovery tools. Share invite links, browse public servers, and make it easy for new members to find and join your space.",
+                points: [
+                    "Generate custom invite links",
+                    "Set invite expiration and usage limits",
+                    "Public server directory",
+                    "Server search and filtering"
+                ]
+            },
+            {
+                icon: `<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>`,
+                title: "Message Editing",
+                gradient: "linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%)",
+                description: "Fix typos and update your messages with ease. Edit sent messages while maintaining a clear history of changes for transparency.",
+                points: [
+                    "Edit messages after sending",
+                    "Visual indicators for edited messages",
+                    "Edit history tracking",
+                    "Time-based edit restrictions"
+                ]
+            },
+            {
+                icon: `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>`,
+                title: "Performance Updates",
+                gradient: "linear-gradient(135deg, #fb923c 0%, #ef4444 100%)",
+                description: "Experience Vybez.page like never before with significant performance improvements. Faster load times, smoother animations, and optimized real-time updates.",
+                points: [
+                    "50% faster initial load times",
+                    "Optimized real-time message delivery",
+                    "Reduced memory footprint",
+                    "Smoother animations and transitions"
+                ]
+            }
+        ];
+
+        // Render features
+        const container = document.getElementById('featuresContainer');
+        features.forEach((feature, index) => {
+            const isEven = index % 2 === 0;
+            const featureHTML = `
+                <div class="feature-item" data-feature-index="${index}">
+                    <div class="feature-content" style="order: ${isEven ? 1 : 2}">
+                        <div class="icon-wrapper" style="width: 5rem; height: 5rem; border-radius: 1rem; background: ${feature.gradient}; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                            <svg class="icon" style="width: 2.5rem; height: 2.5rem; color: white;" viewBox="0 0 24 24">
+                                ${feature.icon}
+                            </svg>
+                        </div>
+                        <h3>${feature.title}</h3>
+                        <p>${feature.description}</p>
+                        <ul class="feature-points">
+                            ${feature.points.map(point => `
+                                <li>
+                                    <div class="check-icon" style="background: ${feature.gradient}">
+                                        <svg style="width: 1rem; height: 1rem; color: white;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                    </div>
+                                    <span>${point}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                    <div class="feature-visual" style="order: ${isEven ? 2 : 1}; background: ${feature.gradient}">
+                        <div class="feature-visual-inner">
+                            <svg class="feature-icon-large" viewBox="0 0 24 24" style="background: ${feature.gradient}; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                                ${feature.icon}
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += featureHTML;
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '-100px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        observer.observe(document.getElementById('detailsHeader'));
+        observer.observe(document.getElementById('ctaSection'));
+        observer.observe(document.getElementById('footer'));
+
+        document.querySelectorAll('.feature-item').forEach(item => {
+            observer.observe(item);
+        });
+    </script>
+</body>
+</html>

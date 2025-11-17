@@ -1232,6 +1232,14 @@ app.get("/self-hosting", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "self-hosting.html"));
 });
 
+app.get("/updates", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "update.html"));
+});
+
+app.get("/whats-new", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "update.html"));
+});
+
 app.get("/invite-mockup.html", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "invite-mockup.html"));
 });
