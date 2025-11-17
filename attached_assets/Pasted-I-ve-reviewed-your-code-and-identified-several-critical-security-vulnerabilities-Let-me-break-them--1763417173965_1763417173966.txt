@@ -1,0 +1,179 @@
+I've reviewed your code and identified several critical security vulnerabilities. Let me break them down by severity:
+🔴 CRITICAL VULNERABILITIES
+1. SQL Injection in Activity Data Endpoint
+Location: index.js - Lines in /api/admin/activity-data
+javascriptconst days = parseInt(req.query.days) || 30;
+const messagesQuery = `
+    SELECT DATE(timestamp) as date, COUNT(*) as count
+    FROM messages
+    WHERE timestamp >= NOW() - INTERVAL '${days} days'  // ⚠️ VULNERABLE
+Problem: Direct string interpolation in SQL queries. Even though you parse it as an integer, this is still dangerous practice.
+Fix: Use parameterized queries:
+javascriptWHERE timestamp >= NOW() - INTERVAL $1
+With parameter: [${days} days]
+Same issue exists in:
+
+/api/admin/health-check-data
+Multiple other admin endpoints
+
+2. Weak Session Secret Generation
+Location: index.js - Session middleware
+javascriptsecret: process.env.SESSION_SECRET || require("crypto").randomBytes(32).toString("hex")
+Problem: If SESSION_SECRET is not set, a new random secret is generated on every server restart, invalidating all existing sessions. This is a fallback that should never be used in production.
+Fix: Fail fast if SESSION_SECRET is missing:
+javascriptif (!process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET environment variable is required');
+}
+3. No CSRF Protection
+Problem: Your application has NO CSRF (Cross-Site Request Forgery) protection. An attacker could trick logged-in users into performing actions like:
+
+Deleting their account
+Creating rooms
+Sending messages
+Changing settings
+
+Fix: Implement CSRF tokens using csurf middleware:
+javascriptconst csrf = require('csurf');
+app.use(csrf({ cookie: true }));
+4. Insecure File Upload Handling
+Location: index.js - Multer configuration
+Problems:
+
+No file type validation beyond MIME type (easily spoofed)
+No virus scanning
+Files stored with predictable names in public directory
+10MB limit is generous for potential abuse
+
+Fix:
+javascript// Add magic number validation
+const fileType = require('file-type');
+
+// In file upload handler:
+const buffer = await fs.readFile(req.file.path);
+const type = await fileType.fromBuffer(buffer);
+if (!type || !allowedTypes.includes(type.mime)) {
+    fs.unlinkSync(req.file.path);
+    return res.status(400).json({ message: 'Invalid file type' });
+}
+5. Room Deletion Authorization Bypass
+Location: index.js - /rooms/:name DELETE endpoint
+Problem: Authorization check happens AFTER fetching room data, and relies on client-provided room name:
+javascriptdb.getAllRooms((err, rooms) => {
+    const room = rooms.find((r) => r.name === roomName);
+    const isCreator = room.created_by === req.session.user.username;
+Issue: Race condition possible. Better to do authorization in a single atomic database query.
+Fix:
+javascriptapp.delete("/rooms/:name", (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+    
+    const roomName = req.params.name;
+    const username = req.session.user.username;
+    const isAdmin = req.session.user.role === "admin";
+    
+    db.pool.query(
+        'DELETE FROM rooms WHERE name = $1 AND (created_by = $2 OR $3 = true) AND is_default = false RETURNING name',
+        [roomName, username, isAdmin],
+        (err, result) => {
+            if (err) return res.status(500).json({ message: "Failed to delete room" });
+            if (result.rows.length === 0) {
+                return res.status(403).json({ message: "Not authorized to delete this room" });
+            }
+            io.emit("roomDeleted", { name: roomName });
+            res.status(200).json({ message: "Room deleted successfully" });
+        }
+    );
+});
+🟡 HIGH-SEVERITY ISSUES
+6. WebSocket Authentication Weakness
+Location: index.js - Socket.io connection handler
+Problem: Socket authentication uses either JWT OR session, but:
+
+No explicit session validation timing
+No check if user is still active/not deleted
+Ban check happens AFTER user is partially connected
+
+Fix: Always verify user still exists and is not banned BEFORE processing any socket events.
+7. XSS in Message Display
+Location: Message sanitization
+javascriptconst sanitizedText = msg.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+Problem: This is basic, but doesn't handle all XSS vectors. Better to use a proper sanitization library.
+Fix:
+javascriptconst DOMPurify = require('isomorphic-dompurify');
+const sanitizedText = DOMPurify.sanitize(msg.text);
+8. Information Disclosure
+Location: Multiple endpoints
+Problems:
+
+Error messages reveal internal structure: "Error checking ban status"
+Database errors logged to console may expose sensitive info
+/api/admin/users endpoint returns email addresses (GDPR concern)
+
+9. Rate Limiting Issues
+Location: api-middleware.js
+Problem: Rate limiting is only applied to API key requests, not regular web requests. Endpoints like /signup, /login, /upload-file have NO rate limiting.
+Fix: Add express-rate-limit:
+javascriptconst rateLimit = require('express-rate-limit');
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts
+    message: 'Too many login attempts, please try again later'
+});
+
+app.post('/login', loginLimiter, (req, res) => { ... });
+10. API Key Storage
+Location: API key validation in api-middleware.js
+Problem: You're iterating through ALL active API keys and comparing each one with bcrypt:
+javascriptfor (const row of allKeys.rows) {
+    const isMatch = await bcrypt.compare(apiKey, row.key_hash);
+This is extremely inefficient and vulnerable to timing attacks. With many API keys, this could DOS your server.
+Fix: Extract a unique identifier from the key and use it to look up the specific hash:
+javascript// Store first 16 chars as lookup prefix
+const prefix = apiKey.substring(0, 20);
+const result = await db.pool.query(
+    'SELECT * FROM api_keys WHERE key_prefix = $1 AND is_active = true',
+    [prefix]
+);
+🟢 MEDIUM-SEVERITY ISSUES
+11. Session Storage in File System
+javascriptstore: new FileStore({ path: sessionsDir, ttl: 86400, retries: 0 })
+Problem: File-based sessions don't scale and can cause issues in distributed environments. Use PostgreSQL or Redis.
+12. No Input Length Validation
+Many endpoints don't validate input length:
+
+Bio field (could be megabytes)
+Message text (could be huge)
+Room names
+
+13. Weak Password Requirements
+Password must have uppercase, lowercase, number, and special char, but:
+
+No check for common passwords
+No check for username in password
+8 characters is relatively short for modern standards
+
+14. Email Validation
+javascriptconst emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+This is too simplistic and will allow invalid emails.
+🔵 RECOMMENDATIONS
+
+Add Content Security Policy (CSP) headers
+Implement HTTPS-only cookies (secure: true in production)
+Add helmet.js for security headers
+Implement proper logging with log rotation
+Add input validation library like Joi or express-validator
+Sanitize all database outputs before sending to client
+Implement account lockout after failed login attempts
+Add 2FA support for admin accounts at minimum
+Regular security audits and dependency updates
+
+Priority Fix Order:
+
+SQL injection issues (CRITICAL)
+Add CSRF protection (CRITICAL)
+Fix API key lookup performance (HIGH)
+Add rate limiting to auth endpoints (HIGH)
+Improve file upload security (HIGH)
+Everything else
+
+Would you like me to provide specific code fixes for any of these vulnerabilities?

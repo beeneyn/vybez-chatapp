@@ -14,6 +14,8 @@ const emailService = require("./emailService.js");
 const serverLogger = require("./serverLogger.js");
 const apiRoutes = require("./api-routes.js");
 const apiMiddleware = require("./api-middleware.js");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 
 const app = express();
 const server = http.createServer(app);
@@ -56,11 +58,69 @@ const upload = multer({
     },
 });
 
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: 'Too many login attempts from this IP, please try again after 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const signupLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 3,
+    message: 'Too many signup attempts from this IP, please try again after an hour',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const uploadLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: 'Too many file uploads from this IP, please try again after 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+if (!process.env.SESSION_SECRET) {
+    console.error('❌ FATAL: SESSION_SECRET environment variable is required');
+    console.error('❌ Please set SESSION_SECRET in your environment variables');
+    process.exit(1);
+}
+
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.socket.io", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+            imgSrc: ["'self'", "data:", "https:", "blob:"],
+            connectSrc: ["'self'", "wss:", "ws:"],
+            mediaSrc: ["'self'", "blob:"],
+            objectSrc: ["'none'"],
+            frameSrc: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
+            upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+        },
+    },
+    hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true,
+    },
+    frameguard: {
+        action: 'deny',
+    },
+    referrerPolicy: {
+        policy: 'strict-origin-when-cross-origin',
+    },
+}));
+
 const sessionMiddleware = session({
     store: new FileStore({ path: sessionsDir, ttl: 86400, retries: 0 }),
-    secret:
-        process.env.SESSION_SECRET ||
-        require("crypto").randomBytes(32).toString("hex"),
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -1071,12 +1131,12 @@ app.get("/api/admin/health-check-data", requireAdminAPI, async (req, res) => {
                 checked_at,
                 response_time_ms
             FROM health_checks
-            WHERE checked_at >= NOW() - INTERVAL '${days} days'
+            WHERE checked_at >= NOW() - ($1 || ' days')::INTERVAL
             ORDER BY checked_at ASC
             LIMIT 1000
         `;
 
-        const result = await db.pool.query(query);
+        const result = await db.pool.query(query, [days]);
         res.json({ healthChecks: result.rows });
     } catch (err) {
         serverLogger.error("DATABASE", "Failed to fetch health check data", {
@@ -1093,7 +1153,7 @@ app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
         const messagesQuery = `
             SELECT DATE(timestamp) as date, COUNT(*) as count
             FROM messages
-            WHERE timestamp >= NOW() - INTERVAL '${days} days'
+            WHERE timestamp >= NOW() - ($1 || ' days')::INTERVAL
             GROUP BY DATE(timestamp)
             ORDER BY date ASC
         `;
@@ -1101,7 +1161,7 @@ app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
         const privateMessagesQuery = `
             SELECT DATE(timestamp) as date, COUNT(*) as count
             FROM private_messages
-            WHERE timestamp >= NOW() - INTERVAL '${days} days'
+            WHERE timestamp >= NOW() - ($1 || ' days')::INTERVAL
             GROUP BY DATE(timestamp)
             ORDER BY date ASC
         `;
@@ -1109,7 +1169,7 @@ app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
         const roomsCreatedQuery = `
             SELECT DATE(created_at) as date, COUNT(*) as count
             FROM rooms
-            WHERE created_at >= NOW() - INTERVAL '${days} days' AND is_default = false
+            WHERE created_at >= NOW() - ($1 || ' days')::INTERVAL AND is_default = false
             GROUP BY DATE(created_at)
             ORDER BY date ASC
         `;
@@ -1117,7 +1177,7 @@ app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
         const supportTicketsQuery = `
             SELECT DATE(created_at) as date, COUNT(*) as count
             FROM support_tickets
-            WHERE created_at >= NOW() - INTERVAL '${days} days'
+            WHERE created_at >= NOW() - ($1 || ' days')::INTERVAL
             GROUP BY DATE(created_at)
             ORDER BY date ASC
         `;
@@ -1125,7 +1185,7 @@ app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
         const apiRequestsQuery = `
             SELECT DATE(created_at) as date, COUNT(*) as count
             FROM api_logs
-            WHERE created_at >= NOW() - INTERVAL '${days} days'
+            WHERE created_at >= NOW() - ($1 || ' days')::INTERVAL
             GROUP BY DATE(created_at)
             ORDER BY date ASC
         `;
@@ -1142,11 +1202,11 @@ app.get("/api/admin/activity-data", requireAdminAPI, async (req, res) => {
             apiRequests,
             totalUsers,
         ] = await Promise.all([
-            db.pool.query(messagesQuery),
-            db.pool.query(privateMessagesQuery),
-            db.pool.query(roomsCreatedQuery),
-            db.pool.query(supportTicketsQuery),
-            db.pool.query(apiRequestsQuery),
+            db.pool.query(messagesQuery, [days]),
+            db.pool.query(privateMessagesQuery, [days]),
+            db.pool.query(roomsCreatedQuery, [days]),
+            db.pool.query(supportTicketsQuery, [days]),
+            db.pool.query(apiRequestsQuery, [days]),
             db.pool.query(totalUsersQuery),
         ]);
 
@@ -1467,7 +1527,7 @@ app.get("/health", async (req, res) => {
     }
 });
 
-app.post("/signup", (req, res) => {
+app.post("/signup", signupLimiter, (req, res) => {
     let { username, password, chat_color, display_name } = req.body;
 
     // Convert username to lowercase automatically
@@ -1575,7 +1635,7 @@ app.post("/signup", (req, res) => {
 });
 
 // --- THIS IS THE CORRECTED LOGIN ROUTE ---
-app.post("/login", (req, res) => {
+app.post("/login", loginLimiter, (req, res) => {
     const { username, password, client } = req.body;
     const clientType = client || "web";
 
@@ -1638,7 +1698,7 @@ app.get("/check-session", (req, res) => {
         res.status(200).json({ loggedIn: true, user: req.session.user });
     else res.status(200).json({ loggedIn: false });
 });
-app.post("/upload-file", upload.single("file"), (req, res) => {
+app.post("/upload-file", uploadLimiter, upload.single("file"), (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -2103,44 +2163,54 @@ app.post("/rooms", (req, res) => {
         res.status(201).json({ message: "Room created successfully", room });
     });
 });
-app.delete("/rooms/:name", (req, res) => {
+app.delete("/rooms/:name", async (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
+    
     const roomName = req.params.name;
+    const username = req.session.user.username;
+    const isAdmin = req.session.user.role === "admin";
 
-    // Check if user has permission to delete this room
-    db.getAllRooms((err, rooms) => {
-        if (err)
-            return res.status(500).json({ message: "Failed to get room info" });
+    try {
+        const result = await db.pool.query(
+            `DELETE FROM rooms 
+             WHERE name = $1 
+             AND (created_by = $2 OR $3 = true) 
+             AND is_default = false 
+             RETURNING name, created_by`,
+            [roomName, username, isAdmin]
+        );
 
-        const room = rooms.find((r) => r.name === roomName);
-        if (!room) return res.status(404).json({ message: "Room not found" });
-
-        const isCreator = room.created_by === req.session.user.username;
-        const isAdmin = req.session.user.role === "admin";
-
-        if (!isCreator && !isAdmin) {
-            return res
-                .status(403)
-                .json({
-                    message:
-                        "Only the room creator or admins can delete this room",
-                });
+        if (result.rows.length === 0) {
+            const checkRoom = await db.pool.query(
+                'SELECT name, is_default FROM rooms WHERE name = $1',
+                [roomName]
+            );
+            
+            if (checkRoom.rows.length === 0) {
+                return res.status(404).json({ message: "Room not found" });
+            }
+            
+            if (checkRoom.rows[0].is_default) {
+                return res.status(403).json({ message: "Cannot delete default rooms" });
+            }
+            
+            return res.status(403).json({ 
+                message: "Only the room creator or admins can delete this room" 
+            });
         }
 
-        db.deleteRoom(roomName, (err) => {
-            if (err) {
-                if (err.message.includes("Cannot delete"))
-                    return res.status(403).json({ message: err.message });
-                return res
-                    .status(500)
-                    .json({ message: "Failed to delete room" });
-            }
-            discordWebhook.logRoomDeleted(roomName, req.session.user.username);
-            io.emit("roomDeleted", { name: roomName });
-            res.status(200).json({ message: "Room deleted successfully" });
+        discordWebhook.logRoomDeleted(roomName, username);
+        io.emit("roomDeleted", { name: roomName });
+        res.status(200).json({ message: "Room deleted successfully" });
+    } catch (err) {
+        serverLogger.error("DATABASE", "Failed to delete room", {
+            error: err.message,
+            room: roomName,
+            user: username
         });
-    });
+        res.status(500).json({ message: "Failed to delete room" });
+    }
 });
 
 const onlineUsers = new Map();
@@ -2579,19 +2649,20 @@ app.use((err, req, res, next) => {
     res.status(500).sendFile(path.join(__dirname, "public", "500.html"));
 });
 
-const requiredEnvVars = ["DATABASE_URL", "SESSION_SECRET", "JWT_SECRET"];
+const requiredEnvVars = ["DATABASE_URL", "JWT_SECRET"];
 const missingEnvVars = requiredEnvVars.filter(
     (varName) => !process.env[varName],
 );
 
 if (missingEnvVars.length > 0) {
     console.error(
-        "⚠️  MISSING REQUIRED ENVIRONMENT VARIABLES:",
+        "❌ FATAL: MISSING REQUIRED ENVIRONMENT VARIABLES:",
         missingEnvVars.join(", "),
     );
     console.error(
-        "⚠️  Server may not function correctly without these variables",
+        "❌ Server cannot start without these variables. Please configure them.",
     );
+    process.exit(1);
 }
 
 const PORT = process.env.PORT || 5000;
