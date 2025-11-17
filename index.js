@@ -1533,6 +1533,20 @@ app.post("/signup", signupLimiter, (req, res) => {
     // Convert username to lowercase automatically
     username = username.toLowerCase();
 
+    // Validate username length
+    if (!username || username.length < 3 || username.length > 20) {
+        return res.status(400).json({
+            message: "Username must be between 3 and 20 characters",
+        });
+    }
+
+    // Validate password length
+    if (!password || password.length < 8 || password.length > 128) {
+        return res.status(400).json({
+            message: "Password must be between 8 and 128 characters",
+        });
+    }
+
     // Username validation
     const usernameRegex = /^[a-z0-9_.]+$/;
     if (!usernameRegex.test(username)) {
@@ -1757,8 +1771,21 @@ app.post("/update-profile", (req, res) => {
         return res.status(401).json({ message: "Unauthorized" });
     const { bio, status, chat_color, email, display_name } = req.body;
 
+    // Validate bio length
+    if (bio && bio.length > 500) {
+        return res.status(400).json({ message: "Bio must be 500 characters or less" });
+    }
+
+    // Validate status length
+    if (status && status.length > 100) {
+        return res.status(400).json({ message: "Status must be 100 characters or less" });
+    }
+
     // Validate email format if provided
     if (email !== undefined && email !== null && email !== "") {
+        if (email.length > 255) {
+            return res.status(400).json({ message: "Email must be 255 characters or less" });
+        }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ message: "Invalid email format" });
@@ -2152,6 +2179,12 @@ app.post("/rooms", (req, res) => {
     const { name } = req.body;
     if (!name || name.trim() === "")
         return res.status(400).json({ message: "Room name is required" });
+    
+    // Validate room name length
+    if (name.length > 50) {
+        return res.status(400).json({ message: "Room name must be 50 characters or less" });
+    }
+    
     db.createRoom(name.trim(), req.session.user.username, (err, room) => {
         if (err) {
             if (err.message === "Room already exists")
@@ -2352,6 +2385,14 @@ io.on("connection", (socket) => {
         });
 
         socket.on("chatMessage", (msg) => {
+            // Validate message length
+            if (msg.text && msg.text.length > 2000) {
+                return socket.emit("error", {
+                    type: "validation",
+                    message: "Message must be 2000 characters or less",
+                });
+            }
+
             db.getActiveMute(user.username, (muteErr, mute) => {
                 if (mute) {
                     return socket.emit("error", {
@@ -2529,6 +2570,14 @@ io.on("connection", (socket) => {
         });
 
         socket.on("privateMessage", ({ to, text }) => {
+            // Validate message length
+            if (text && text.length > 2000) {
+                return socket.emit("error", {
+                    type: "validation",
+                    message: "Message must be 2000 characters or less",
+                });
+            }
+
             db.getActiveMute(user.username, (muteErr, mute) => {
                 if (mute) {
                     return socket.emit("error", {
