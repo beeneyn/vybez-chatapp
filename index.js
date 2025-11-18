@@ -2220,7 +2220,7 @@ app.get("/rooms", (req, res) => {
                 is_default: true,
                 server_id: channel.server_id,
                 type: channel.type,
-                topic: channel.topic
+                description: channel.description
             }));
             
             res.status(200).json({ rooms });

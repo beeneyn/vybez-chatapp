@@ -156,6 +156,14 @@
 
     // Setup Event Listeners
     function setupEventListeners() {
+        // Create Server Button
+        const createServerBtn = document.getElementById('create-server-btn');
+        if (createServerBtn) {
+            createServerBtn.addEventListener('click', () => {
+                alert('Server creation feature coming soon! For now, you can create channels in the Vybez Community server.');
+            });
+        }
+
         // Server Settings Button
         const serverSettingsBtn = document.getElementById('server-settings-btn');
         if (serverSettingsBtn) {

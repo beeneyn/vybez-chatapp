@@ -940,7 +940,7 @@ const getUserServers = async (username, callback) => {
     }
 };
 
-const createChannel = async (serverId, name, type, created_by, topic, callback) => {
+const createChannel = async (serverId, name, type, created_by, description, callback) => {
     try {
         const channelName = name.startsWith('#') ? name.substring(1) : name;
         
@@ -951,8 +951,8 @@ const createChannel = async (serverId, name, type, created_by, topic, callback) 
         const position = positionResult.rows[0].next_position;
         
         const result = await pool.query(
-            'INSERT INTO channels (server_id, name, type, topic, position) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [serverId, channelName, type || 'text', topic || null, position]
+            'INSERT INTO channels (server_id, name, type, description, position) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [serverId, channelName, type || 'text', description || null, position]
         );
         callback(null, result.rows[0]);
     } catch (err) {
