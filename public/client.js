@@ -1,3 +1,34 @@
+// Initialize variables and bridge immediately (before DOM loads)
+let currentUser = null;
+let currentUserRole = null;
+let currentRoom = "";
+const socket = io({ autoConnect: false });
+let typingTimeout = null;
+let lastMessageDate = null;
+let unreadCounts = {};
+
+// Client Bridge: Expose state to discord-ui.js safely (available immediately)
+window.vybezClientBridge = {
+    getSocket: () => socket,
+    getCurrentRoom: () => currentRoom,
+    setCurrentRoom: (room) => {
+        const oldRoom = currentRoom;
+        currentRoom = room;
+        // Dispatch custom event for other scripts to listen
+        window.dispatchEvent(new CustomEvent('vybez:room-changed', {
+            detail: { oldRoom, newRoom: room }
+        }));
+    },
+    getCurrentUser: () => currentUser,
+    getCurrentUserRole: () => currentUserRole,
+    openModal: (id) => {
+        document.getElementById(id).style.display = 'flex';
+    },
+    closeModal: (id) => {
+        document.getElementById(id).style.display = 'none';
+    }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     // Security Warning in Console
     console.log(
@@ -27,36 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const savedTheme = localStorage.getItem("theme") || "light";
     document.body.setAttribute("data-theme", savedTheme);
-
-    let currentUser = null;
-    let currentUserRole = null;
-    let currentRoom = "";
-    const socket = io({ autoConnect: false });
-    let typingTimeout = null;
-    let lastMessageDate = null;
-    let unreadCounts = {};
-
-    // Client Bridge: Expose state to discord-ui.js safely
-    window.vybezClientBridge = {
-        getSocket: () => socket,
-        getCurrentRoom: () => currentRoom,
-        setCurrentRoom: (room) => {
-            const oldRoom = currentRoom;
-            currentRoom = room;
-            // Dispatch custom event for other scripts to listen
-            window.dispatchEvent(new CustomEvent('vybez:room-changed', {
-                detail: { oldRoom, newRoom: room }
-            }));
-        },
-        getCurrentUser: () => currentUser,
-        getCurrentUserRole: () => currentUserRole,
-        openModal: (id) => {
-            document.getElementById(id).style.display = 'flex';
-        },
-        closeModal: (id) => {
-            document.getElementById(id).style.display = 'none';
-        }
-    };
 
     const showChatUI = (user) => {
         currentUser = user.username;

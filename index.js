@@ -2215,7 +2215,7 @@ app.get("/rooms", (req, res) => {
             const rooms = channels.map(channel => ({
                 id: channel.id,
                 name: '#' + channel.name,
-                created_by: server.owner,
+                created_by: server.owner_username,
                 created_at: channel.created_at,
                 is_default: true,
                 server_id: channel.server_id,
@@ -2240,11 +2240,13 @@ app.post("/rooms", (req, res) => {
     
     db.getDefaultServer((err, server) => {
         if (err) {
+            console.error("Error getting default server:", err);
             return res.status(500).json({ message: "Failed to get default server" });
         }
         
         db.createChannel(server.id, name.trim(), 'text', req.session.user.username, null, (err, channel) => {
             if (err) {
+                console.error("Error creating channel:", err);
                 if (err.message === "Channel already exists in this server")
                     return res.status(409).json({ message: "Room already exists" });
                 return res.status(500).json({ message: "Failed to create room" });
@@ -2253,7 +2255,7 @@ app.post("/rooms", (req, res) => {
             const room = {
                 id: channel.id,
                 name: '#' + channel.name,
-                created_by: server.owner,
+                created_by: server.owner_username,
                 created_at: channel.created_at,
                 server_id: channel.server_id
             };
