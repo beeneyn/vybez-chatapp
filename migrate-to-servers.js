@@ -258,10 +258,10 @@ async function migrateToServers() {
             
             for (const user of adminUsers.rows) {
                 await client.query(`
-                    INSERT INTO user_roles (server_id, username, role_id)
-                    VALUES ($1, $2, $3)
-                    ON CONFLICT (server_id, username, role_id) DO NOTHING
-                `, [serverId, user.username, adminRole.rows[0].id]);
+                    INSERT INTO user_roles (username, role_id)
+                    VALUES ($1, $2)
+                    ON CONFLICT (username, role_id) DO NOTHING
+                `, [user.username, adminRole.rows[0].id]);
             }
             
             console.log(`   ✓ Assigned admin role to ${adminUsers.rows.length} user(s)\n`);
