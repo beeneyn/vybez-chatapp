@@ -333,6 +333,196 @@ const initializeTables = async (client) => {
             CREATE INDEX IF NOT EXISTS idx_health_checks_checked_at ON health_checks(checked_at DESC)
         `);
         
+        // VERSION 1.2: Server Organization Tables
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS servers (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                icon_url TEXT DEFAULT NULL,
+                owner_username TEXT NOT NULL,
+                is_public BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(name)
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS channels (
+                id SERIAL PRIMARY KEY,
+                server_id INTEGER NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+                name TEXT NOT NULL,
+                type TEXT DEFAULT 'text',
+                category TEXT DEFAULT NULL,
+                position INTEGER DEFAULT 0,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(server_id, name)
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS server_members (
+                id SERIAL PRIMARY KEY,
+                server_id INTEGER NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+                username TEXT NOT NULL,
+                joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(server_id, username)
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS roles (
+                id SERIAL PRIMARY KEY,
+                server_id INTEGER NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+                name TEXT NOT NULL,
+                color TEXT DEFAULT '#99AAB5',
+                position INTEGER DEFAULT 0,
+                is_default BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(server_id, name)
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS role_permissions (
+                id SERIAL PRIMARY KEY,
+                role_id INTEGER NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+                permission TEXT NOT NULL,
+                UNIQUE(role_id, permission)
+            )
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS user_roles (
+                id SERIAL PRIMARY KEY,
+                username TEXT NOT NULL,
+                role_id INTEGER NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+                assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(username, role_id)
+            )
+        `);
+        
+        // Create a function to check if user is member of role's server
+        await client.query(`
+            CREATE OR REPLACE FUNCTION check_user_role_membership()
+            RETURNS TRIGGER AS $$
+            DECLARE
+                v_server_id INTEGER;
+                v_is_member BOOLEAN;
+            BEGIN
+                -- Get server_id from the role
+                SELECT server_id INTO v_server_id FROM roles WHERE id = NEW.role_id;
+                
+                -- Check if user is a member of that server
+                SELECT EXISTS(
+                    SELECT 1 FROM server_members 
+                    WHERE server_id = v_server_id AND username = NEW.username
+                ) INTO v_is_member;
+                
+                IF NOT v_is_member THEN
+                    RAISE EXCEPTION 'User % is not a member of the server for role %', NEW.username, NEW.role_id;
+                END IF;
+                
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        `);
+        
+        await client.query(`
+            DROP TRIGGER IF EXISTS enforce_user_role_membership ON user_roles;
+            CREATE TRIGGER enforce_user_role_membership
+            BEFORE INSERT OR UPDATE ON user_roles
+            FOR EACH ROW
+            EXECUTE FUNCTION check_user_role_membership();
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS message_edits (
+                id SERIAL PRIMARY KEY,
+                message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+                original_text TEXT NOT NULL,
+                edited_text TEXT NOT NULL,
+                edited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                edited_by TEXT NOT NULL
+            )
+        `);
+
+        // Create indexes for Version 1.2 tables
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_channels_server_id ON channels(server_id);
+            CREATE INDEX IF NOT EXISTS idx_server_members_username ON server_members(username);
+            CREATE INDEX IF NOT EXISTS idx_server_members_server_id ON server_members(server_id);
+            CREATE INDEX IF NOT EXISTS idx_roles_server_id ON roles(server_id);
+            CREATE INDEX IF NOT EXISTS idx_user_roles_username ON user_roles(username);
+            CREATE INDEX IF NOT EXISTS idx_user_roles_role_id ON user_roles(role_id);
+            CREATE INDEX IF NOT EXISTS idx_message_edits_message_id ON message_edits(message_id);
+        `);
+        
+        // Migration: Add NOT NULL constraints to existing tables
+        await client.query(`
+            DO $$ BEGIN
+                -- Channels: make server_id NOT NULL
+                IF EXISTS (SELECT 1 FROM information_schema.columns 
+                          WHERE table_name='channels' AND column_name='server_id' AND is_nullable='YES') THEN
+                    DELETE FROM channels WHERE server_id IS NULL;
+                    ALTER TABLE channels ALTER COLUMN server_id SET NOT NULL;
+                END IF;
+                
+                -- Server members: make server_id and username NOT NULL
+                IF EXISTS (SELECT 1 FROM information_schema.columns 
+                          WHERE table_name='server_members' AND column_name='server_id' AND is_nullable='YES') THEN
+                    DELETE FROM server_members WHERE server_id IS NULL OR username IS NULL;
+                    ALTER TABLE server_members ALTER COLUMN server_id SET NOT NULL;
+                    ALTER TABLE server_members ALTER COLUMN username SET NOT NULL;
+                END IF;
+                
+                -- Roles: make server_id NOT NULL
+                IF EXISTS (SELECT 1 FROM information_schema.columns 
+                          WHERE table_name='roles' AND column_name='server_id' AND is_nullable='YES') THEN
+                    DELETE FROM roles WHERE server_id IS NULL;
+                    ALTER TABLE roles ALTER COLUMN server_id SET NOT NULL;
+                END IF;
+                
+                -- Role permissions: make role_id NOT NULL
+                IF EXISTS (SELECT 1 FROM information_schema.columns 
+                          WHERE table_name='role_permissions' AND column_name='role_id' AND is_nullable='YES') THEN
+                    DELETE FROM role_permissions WHERE role_id IS NULL;
+                    ALTER TABLE role_permissions ALTER COLUMN role_id SET NOT NULL;
+                END IF;
+                
+                -- User roles: clean up invalid assignments, drop server_id, add NOT NULL
+                -- First, remove any user_roles where user is not a member of the role's server
+                DELETE FROM user_roles ur
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM server_members sm
+                    JOIN roles r ON sm.server_id = r.server_id
+                    WHERE sm.username = ur.username AND r.id = ur.role_id
+                );
+                
+                -- Drop redundant server_id column if exists
+                IF EXISTS (SELECT 1 FROM information_schema.columns 
+                          WHERE table_name='user_roles' AND column_name='server_id') THEN
+                    ALTER TABLE user_roles DROP COLUMN IF EXISTS server_id;
+                END IF;
+                
+                -- Add NOT NULL constraints
+                IF EXISTS (SELECT 1 FROM information_schema.columns 
+                          WHERE table_name='user_roles' AND column_name='username' AND is_nullable='YES') THEN
+                    DELETE FROM user_roles WHERE username IS NULL OR role_id IS NULL;
+                    ALTER TABLE user_roles ALTER COLUMN username SET NOT NULL;
+                    ALTER TABLE user_roles ALTER COLUMN role_id SET NOT NULL;
+                END IF;
+                
+                -- Message edits: make message_id NOT NULL
+                IF EXISTS (SELECT 1 FROM information_schema.columns 
+                          WHERE table_name='message_edits' AND column_name='message_id' AND is_nullable='YES') THEN
+                    DELETE FROM message_edits WHERE message_id IS NULL;
+                    ALTER TABLE message_edits ALTER COLUMN message_id SET NOT NULL;
+                END IF;
+            END $$;
+        `);
+        
         const defaultRooms = ['#general', '#tech', '#random'];
         for (const room of defaultRooms) {
             await client.query(
