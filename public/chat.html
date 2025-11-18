@@ -20,21 +20,32 @@
     <!-- Custom Title Bar -->
     <div id="title-bar-container"></div>
 
-    <div class="container mx-auto px-4 py-3 flex-grow overflow-hidden">
-        <div id="app-container" class="flex h-full gap-4 hidden">
+    <div class="flex-grow overflow-hidden">
+        <div id="app-container" class="flex h-full hidden">
 
-            <div class="w-1/6 flex flex-col">
-                <div class="bg-white rounded-lg shadow flex flex-col h-full">
-                    <div class="px-4 py-3 font-bold border-b flex justify-between items-center chat-header">
-                        <span>Rooms</span>
-                        <button id="create-room-btn" class="px-2 py-1 btn-brand-gradient text-white text-xs rounded" title="Create Room">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    <div class="flex-1 overflow-y-auto">
-                        <ul id="room-list" class="divide-y"></ul>
-                    </div>
+            <!-- Server Switcher Column -->
+            <div class="w-[72px] bg-midnight flex flex-col items-center py-3 gap-2">
+                <div id="server-list" class="flex flex-col items-center gap-2 w-full"></div>
+                <button id="create-server-btn" class="w-12 h-12 rounded-full bg-midnight-light hover:bg-violet-500 hover:rounded-2xl transition-all duration-200 flex items-center justify-center text-gray-400 hover:text-white group" title="Add a Server">
+                    <i class="fas fa-plus text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Channels Sidebar -->
+            <div class="w-60 bg-midnight-light flex flex-col">
+                <div class="h-12 px-4 flex items-center justify-between border-b border-midnight shadow-sm">
+                    <h2 id="server-name" class="font-bold text-white truncate">Vybez Community</h2>
+                    <button id="server-settings-btn" class="text-gray-400 hover:text-white transition" title="Server Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
                 </div>
+                <div class="flex-1 overflow-y-auto p-2">
+                    <div id="channels-container"></div>
+                </div>
+                <button id="create-channel-btn" class="mx-2 mb-2 px-3 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm rounded flex items-center justify-center gap-2 transition" title="Create Channel">
+                    <i class="fas fa-plus"></i>
+                    <span>Create Channel</span>
+                </button>
             </div>
 
             <div class="flex-1 flex flex-col">
@@ -222,6 +233,130 @@
             </div>
         </div>
     </div>
+
+    <!-- Server Settings Modal -->
+    <div id="serverSettingsModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+            <div class="bg-gradient-to-r from-violet-500 via-magenta-500 to-cyan-500 p-6 rounded-t-lg -mx-6 -mt-6 mb-4">
+                <div class="flex justify-between items-center">
+                    <h5 class="text-2xl font-bold text-white">
+                        <i class="fas fa-cog mr-2"></i>Server Settings
+                    </h5>
+                    <button class="close-server-settings-modal text-white hover:bg-white hover:bg-opacity-20 rounded-full w-8 h-8 flex items-center justify-center transition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 h-[600px]">
+                <!-- Sidebar -->
+                <div class="w-48 border-r pr-4">
+                    <button class="settings-tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition active" data-tab="overview">
+                        <i class="fas fa-info-circle mr-2"></i>Overview
+                    </button>
+                    <button class="settings-tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition" data-tab="roles">
+                        <i class="fas fa-shield-alt mr-2"></i>Roles
+                    </button>
+                    <button class="settings-tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition" data-tab="members">
+                        <i class="fas fa-users mr-2"></i>Members
+                    </button>
+                    <button class="settings-tab-btn w-full text-left px-4 py-2 rounded hover:bg-gray-100 transition" data-tab="channels">
+                        <i class="fas fa-hashtag mr-2"></i>Channels
+                    </button>
+                </div>
+                
+                <!-- Content -->
+                <div class="flex-1 overflow-y-auto">
+                    <!-- Overview Tab -->
+                    <div id="settings-tab-overview" class="settings-tab-content">
+                        <h3 class="text-xl font-bold mb-4">Server Overview</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Server Name</label>
+                                <input type="text" id="server-name-input" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500" value="Vybez Community">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <textarea id="server-description-input" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500" rows="3">Welcome to Vybez Community!</textarea>
+                            </div>
+                            <button class="px-4 py-2 btn-brand-gradient text-white rounded font-semibold">Save Changes</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Roles Tab -->
+                    <div id="settings-tab-roles" class="settings-tab-content hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">Roles</h3>
+                            <button id="create-role-btn" class="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded text-sm">
+                                <i class="fas fa-plus mr-1"></i>Create Role
+                            </button>
+                        </div>
+                        <div id="roles-list" class="space-y-2">
+                            <p class="text-gray-500 text-center py-4">Loading roles...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Members Tab -->
+                    <div id="settings-tab-members" class="settings-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4">Server Members</h3>
+                        <div id="server-members-list" class="space-y-2">
+                            <p class="text-gray-500 text-center py-4">Loading members...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Channels Tab -->
+                    <div id="settings-tab-channels" class="settings-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4">Channels</h3>
+                        <div id="server-channels-list" class="space-y-2">
+                            <p class="text-gray-500 text-center py-4">Loading channels...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Channel Modal -->
+    <div id="createChannelModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="flex justify-between items-center mb-4">
+                <h5 class="text-lg font-semibold">Create Channel</h5>
+                <button class="close-create-channel-modal text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Channel Type</label>
+                    <select id="channel-type-select" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500">
+                        <option value="text">
+                            <i class="fas fa-hashtag"></i> Text Channel
+                        </option>
+                        <option value="voice">
+                            <i class="fas fa-volume-up"></i> Voice Channel (Coming Soon)
+                        </option>
+                        <option value="announcement">
+                            <i class="fas fa-bullhorn"></i> Announcement Channel
+                        </option>
+                    </select>
+                </div>
+                <div>
+                    <label for="channel-name-input" class="block text-sm font-medium text-gray-700 mb-1">Channel Name</label>
+                    <input type="text" id="channel-name-input" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500" placeholder="new-channel" maxlength="30">
+                    <p class="text-xs text-gray-500 mt-1">Use lowercase and hyphens (no spaces)</p>
+                </div>
+                <div>
+                    <label for="channel-topic-input" class="block text-sm font-medium text-gray-700 mb-1">Topic (Optional)</label>
+                    <input type="text" id="channel-topic-input" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500" placeholder="What's this channel about?" maxlength="100">
+                </div>
+            </div>
+            <div id="create-channel-message" class="text-sm mb-3 mt-4 hidden"></div>
+            <div class="flex gap-2 justify-end mt-6">
+                <button type="button" class="close-create-channel-modal px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded">Cancel</button>
+                <button type="button" id="create-channel-confirm-btn" class="px-4 py-2 btn-brand-gradient text-white rounded font-semibold">Create Channel</button>
+            </div>
+        </div>
+    </div>
     
     <script>
         // Load title bar for Electron app
@@ -238,6 +373,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="desktop-integration.js"></script>
     <script src="client.js"></script>
+    <script src="discord-ui.js"></script>
     <script src="store-compliance.js"></script>
     <script>
         window.openModal = function(id) {

@@ -36,6 +36,28 @@ document.addEventListener("DOMContentLoaded", () => {
     let lastMessageDate = null;
     let unreadCounts = {};
 
+    // Client Bridge: Expose state to discord-ui.js safely
+    window.vybezClientBridge = {
+        getSocket: () => socket,
+        getCurrentRoom: () => currentRoom,
+        setCurrentRoom: (room) => {
+            const oldRoom = currentRoom;
+            currentRoom = room;
+            // Dispatch custom event for other scripts to listen
+            window.dispatchEvent(new CustomEvent('vybez:room-changed', {
+                detail: { oldRoom, newRoom: room }
+            }));
+        },
+        getCurrentUser: () => currentUser,
+        getCurrentUserRole: () => currentUserRole,
+        openModal: (id) => {
+            document.getElementById(id).style.display = 'flex';
+        },
+        closeModal: (id) => {
+            document.getElementById(id).style.display = 'none';
+        }
+    };
+
     const showChatUI = (user) => {
         currentUser = user.username;
         currentUserRole = user.role;
@@ -933,7 +955,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const typingIndicator = document.getElementById("typing-indicator");
 
         socket.on("loadHistory", async ({ room, messages }) => {
-            currentRoom = room;
+            window.vybezClientBridge.setCurrentRoom(room);
             lastMessageDate = null; // Reset date separator when loading new room
             if (welcomeMessage)
                 welcomeMessage.textContent = `Welcome, ${currentUser}! | Room: ${room}`;
