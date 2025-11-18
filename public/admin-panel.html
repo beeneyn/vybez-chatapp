@@ -41,7 +41,7 @@
                 <a href="/chat" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
                     <i class="fas fa-comments"></i> Back to Chat
                 </a>
-                <button onclick="logout()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition">
+                <button class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
@@ -114,40 +114,40 @@
         <div class="glass-card rounded-lg p-6 mb-8">
             <div class="border-b border-gray-600 mb-6">
                 <nav class="flex space-x-4">
-                    <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-4 py-2 text-white font-semibold border-b-2 border-purple-500">
+                    <button id="tab-users" class="tab-btn px-4 py-2 text-white font-semibold border-b-2 border-purple-500">
                         <i class="fas fa-users"></i> Users
                     </button>
-                    <button onclick="switchTab('rooms')" id="tab-rooms" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-rooms" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-door-open"></i> Rooms
                     </button>
-                    <button onclick="switchTab('messages')" id="tab-messages" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-messages" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-comments"></i> Recent Messages
                     </button>
-                    <button onclick="switchTab('files')" id="tab-files" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-files" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-file"></i> Files
                     </button>
-                    <button onclick="switchTab('tickets')" id="tab-tickets" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-tickets" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-ticket-alt"></i> Support Tickets
                     </button>
-                    <button onclick="switchTab('announcements')" id="tab-announcements" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-announcements" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-bullhorn"></i> Announcements
                     </button>
-                    <button onclick="switchTab('apikeys')" id="tab-apikeys" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-apikeys" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-key"></i> API Keys
                     </button>
-                    <button onclick="switchTab('apilogs')" id="tab-apilogs" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-apilogs" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-database"></i> API Logs
                     </button>
-                    <button onclick="switchTab('serverlogs')" id="tab-serverlogs" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-serverlogs" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-server"></i> Server Logs
                     </button>
-                    <button onclick="switchTab('maintenance')" id="tab-maintenance" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-maintenance" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-wrench"></i> Maintenance
                     </button>
-                    <button onclick="switchTab('database')" id="tab-database" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-database" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-hdd"></i> Database
                     </button>
-                    <button onclick="switchTab('activity')" id="tab-activity" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
+                    <button id="tab-activity" class="tab-btn px-4 py-2 text-gray-400 hover:text-white font-semibold border-b-2 border-transparent">
                         <i class="fas fa-chart-line"></i> Activity
                     </button>
                 </nav>
@@ -157,7 +157,7 @@
             <div id="content-users" class="tab-content">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">User Management</h3>
-                    <button onclick="loadUsers()" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
+                    <button class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
                         <i class="fas fa-sync"></i> Refresh
                     </button>
                 </div>
@@ -183,7 +183,7 @@
             <div id="content-rooms" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">Room Management</h3>
-                    <button onclick="loadRooms()" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition">
+                    <button class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition">
                         <i class="fas fa-sync"></i> Refresh
                     </button>
                 </div>
@@ -209,7 +209,7 @@
             <div id="content-messages" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">Recent Messages (Last 100)</h3>
-                    <button onclick="loadMessages()" class="px-4 py-2 bg-magenta-500 hover:bg-magenta-600 text-white rounded-lg transition">
+                    <button class="px-4 py-2 bg-magenta-500 hover:bg-magenta-600 text-white rounded-lg transition">
                         <i class="fas fa-sync"></i> Refresh
                     </button>
                 </div>
@@ -222,7 +222,7 @@
             <div id="content-files" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">File Uploads</h3>
-                    <button onclick="loadFiles()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition">
+                    <button class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition">
                         <i class="fas fa-sync"></i> Refresh
                     </button>
                 </div>
@@ -256,7 +256,7 @@
                             <option value="resolved">Resolved</option>
                             <option value="closed">Closed</option>
                         </select>
-                        <button onclick="loadTickets()" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition">
+                        <button class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition">
                             <i class="fas fa-sync"></i> Refresh
                         </button>
                     </div>
@@ -268,7 +268,7 @@
             <div id="content-announcements" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">System Announcements</h3>
-                    <button onclick="showNewAnnouncementForm()" class="px-4 py-2 bg-magenta-500 hover:bg-magenta-600 text-white rounded-lg transition">
+                    <button class="px-4 py-2 bg-magenta-500 hover:bg-magenta-600 text-white rounded-lg transition">
                         <i class="fas fa-plus"></i> New Announcement
                     </button>
                 </div>
@@ -286,10 +286,10 @@
                             <textarea id="announcement-content" rows="4" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:border-magenta-500" placeholder="Announcement content..."></textarea>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="createAnnouncement()" class="px-6 py-2 bg-magenta-500 hover:bg-magenta-600 text-white rounded-lg transition">
+                            <button class="px-6 py-2 bg-magenta-500 hover:bg-magenta-600 text-white rounded-lg transition">
                                 <i class="fas fa-paper-plane"></i> Post Announcement
                             </button>
-                            <button onclick="hideNewAnnouncementForm()" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition">
+                            <button class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition">
                                 <i class="fas fa-times"></i> Cancel
                             </button>
                         </div>
@@ -306,7 +306,7 @@
             <div id="content-apikeys" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">API Keys Management</h3>
-                    <button onclick="loadAPIKeys()" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
+                    <button class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
                         <i class="fas fa-sync"></i> Refresh
                     </button>
                 </div>
@@ -319,7 +319,7 @@
                     <h3 class="text-xl font-bold text-white">API Request Logs</h3>
                     <div class="flex gap-2">
                         <input type="text" id="apilogs-search" placeholder="Search by username..." class="px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg">
-                        <button onclick="loadAPILogs()" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition">
+                        <button class="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg transition">
                             <i class="fas fa-sync"></i> Refresh
                         </button>
                     </div>
@@ -362,7 +362,7 @@
                             <option value="SYSTEM">System</option>
                             <option value="SOCKET">Socket</option>
                         </select>
-                        <button onclick="loadServerLogs()" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition">
+                        <button class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition">
                             <i class="fas fa-sync"></i> Refresh
                         </button>
                     </div>
@@ -392,7 +392,7 @@
                         <h4 class="text-white font-semibold text-lg mb-1">Maintenance Mode Status</h4>
                         <p class="text-gray-400 text-sm" id="maintenance-status-text">Loading...</p>
                     </div>
-                    <button onclick="toggleMaintenance()" id="maintenance-toggle-btn" class="px-6 py-3 rounded-lg font-semibold transition text-white">
+                    <button id="maintenance-toggle-btn" class="px-6 py-3 rounded-lg font-semibold transition text-white">
                         <i class="fas fa-spinner fa-spin mr-2"></i> Loading...
                     </button>
                 </div>
@@ -402,7 +402,7 @@
             <div id="content-database" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">Database Management</h3>
-                    <button onclick="loadDatabaseStats()" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
+                    <button class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
                         <i class="fas fa-sync"></i> Refresh
                     </button>
                 </div>
@@ -494,7 +494,7 @@
                             <option value="60">Last 60 Days</option>
                             <option value="90">Last 90 Days</option>
                         </select>
-                        <button onclick="loadActivityGraphs()" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
+                        <button class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition">
                             <i class="fas fa-sync"></i> Refresh
                         </button>
                     </div>
@@ -560,7 +560,7 @@
                 <h2 class="text-2xl font-bold text-white">
                     <i class="fas fa-user-shield text-purple-500"></i> Mod View
                 </h2>
-                <button onclick="closeModView()" class="text-gray-400 hover:text-white">
+                <button class="text-gray-400 hover:text-white">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>

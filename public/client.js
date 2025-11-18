@@ -1412,6 +1412,65 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
+        // Button event listeners
+        document.getElementById("create-room-btn")?.addEventListener("click", () => {
+            window.openModal("createRoomModal");
+        });
+
+        document.getElementById("announcements-button")?.addEventListener("click", () => {
+            window.openModal("announcementsModal");
+        });
+
+        document.getElementById("support-button")?.addEventListener("click", () => {
+            window.location.href = "/support";
+        });
+
+        document.getElementById("settings-button")?.addEventListener("click", () => {
+            window.location.href = "/settings";
+        });
+
+        document.getElementById("search-button")?.addEventListener("click", () => {
+            window.openModal("searchModal");
+        });
+
+        // Private message input - handle Enter key
+        document.getElementById("pm-input")?.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                document.getElementById("pm-send-btn")?.click();
+            }
+        });
+
+        // Modal close buttons
+        document.querySelectorAll(".close-pm-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                window.closeModal("privateMessageModal");
+            });
+        });
+
+        document.querySelectorAll(".close-create-room-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                window.closeModal("createRoomModal");
+            });
+        });
+
+        document.querySelectorAll(".close-search-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                window.closeModal("searchModal");
+            });
+        });
+
+        document.querySelectorAll(".close-announcements-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                window.closeModal("announcementsModal");
+            });
+        });
+
+        document.querySelectorAll(".close-notifications-modal").forEach(btn => {
+            btn.addEventListener("click", () => {
+                window.closeModal("notificationsModal");
+            });
+        });
+
         const messageForm = document.getElementById("message-form");
         const messageInput = document.getElementById("message-input");
 

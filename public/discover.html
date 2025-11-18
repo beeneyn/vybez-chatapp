@@ -226,7 +226,7 @@
             container.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     ${servers.map(server => `
-                        <div class="server-card glass-card rounded-xl p-6 cursor-pointer" onclick="showServerPreview('${server.id}')">
+                        <div class="server-card glass-card rounded-xl p-6 cursor-pointer">
                             <div class="flex items-start justify-between mb-4">
                                 ${server.icon ? 
                                     `<img src="${server.icon}" alt="${server.name}" class="w-16 h-16 rounded-full">` :

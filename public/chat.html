@@ -27,7 +27,7 @@
                 <div class="bg-white rounded-lg shadow flex flex-col h-full">
                     <div class="px-4 py-3 font-bold border-b flex justify-between items-center chat-header">
                         <span>Rooms</span>
-                        <button id="create-room-btn" class="px-2 py-1 btn-brand-gradient text-white text-xs rounded" onclick="window.openModal('createRoomModal')" title="Create Room">
+                        <button id="create-room-btn" class="px-2 py-1 btn-brand-gradient text-white text-xs rounded" title="Create Room">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -42,7 +42,7 @@
                     <div class="px-4 py-3 border-b flex justify-between items-center chat-header">
                         <h3 id="welcome-message" class="text-lg font-semibold"></h3>
                         <div class="flex gap-2">
-                            <button id="announcements-button" class="px-3 py-1 bg-magenta-500 hover:bg-magenta-600 text-white text-sm rounded relative" title="Announcements" onclick="window.openModal('announcementsModal')">
+                            <button id="announcements-button" class="px-3 py-1 bg-magenta-500 hover:bg-magenta-600 text-white text-sm rounded relative" title="Announcements">
                                 <i class="fas fa-bullhorn"></i>
                                 <span id="announcements-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
                             </button>
@@ -50,10 +50,10 @@
                                 <i class="fas fa-bell"></i>
                                 <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
                             </button>
-                            <button id="support-button" class="px-3 py-1 bg-cyan-500 hover:bg-cyan-600 text-white text-sm rounded" title="Support" onclick="window.location.href='/support'">
+                            <button id="support-button" class="px-3 py-1 bg-cyan-500 hover:bg-cyan-600 text-white text-sm rounded" title="Support">
                                 <i class="fas fa-headset"></i>
                             </button>
-                            <button id="settings-button" class="px-3 py-1 btn-brand-gradient text-white text-sm rounded" title="Settings" onclick="window.location.href='/settings'">
+                            <button id="settings-button" class="px-3 py-1 btn-brand-gradient text-white text-sm rounded" title="Settings">
                                 <i class="fas fa-gear"></i>
                             </button>
                             <button id="logout-button" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded">Logout</button>
@@ -71,7 +71,7 @@
                             <button type="button" id="upload-button" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded" title="Upload File">
                                 <i class="fas fa-paperclip"></i>
                             </button>
-                            <button type="button" id="search-button" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded" title="Search Messages" onclick="window.openModal('searchModal')">
+                            <button type="button" id="search-button" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded" title="Search Messages">
                                 <i class="fas fa-search"></i>
                             </button>
                             <input type="text" id="message-input" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type a message..." required autocomplete="off">
@@ -114,7 +114,7 @@
                             <p class="text-xs opacity-75 mt-1" id="pm-user-bio">Loading...</p>
                         </div>
                     </div>
-                    <button onclick="window.closeModal('privateMessageModal')" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full w-8 h-8 flex items-center justify-center transition">
+                    <button class="close-pm-modal text-white hover:bg-white hover:bg-opacity-20 rounded-full w-8 h-8 flex items-center justify-center transition">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -126,7 +126,7 @@
                     <i class="fas fa-ban"></i>
                     <span id="pm-block-btn-text">Block User</span>
                 </button>
-                <button onclick="window.closeModal('privateMessageModal')" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded">
+                <button class="close-pm-modal px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded">
                     Close
                 </button>
             </div>
@@ -138,7 +138,7 @@
             
             <!-- Message Input -->
             <div class="flex gap-2">
-                <input type="text" id="pm-input" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500" placeholder="Type your message..." onkeypress="if(event.key==='Enter') document.getElementById('pm-send-btn').click()">
+                <input type="text" id="pm-input" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500" placeholder="Type your message...">
                 <button class="px-6 py-3 btn-brand-gradient text-white rounded-lg font-semibold hover:shadow-lg transition" id="pm-send-btn">
                     <i class="fas fa-paper-plane mr-2"></i>Send
                 </button>
@@ -150,7 +150,7 @@
         <div class="modal-content" style="max-width: 400px;">
             <div class="flex justify-between items-center mb-4">
                 <h5 class="text-lg font-semibold">Create New Room</h5>
-                <button onclick="window.closeModal('createRoomModal')" class="text-gray-500 hover:text-gray-700">
+                <button class="close-create-room-modal text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -161,7 +161,7 @@
             </div>
             <div id="create-room-message" class="text-sm mb-3 hidden"></div>
             <div class="flex gap-2 justify-end">
-                <button type="button" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded" onclick="window.closeModal('createRoomModal')">Cancel</button>
+                <button type="button" class="close-create-room-modal px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded">Cancel</button>
                 <button type="button" class="px-4 py-2 btn-brand-gradient text-white rounded font-semibold" id="create-room-confirm-btn">Create</button>
             </div>
         </div>
@@ -171,7 +171,7 @@
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
                 <h5 class="text-lg font-semibold">Search Messages</h5>
-                <button onclick="window.closeModal('searchModal')" class="text-gray-500 hover:text-gray-700">
+                <button class="close-search-modal text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -191,7 +191,7 @@
                     <h5 class="text-2xl font-bold text-white">
                         <i class="fas fa-bullhorn mr-2"></i>Announcements
                     </h5>
-                    <button onclick="window.closeModal('announcementsModal')" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full w-8 h-8 flex items-center justify-center transition">
+                    <button class="close-announcements-modal text-white hover:bg-white hover:bg-opacity-20 rounded-full w-8 h-8 flex items-center justify-center transition">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -212,7 +212,7 @@
                     <button id="mark-all-read-btn" class="px-3 py-1.5 bg-cyan-500 hover:bg-cyan-600 text-white text-sm rounded font-semibold transition" title="Mark all as read">
                         <i class="fas fa-check-double mr-1"></i>Mark All Read
                     </button>
-                    <button onclick="window.closeModal('notificationsModal')" class="text-gray-500 hover:text-gray-700">
+                    <button class="close-notifications-modal text-gray-500 hover:text-gray-700">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
