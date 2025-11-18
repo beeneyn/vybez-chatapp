@@ -940,6 +940,84 @@ const getUserServers = async (username, callback) => {
     }
 };
 
+const createChannel = async (serverId, name, type, created_by, topic, callback) => {
+    try {
+        const channelName = name.startsWith('#') ? name.substring(1) : name;
+        
+        const positionResult = await pool.query(
+            'SELECT COALESCE(MAX(position), -1) + 1 as next_position FROM channels WHERE server_id = $1',
+            [serverId]
+        );
+        const position = positionResult.rows[0].next_position;
+        
+        const result = await pool.query(
+            'INSERT INTO channels (server_id, name, type, topic, position) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [serverId, channelName, type || 'text', topic || null, position]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        if (err.code === '23505') {
+            callback(new Error('Channel already exists in this server'));
+        } else {
+            callback(err);
+        }
+    }
+};
+
+const deleteChannel = async (channelId, username, callback) => {
+    try {
+        const channelResult = await pool.query(
+            'SELECT c.*, s.owner FROM channels c JOIN servers s ON c.server_id = s.id WHERE c.id = $1',
+            [channelId]
+        );
+        
+        if (channelResult.rows.length === 0) {
+            return callback(new Error('Channel not found'));
+        }
+        
+        const channel = channelResult.rows[0];
+        
+        const userResult = await pool.query('SELECT role FROM users WHERE username = $1', [username]);
+        const isGlobalAdmin = userResult.rows.length > 0 && userResult.rows[0].role === 'admin';
+        const isOwner = channel.owner === username;
+        
+        const permissionResult = await pool.query(`
+            SELECT COUNT(*) as count FROM user_roles ur
+            JOIN roles r ON ur.role_id = r.id
+            JOIN role_permissions rp ON r.id = rp.role_id
+            WHERE ur.username = $1 AND r.server_id = $2 AND rp.permission = 'manage_channels'
+        `, [username, channel.server_id]);
+        
+        const hasManageChannels = permissionResult.rows[0].count > 0;
+        
+        if (!isGlobalAdmin && !isOwner && !hasManageChannels) {
+            return callback(new Error('Permission denied: You need manage_channels permission to delete channels'));
+        }
+        
+        await pool.query('DELETE FROM channels WHERE id = $1', [channelId]);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getChannelMessages = async (channelId, limit, callback) => {
+    try {
+        const result = await pool.query(
+            `SELECT messages.*, users.avatar_url, users.display_name 
+             FROM messages 
+             LEFT JOIN users ON messages.username = users.username 
+             WHERE room = $1 
+             ORDER BY messages.timestamp DESC 
+             LIMIT $2`,
+            [channelId.toString(), limit || 50]
+        );
+        callback(null, result.rows.reverse());
+    } catch (err) {
+        callback(err);
+    }
+};
+
 const deleteUserAccount = async (username, callback) => {
     const client = await pool.connect();
     try {
@@ -1527,6 +1605,9 @@ module.exports = {
     getDefaultServer,
     getChannelById,
     getUserServers,
+    createChannel,
+    deleteChannel,
+    getChannelMessages,
     deleteUserAccount,
     changeUsername,
     addWarning,

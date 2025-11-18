@@ -2202,10 +2202,29 @@ app.post("/unblock-user", (req, res) => {
 app.get("/rooms", (req, res) => {
     if (!req.session.user)
         return res.status(401).json({ message: "Unauthorized" });
-    db.getAllRooms((err, rooms) => {
-        if (err)
-            return res.status(500).json({ message: "Failed to get rooms" });
-        res.status(200).json({ rooms });
+    
+    db.getDefaultServer((err, server) => {
+        if (err) {
+            return res.status(500).json({ message: "Failed to get default server" });
+        }
+        
+        db.getAllChannelsForServer(server.id, (err, channels) => {
+            if (err)
+                return res.status(500).json({ message: "Failed to get rooms" });
+            
+            const rooms = channels.map(channel => ({
+                id: channel.id,
+                name: '#' + channel.name,
+                created_by: server.owner,
+                created_at: channel.created_at,
+                is_default: true,
+                server_id: channel.server_id,
+                type: channel.type,
+                topic: channel.topic
+            }));
+            
+            res.status(200).json({ rooms });
+        });
     });
 });
 app.post("/rooms", (req, res) => {
@@ -2215,20 +2234,34 @@ app.post("/rooms", (req, res) => {
     if (!name || name.trim() === "")
         return res.status(400).json({ message: "Room name is required" });
     
-    // Validate room name length
     if (name.length > 50) {
         return res.status(400).json({ message: "Room name must be 50 characters or less" });
     }
     
-    db.createRoom(name.trim(), req.session.user.username, (err, room) => {
+    db.getDefaultServer((err, server) => {
         if (err) {
-            if (err.message === "Room already exists")
-                return res.status(409).json({ message: "Room already exists" });
-            return res.status(500).json({ message: "Failed to create room" });
+            return res.status(500).json({ message: "Failed to get default server" });
         }
-        discordWebhook.logRoomCreated(room.name, req.session.user.username);
-        io.emit("roomCreated", room);
-        res.status(201).json({ message: "Room created successfully", room });
+        
+        db.createChannel(server.id, name.trim(), 'text', req.session.user.username, null, (err, channel) => {
+            if (err) {
+                if (err.message === "Channel already exists in this server")
+                    return res.status(409).json({ message: "Room already exists" });
+                return res.status(500).json({ message: "Failed to create room" });
+            }
+            
+            const room = {
+                id: channel.id,
+                name: '#' + channel.name,
+                created_by: server.owner,
+                created_at: channel.created_at,
+                server_id: channel.server_id
+            };
+            
+            discordWebhook.logRoomCreated(room.name, req.session.user.username);
+            io.emit("roomCreated", room);
+            res.status(201).json({ message: "Room created successfully", room });
+        });
     });
 });
 app.delete("/rooms/:name", async (req, res) => {
@@ -2237,40 +2270,44 @@ app.delete("/rooms/:name", async (req, res) => {
     
     const roomName = req.params.name;
     const username = req.session.user.username;
-    const isAdmin = req.session.user.role === "admin";
+    const channelName = roomName.startsWith('#') ? roomName.substring(1) : roomName;
 
     try {
-        const result = await db.pool.query(
-            `DELETE FROM rooms 
-             WHERE name = $1 
-             AND (created_by = $2 OR $3 = true) 
-             AND is_default = false 
-             RETURNING name, created_by`,
-            [roomName, username, isAdmin]
-        );
-
-        if (result.rows.length === 0) {
-            const checkRoom = await db.pool.query(
-                'SELECT name, is_default FROM rooms WHERE name = $1',
-                [roomName]
-            );
-            
-            if (checkRoom.rows.length === 0) {
-                return res.status(404).json({ message: "Room not found" });
-            }
-            
-            if (checkRoom.rows[0].is_default) {
-                return res.status(403).json({ message: "Cannot delete default rooms" });
-            }
-            
-            return res.status(403).json({ 
-                message: "Only the room creator or admins can delete this room" 
+        const server = await new Promise((resolve, reject) => {
+            db.getDefaultServer((err, server) => {
+                if (err) reject(err);
+                else resolve(server);
             });
+        });
+        
+        const channelResult = await db.pool.query(
+            'SELECT id FROM channels WHERE server_id = $1 AND name = $2',
+            [server.id, channelName]
+        );
+        
+        if (channelResult.rows.length === 0) {
+            return res.status(404).json({ message: "Room not found" });
         }
-
-        discordWebhook.logRoomDeleted(roomName, username);
-        io.emit("roomDeleted", { name: roomName });
-        res.status(200).json({ message: "Room deleted successfully" });
+        
+        const channelId = channelResult.rows[0].id;
+        
+        db.deleteChannel(channelId, username, (err) => {
+            if (err) {
+                if (err.message.includes('Permission denied')) {
+                    return res.status(403).json({ message: err.message });
+                }
+                serverLogger.error("DATABASE", "Failed to delete room", {
+                    error: err.message,
+                    room: roomName,
+                    user: username
+                });
+                return res.status(500).json({ message: "Failed to delete room" });
+            }
+            
+            discordWebhook.logRoomDeleted(roomName, username);
+            io.emit("roomDeleted", { name: roomName });
+            res.status(200).json({ message: "Room deleted successfully" });
+        });
     } catch (err) {
         serverLogger.error("DATABASE", "Failed to delete room", {
             error: err.message,
@@ -2362,61 +2399,102 @@ io.on("connection", (socket) => {
         socket.user = user;
         socket.clientType = clientType;
 
-        db.getAllRooms((err, rooms) => {
-            const roomList = err ? ["#general"] : rooms.map((r) => r.name);
-            const defaultRoom = roomList[0];
-            socket.join(defaultRoom);
-            socket.currentRoom = defaultRoom;
-            onlineUsers.set(socket.id, user);
-            emitFullUserList();
-            socket.emit("roomList", roomList);
+        db.getDefaultServer((serverErr, server) => {
+            if (serverErr) {
+                console.error('Error getting default server:', serverErr);
+                return socket.emit('error', { message: 'Failed to connect' });
+            }
+            
+            db.getAllChannelsForServer(server.id, (err, channels) => {
+                const roomList = err || !channels.length ? ["#general"] : channels.map((c) => '#' + c.name);
+                const defaultRoomName = roomList[0];
+                const defaultChannel = channels && channels.length > 0 ? channels[0] : null;
+                
+                if (defaultChannel) {
+                    const defaultChannelId = defaultChannel.id.toString();
+                    socket.join(defaultChannelId);
+                    socket.currentRoom = defaultChannelId;
+                    socket.currentRoomName = defaultRoomName;
+                    
+                    onlineUsers.set(socket.id, user);
+                    emitFullUserList();
+                    socket.emit("roomList", roomList);
 
-            db.getRecentMessages(defaultRoom, (err, messages) => {
-                if (!err && messages) {
-                    const history = messages.map((msg) => ({
-                        id: msg.id,
-                        user: msg.username,
-                        display_name: msg.display_name,
-                        text: msg.message_text,
-                        color: msg.chat_color,
-                        timestamp: msg.timestamp,
-                        fileUrl: msg.file_url,
-                        fileType: msg.file_type,
-                        avatar: msg.avatar_url,
-                        role: msg.role,
-                    }));
-                    socket.emit("loadHistory", {
-                        room: defaultRoom,
-                        messages: history,
+                    db.getChannelMessages(defaultChannelId, 50, (err, messages) => {
+                        if (!err && messages) {
+                            const history = messages.map((msg) => ({
+                                id: msg.id,
+                                user: msg.username,
+                                display_name: msg.display_name,
+                                text: msg.message_text,
+                                color: msg.chat_color,
+                                timestamp: msg.timestamp,
+                                fileUrl: msg.file_url,
+                                fileType: msg.file_type,
+                                avatar: msg.avatar_url,
+                                role: msg.role,
+                            }));
+                            socket.emit("loadHistory", {
+                                room: defaultRoomName,
+                                messages: history,
+                            });
+                        }
                     });
                 }
             });
         });
 
-        socket.on("switchRoom", (newRoom) => {
-            socket.leave(socket.currentRoom);
-            socket.join(newRoom);
-            socket.currentRoom = newRoom;
-            db.getRecentMessages(newRoom, (err, messages) => {
-                if (!err && messages) {
-                    const history = messages.map((msg) => ({
-                        id: msg.id,
-                        user: msg.username,
-                        display_name: msg.display_name,
-                        text: msg.message_text,
-                        color: msg.chat_color,
-                        timestamp: msg.timestamp,
-                        fileUrl: msg.file_url,
-                        fileType: msg.file_type,
-                        avatar: msg.avatar_url,
-                        role: msg.role,
-                    }));
-                    socket.emit("loadHistory", {
-                        room: newRoom,
-                        messages: history,
+        socket.on("switchRoom", async (newRoom) => {
+            try {
+                const server = await new Promise((resolve, reject) => {
+                    db.getDefaultServer((err, server) => {
+                        if (err) reject(err);
+                        else resolve(server);
                     });
+                });
+                
+                const channelName = newRoom.startsWith('#') ? newRoom.substring(1) : newRoom;
+                
+                const channelResult = await db.pool.query(
+                    'SELECT id FROM channels WHERE server_id = $1 AND name = $2',
+                    [server.id, channelName]
+                );
+                
+                if (channelResult.rows.length === 0) {
+                    return socket.emit('error', { message: 'Channel not found' });
                 }
-            });
+                
+                const channelId = channelResult.rows[0].id.toString();
+                
+                socket.leave(socket.currentRoom);
+                socket.join(channelId);
+                socket.currentRoom = channelId;
+                socket.currentRoomName = newRoom;
+                
+                db.getChannelMessages(channelId, 50, (err, messages) => {
+                    if (!err && messages) {
+                        const history = messages.map((msg) => ({
+                            id: msg.id,
+                            user: msg.username,
+                            display_name: msg.display_name,
+                            text: msg.message_text,
+                            color: msg.chat_color,
+                            timestamp: msg.timestamp,
+                            fileUrl: msg.file_url,
+                            fileType: msg.file_type,
+                            avatar: msg.avatar_url,
+                            role: msg.role,
+                        }));
+                        socket.emit("loadHistory", {
+                            room: newRoom,
+                            messages: history,
+                        });
+                    }
+                });
+            } catch (err) {
+                console.error('Error switching room:', err);
+                socket.emit('error', { message: 'Failed to switch room' });
+            }
         });
 
         socket.on("chatMessage", (msg) => {
@@ -2475,7 +2553,7 @@ io.on("connection", (socket) => {
                         };
                         discordWebhook.logChatMessage(
                             user.username,
-                            socket.currentRoom,
+                            socket.currentRoomName || socket.currentRoom,
                             sanitizedText,
                             !!msg.fileUrl,
                             clientType,
@@ -2494,7 +2572,7 @@ io.on("connection", (socket) => {
                                             db.addNotification(
                                                 mentionedUser,
                                                 "mention",
-                                                `${user.username} mentioned you in ${socket.currentRoom}`,
+                                                `${user.username} mentioned you in ${socket.currentRoomName || socket.currentRoom}`,
                                                 (notifErr) => {
                                                     if (!notifErr) {
                                                         io.to(
@@ -2502,14 +2580,14 @@ io.on("connection", (socket) => {
                                                         ).emit("notification", {
                                                             type: "mention",
                                                             from: user.username,
-                                                            room: socket.currentRoom,
+                                                            room: socket.currentRoomName || socket.currentRoom,
                                                             message:
                                                                 sanitizedText,
                                                         });
                                                         discordWebhook.logMention(
                                                             user.username,
                                                             mentionedUser,
-                                                            socket.currentRoom,
+                                                            socket.currentRoomName || socket.currentRoom,
                                                             sanitizedText,
                                                         );
                                                     }
@@ -2544,7 +2622,7 @@ io.on("connection", (socket) => {
                 discordWebhook.logReaction(
                     user.username,
                     emoji,
-                    socket.currentRoom,
+                    socket.currentRoomName || socket.currentRoom,
                 );
                 db.getReactionsForMessage(messageId, (err, reactions) => {
                     if (!err)
