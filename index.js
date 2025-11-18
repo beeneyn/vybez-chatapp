@@ -2320,6 +2320,438 @@ app.delete("/rooms/:name", async (req, res) => {
     }
 });
 
+// ================== SERVER MANAGEMENT ROUTES ==================
+// Middleware to check server membership
+function checkServerMembership(req, res, next) {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const serverId = req.params.serverId;
+    const username = req.session.user.username;
+    
+    db.isUserMemberOfServer(serverId, username, (err, isMember) => {
+        if (err) {
+            console.error("Error checking server membership:", err);
+            return res.status(500).json({ message: "Failed to verify membership" });
+        }
+        if (!isMember) {
+            return res.status(403).json({ message: "You are not a member of this server" });
+        }
+        next();
+    });
+}
+
+app.get("/servers", (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    db.getUserServers(req.session.user.username, (err, servers) => {
+        if (err) {
+            console.error("Error getting user servers:", err);
+            return res.status(500).json({ message: "Failed to get servers" });
+        }
+        res.status(200).json(servers);
+    });
+});
+
+app.post("/servers", (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { name, description } = req.body;
+    
+    if (!name || name.trim() === "")
+        return res.status(400).json({ message: "Server name is required" });
+    
+    if (name.length > 100) {
+        return res.status(400).json({ message: "Server name must be 100 characters or less" });
+    }
+    
+    db.createServer(name.trim(), description || null, req.session.user.username, (err, server) => {
+        if (err) {
+            console.error("Error creating server:", err);
+            if (err.message === "Server name already exists")
+                return res.status(409).json({ message: "Server name already exists" });
+            return res.status(500).json({ message: "Failed to create server" });
+        }
+        
+        discordWebhook.logServerCreated(server.name, req.session.user.username);
+        res.status(201).json(server);
+    });
+});
+
+app.get("/servers/:serverId/channels", checkServerMembership, (req, res) => {
+    const serverId = req.params.serverId;
+    
+    db.getAllChannelsForServer(serverId, (err, channels) => {
+        if (err) {
+            console.error("Error getting channels for server:", err);
+            return res.status(500).json({ message: "Failed to get channels" });
+        }
+        res.status(200).json(channels);
+    });
+});
+
+// ================== SERVER INVITE ROUTES ==================
+app.post("/servers/:serverId/invites", checkServerMembership, (req, res) => {
+    const { serverId } = req.params;
+    const { expiresInHours, maxUses } = req.body;
+    
+    db.createInvite(serverId, req.session.user.username, expiresInHours, maxUses, (err, invite) => {
+        if (err) {
+            console.error("Error creating invite:", err);
+            return res.status(500).json({ message: "Failed to create invite" });
+        }
+        res.status(201).json(invite);
+    });
+});
+
+app.get("/servers/:serverId/invites", checkServerMembership, (req, res) => {
+    const { serverId } = req.params;
+    
+    db.getServerInvites(serverId, (err, invites) => {
+        if (err) {
+            console.error("Error getting invites:", err);
+            return res.status(500).json({ message: "Failed to get invites" });
+        }
+        res.status(200).json(invites);
+    });
+});
+
+app.get("/invites/:code/info", (req, res) => {
+    const { code } = req.params;
+    
+    db.getInviteByCode(code, (err, invite) => {
+        if (err) {
+            return res.status(404).json({ message: err.message });
+        }
+        res.status(200).json({
+            server_name: invite.server_name,
+            server_description: invite.server_description,
+            code: invite.code
+        });
+    });
+});
+
+app.post("/invites/:code/join", (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { code } = req.params;
+    
+    db.useInvite(code, req.session.user.username, (err, serverId) => {
+        if (err) {
+            return res.status(400).json({ message: err.message });
+        }
+        res.status(200).json({ message: "Successfully joined server", serverId });
+    });
+});
+
+app.delete("/invites/:inviteId", async (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { inviteId } = req.params;
+    const username = req.session.user.username;
+    
+    try {
+        // First get the invite to find its server
+        const inviteResult = await db.pool.query(
+            'SELECT server_id FROM server_invites WHERE id = $1',
+            [inviteId]
+        );
+        
+        if (inviteResult.rows.length === 0) {
+            return res.status(404).json({ message: "Invite not found" });
+        }
+        
+        const serverId = inviteResult.rows[0].server_id;
+        
+        // Check if user is a member of the server
+        db.isUserMemberOfServer(serverId, username, (err, isMember) => {
+            if (err) {
+                console.error("Error checking membership:", err);
+                return res.status(500).json({ message: "Failed to verify membership" });
+            }
+            if (!isMember) {
+                return res.status(403).json({ message: "You are not a member of this server" });
+            }
+            
+            db.deleteInvite(inviteId, (err) => {
+                if (err) {
+                    console.error("Error deleting invite:", err);
+                    return res.status(500).json({ message: "Failed to delete invite" });
+                }
+                res.status(200).json({ message: "Invite deleted successfully" });
+            });
+        });
+    } catch (error) {
+        console.error("Error deleting invite:", error);
+        return res.status(500).json({ message: "Failed to delete invite" });
+    }
+});
+
+// ================== ROLE MANAGEMENT ROUTES ==================
+app.get("/servers/:serverId/roles", checkServerMembership, (req, res) => {
+    const { serverId } = req.params;
+    
+    db.getServerRoles(serverId, (err, roles) => {
+        if (err) {
+            console.error("Error getting roles:", err);
+            return res.status(500).json({ message: "Failed to get roles" });
+        }
+        res.status(200).json(roles);
+    });
+});
+
+app.put("/roles/:roleId", async (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { roleId } = req.params;
+    const { name, color } = req.body;
+    const username = req.session.user.username;
+    
+    try {
+        // First get the role to find its server
+        const roleResult = await db.pool.query(
+            'SELECT server_id FROM roles WHERE id = $1',
+            [roleId]
+        );
+        
+        if (roleResult.rows.length === 0) {
+            return res.status(404).json({ message: "Role not found" });
+        }
+        
+        const serverId = roleResult.rows[0].server_id;
+        
+        // Check if user is a member of the server
+        db.isUserMemberOfServer(serverId, username, (err, isMember) => {
+            if (err) {
+                console.error("Error checking membership:", err);
+                return res.status(500).json({ message: "Failed to verify membership" });
+            }
+            if (!isMember) {
+                return res.status(403).json({ message: "You are not a member of this server" });
+            }
+            
+            db.updateRole(roleId, name, color, (err, role) => {
+                if (err) {
+                    console.error("Error updating role:", err);
+                    return res.status(500).json({ message: "Failed to update role" });
+                }
+                res.status(200).json(role);
+            });
+        });
+    } catch (error) {
+        console.error("Error updating role:", error);
+        return res.status(500).json({ message: "Failed to update role" });
+    }
+});
+
+app.delete("/roles/:roleId", async (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { roleId } = req.params;
+    const username = req.session.user.username;
+    
+    try {
+        // First get the role to find its server
+        const roleResult = await db.pool.query(
+            'SELECT server_id FROM roles WHERE id = $1',
+            [roleId]
+        );
+        
+        if (roleResult.rows.length === 0) {
+            return res.status(404).json({ message: "Role not found" });
+        }
+        
+        const serverId = roleResult.rows[0].server_id;
+        
+        // Check if user is a member of the server
+        db.isUserMemberOfServer(serverId, username, (err, isMember) => {
+            if (err) {
+                console.error("Error checking membership:", err);
+                return res.status(500).json({ message: "Failed to verify membership" });
+            }
+            if (!isMember) {
+                return res.status(403).json({ message: "You are not a member of this server" });
+            }
+            
+            db.deleteRole(roleId, (err) => {
+                if (err) {
+                    console.error("Error deleting role:", err);
+                    return res.status(500).json({ message: "Failed to delete role" });
+                }
+                res.status(200).json({ message: "Role deleted successfully" });
+            });
+        });
+    } catch (error) {
+        console.error("Error deleting role:", error);
+        return res.status(500).json({ message: "Failed to delete role" });
+    }
+});
+
+app.put("/roles/:roleId/permissions", async (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { roleId } = req.params;
+    const { permissions } = req.body;
+    const username = req.session.user.username;
+    
+    try {
+        // First get the role to find its server
+        const roleResult = await db.pool.query(
+            'SELECT server_id FROM roles WHERE id = $1',
+            [roleId]
+        );
+        
+        if (roleResult.rows.length === 0) {
+            return res.status(404).json({ message: "Role not found" });
+        }
+        
+        const serverId = roleResult.rows[0].server_id;
+        
+        // Check if user is a member of the server
+        db.isUserMemberOfServer(serverId, username, (err, isMember) => {
+            if (err) {
+                console.error("Error checking membership:", err);
+                return res.status(500).json({ message: "Failed to verify membership" });
+            }
+            if (!isMember) {
+                return res.status(403).json({ message: "You are not a member of this server" });
+            }
+            
+            db.updateRolePermissions(roleId, permissions, (err) => {
+                if (err) {
+                    console.error("Error updating role permissions:", err);
+                    return res.status(500).json({ message: "Failed to update permissions" });
+                }
+                res.status(200).json({ message: "Permissions updated successfully" });
+            });
+        });
+    } catch (error) {
+        console.error("Error updating role permissions:", error);
+        return res.status(500).json({ message: "Failed to update permissions" });
+    }
+});
+
+// ================== MEMBER MANAGEMENT ROUTES ==================
+app.get("/servers/:serverId/members", checkServerMembership, (req, res) => {
+    const { serverId } = req.params;
+    
+    db.getServerMembers(serverId, (err, members) => {
+        if (err) {
+            console.error("Error getting members:", err);
+            return res.status(500).json({ message: "Failed to get members" });
+        }
+        res.status(200).json(members);
+    });
+});
+
+app.delete("/servers/:serverId/members/:username", checkServerMembership, (req, res) => {
+    const { serverId, username } = req.params;
+    
+    db.kickMember(serverId, username, (err) => {
+        if (err) {
+            console.error("Error kicking member:", err);
+            return res.status(500).json({ message: "Failed to kick member" });
+        }
+        res.status(200).json({ message: "Member kicked successfully" });
+    });
+});
+
+app.post("/members/:username/roles/:roleId", async (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { username, roleId } = req.params;
+    const currentUser = req.session.user.username;
+    
+    try {
+        // First get the role to find its server
+        const roleResult = await db.pool.query(
+            'SELECT server_id FROM roles WHERE id = $1',
+            [roleId]
+        );
+        
+        if (roleResult.rows.length === 0) {
+            return res.status(404).json({ message: "Role not found" });
+        }
+        
+        const serverId = roleResult.rows[0].server_id;
+        
+        // Check if user is a member of the server
+        db.isUserMemberOfServer(serverId, currentUser, (err, isMember) => {
+            if (err) {
+                console.error("Error checking membership:", err);
+                return res.status(500).json({ message: "Failed to verify membership" });
+            }
+            if (!isMember) {
+                return res.status(403).json({ message: "You are not a member of this server" });
+            }
+            
+            db.assignRoleToMember(username, roleId, (err) => {
+                if (err) {
+                    console.error("Error assigning role:", err);
+                    return res.status(500).json({ message: "Failed to assign role" });
+                }
+                res.status(200).json({ message: "Role assigned successfully" });
+            });
+        });
+    } catch (error) {
+        console.error("Error assigning role:", error);
+        return res.status(500).json({ message: "Failed to assign role" });
+    }
+});
+
+app.delete("/members/:username/roles/:roleId", async (req, res) => {
+    if (!req.session.user)
+        return res.status(401).json({ message: "Unauthorized" });
+    
+    const { username, roleId } = req.params;
+    const currentUser = req.session.user.username;
+    
+    try {
+        // First get the role to find its server
+        const roleResult = await db.pool.query(
+            'SELECT server_id FROM roles WHERE id = $1',
+            [roleId]
+        );
+        
+        if (roleResult.rows.length === 0) {
+            return res.status(404).json({ message: "Role not found" });
+        }
+        
+        const serverId = roleResult.rows[0].server_id;
+        
+        // Check if user is a member of the server
+        db.isUserMemberOfServer(serverId, currentUser, (err, isMember) => {
+            if (err) {
+                console.error("Error checking membership:", err);
+                return res.status(500).json({ message: "Failed to verify membership" });
+            }
+            if (!isMember) {
+                return res.status(403).json({ message: "You are not a member of this server" });
+            }
+            
+            db.removeRoleFromMember(username, roleId, (err) => {
+                if (err) {
+                    console.error("Error removing role:", err);
+                    return res.status(500).json({ message: "Failed to remove role" });
+                }
+                res.status(200).json({ message: "Role removed successfully" });
+            });
+        });
+    } catch (error) {
+        console.error("Error removing role:", error);
+        return res.status(500).json({ message: "Failed to remove role" });
+    }
+});
+
 const onlineUsers = new Map();
 const typingUsers = new Map();
 

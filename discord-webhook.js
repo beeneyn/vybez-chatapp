@@ -108,6 +108,18 @@ function logRoomDeleted(roomName, deletedBy) {
     );
 }
 
+function logServerCreated(serverName, createdBy) {
+    sendDiscordWebhook(
+        '🎉 Server Created',
+        `A new server has been created`,
+        0x5865f2,
+        [
+            { name: 'Server Name', value: serverName, inline: true },
+            { name: 'Created By', value: createdBy, inline: true }
+        ]
+    );
+}
+
 function logFileUpload(username, fileName, fileType) {
     sendDiscordWebhook(
         '📎 File Uploaded',
@@ -333,6 +345,7 @@ module.exports = {
     logUserLogin,
     logRoomCreated,
     logRoomDeleted,
+    logServerCreated,
     logFileUpload,
     logChatMessage,
     logPrivateMessage,

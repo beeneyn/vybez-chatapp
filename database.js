@@ -448,6 +448,20 @@ const initializeTables = async (client) => {
             )
         `);
 
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS server_invites (
+                id SERIAL PRIMARY KEY,
+                server_id INTEGER NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
+                code TEXT UNIQUE NOT NULL,
+                created_by TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at TIMESTAMP,
+                max_uses INTEGER DEFAULT NULL,
+                uses INTEGER DEFAULT 0,
+                active BOOLEAN DEFAULT TRUE
+            )
+        `);
+
         // Create indexes for Version 1.2 tables
         await client.query(`
             CREATE INDEX IF NOT EXISTS idx_channels_server_id ON channels(server_id);
@@ -457,6 +471,8 @@ const initializeTables = async (client) => {
             CREATE INDEX IF NOT EXISTS idx_user_roles_username ON user_roles(username);
             CREATE INDEX IF NOT EXISTS idx_user_roles_role_id ON user_roles(role_id);
             CREATE INDEX IF NOT EXISTS idx_message_edits_message_id ON message_edits(message_id);
+            CREATE INDEX IF NOT EXISTS idx_server_invites_code ON server_invites(code);
+            CREATE INDEX IF NOT EXISTS idx_server_invites_server_id ON server_invites(server_id);
         `);
         
         // Migration: Add NOT NULL constraints to existing tables
@@ -937,6 +953,92 @@ const getUserServers = async (username, callback) => {
         callback(null, result.rows);
     } catch (err) {
         callback(err);
+    }
+};
+
+const createServer = async (name, description, owner_username, callback) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        const serverResult = await client.query(
+            'INSERT INTO servers (name, description, owner_username) VALUES ($1, $2, $3) RETURNING *',
+            [name, description, owner_username]
+        );
+        const server = serverResult.rows[0];
+        
+        await client.query(
+            'INSERT INTO server_members (server_id, username) VALUES ($1, $2)',
+            [server.id, owner_username]
+        );
+        
+        const everyoneRole = await client.query(
+            'INSERT INTO roles (server_id, name, color, position, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [server.id, 'everyone', '#99AAB5', 0, 0]
+        );
+        
+        const everyonePermissions = ['send_messages', 'read_messages'];
+        for (const permission of everyonePermissions) {
+            await client.query(
+                'INSERT INTO role_permissions (role_id, permission) VALUES ($1, $2)',
+                [everyoneRole.rows[0].id, permission]
+            );
+        }
+        
+        const moderatorRole = await client.query(
+            'INSERT INTO roles (server_id, name, color, position, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [server.id, 'Moderator', '#5865F2', 1, 0]
+        );
+        
+        const moderatorPermissions = [
+            'manage_messages', 'kick_members', 'send_messages', 'read_messages'
+        ];
+        for (const permission of moderatorPermissions) {
+            await client.query(
+                'INSERT INTO role_permissions (role_id, permission) VALUES ($1, $2)',
+                [moderatorRole.rows[0].id, permission]
+            );
+        }
+        
+        const adminRole = await client.query(
+            'INSERT INTO roles (server_id, name, color, position, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [server.id, 'Admin', '#ED4245', 2, 0]
+        );
+        
+        const adminPermissions = [
+            'administrator', 'manage_server', 'manage_roles', 'manage_channels',
+            'kick_members', 'ban_members', 'create_invite', 'manage_messages',
+            'send_messages', 'read_messages', 'mention_everyone', 'view_audit_log'
+        ];
+        
+        for (const permission of adminPermissions) {
+            await client.query(
+                'INSERT INTO role_permissions (role_id, permission) VALUES ($1, $2)',
+                [adminRole.rows[0].id, permission]
+            );
+        }
+        
+        await client.query(
+            'INSERT INTO user_roles (username, role_id) VALUES ($1, $2)',
+            [owner_username, adminRole.rows[0].id]
+        );
+        
+        await client.query(
+            'INSERT INTO channels (server_id, name, type, description, position) VALUES ($1, $2, $3, $4, $5)',
+            [server.id, 'general', 'text', 'General discussion channel', 0]
+        );
+        
+        await client.query('COMMIT');
+        callback(null, server);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        if (err.code === '23505') {
+            callback(new Error('Server name already exists'));
+        } else {
+            callback(err);
+        }
+    } finally {
+        client.release();
     }
 };
 
@@ -1575,6 +1677,286 @@ const markAllNotificationsRead = async (username, callback) => {
     }
 };
 
+// ==================== SERVER INVITES ====================
+const createInvite = async (serverId, createdBy, expiresInHours, maxUses, callback) => {
+    try {
+        const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+        const expiresAt = expiresInHours ? new Date(Date.now() + expiresInHours * 60 * 60 * 1000) : null;
+        
+        const result = await pool.query(
+            'INSERT INTO server_invites (server_id, code, created_by, expires_at, max_uses) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [serverId, code, createdBy, expiresAt, maxUses]
+        );
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getInviteByCode = async (code, callback) => {
+    try {
+        const result = await pool.query(`
+            SELECT i.*, s.name as server_name, s.description as server_description
+            FROM server_invites i
+            JOIN servers s ON i.server_id = s.id
+            WHERE i.code = $1 AND i.active = TRUE
+        `, [code]);
+        
+        if (result.rows.length === 0) {
+            return callback(new Error('Invalid or expired invite'));
+        }
+        
+        const invite = result.rows[0];
+        
+        if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
+            await pool.query('UPDATE server_invites SET active = FALSE WHERE id = $1', [invite.id]);
+            return callback(new Error('This invite has expired'));
+        }
+        
+        if (invite.max_uses && invite.uses >= invite.max_uses) {
+            await pool.query('UPDATE server_invites SET active = FALSE WHERE id = $1', [invite.id]);
+            return callback(new Error('This invite has reached its maximum uses'));
+        }
+        
+        callback(null, invite);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const useInvite = async (code, username, callback) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        const inviteResult = await client.query(`
+            SELECT i.*, s.id as server_id
+            FROM server_invites i
+            JOIN servers s ON i.server_id = s.id
+            WHERE i.code = $1 AND i.active = TRUE
+        `, [code]);
+        
+        if (inviteResult.rows.length === 0) {
+            throw new Error('Invalid invite');
+        }
+        
+        const invite = inviteResult.rows[0];
+        
+        const memberCheck = await client.query(
+            'SELECT 1 FROM server_members WHERE server_id = $1 AND username = $2',
+            [invite.server_id, username]
+        );
+        
+        if (memberCheck.rows.length > 0) {
+            throw new Error('You are already a member of this server');
+        }
+        
+        await client.query(
+            'INSERT INTO server_members (server_id, username) VALUES ($1, $2)',
+            [invite.server_id, username]
+        );
+        
+        await client.query(
+            'UPDATE server_invites SET uses = uses + 1 WHERE id = $1',
+            [invite.id]
+        );
+        
+        await client.query('COMMIT');
+        callback(null, invite.server_id);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        callback(err);
+    } finally {
+        client.release();
+    }
+};
+
+const getServerInvites = async (serverId, callback) => {
+    try {
+        const result = await pool.query(`
+            SELECT * FROM server_invites 
+            WHERE server_id = $1 AND active = TRUE
+            ORDER BY created_at DESC
+        `, [serverId]);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const deleteInvite = async (inviteId, callback) => {
+    try {
+        await pool.query('UPDATE server_invites SET active = FALSE WHERE id = $1', [inviteId]);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+// ==================== ROLE MANAGEMENT ====================
+const getServerRoles = async (serverId, callback) => {
+    try {
+        const result = await pool.query(`
+            SELECT r.*, 
+                   COALESCE(json_agg(rp.permission) FILTER (WHERE rp.permission IS NOT NULL), '[]') as permission_list
+            FROM roles r
+            LEFT JOIN role_permissions rp ON r.id = rp.role_id
+            WHERE r.server_id = $1
+            GROUP BY r.id
+            ORDER BY r.position DESC
+        `, [serverId]);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const updateRole = async (roleId, name, color, callback) => {
+    try {
+        const result = await pool.query(
+            'UPDATE roles SET name = $1, color = $2 WHERE id = $3 RETURNING *',
+            [name, color, roleId]
+        );
+        if (result.rowCount === 0) {
+            return callback(new Error('Role not found'));
+        }
+        callback(null, result.rows[0]);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const deleteRole = async (roleId, callback) => {
+    try {
+        await pool.query('DELETE FROM role_permissions WHERE role_id = $1', [roleId]);
+        await pool.query('DELETE FROM user_roles WHERE role_id = $1', [roleId]);
+        await pool.query('DELETE FROM roles WHERE id = $1', [roleId]);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const updateRolePermissions = async (roleId, permissions, callback) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        await client.query('DELETE FROM role_permissions WHERE role_id = $1', [roleId]);
+        
+        for (const permission of permissions) {
+            await client.query(
+                'INSERT INTO role_permissions (role_id, permission) VALUES ($1, $2)',
+                [roleId, permission]
+            );
+        }
+        
+        await client.query('COMMIT');
+        callback(null);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        callback(err);
+    } finally {
+        client.release();
+    }
+};
+
+// ==================== MEMBER MANAGEMENT ====================
+const getServerMembers = async (serverId, callback) => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                sm.username,
+                sm.joined_at,
+                u.avatar_url,
+                u.status,
+                COALESCE(json_agg(
+                    json_build_object(
+                        'id', r.id,
+                        'name', r.name,
+                        'color', r.color,
+                        'position', r.position
+                    ) ORDER BY r.position DESC
+                ) FILTER (WHERE r.id IS NOT NULL), '[]') as roles
+            FROM server_members sm
+            LEFT JOIN users u ON sm.username = u.username
+            LEFT JOIN user_roles ur ON sm.username = ur.username
+            LEFT JOIN roles r ON ur.role_id = r.id AND r.server_id = $1
+            WHERE sm.server_id = $1
+            GROUP BY sm.username, sm.joined_at, u.avatar_url, u.status
+            ORDER BY sm.joined_at ASC
+        `, [serverId]);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const kickMember = async (serverId, username, callback) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        await client.query(
+            'DELETE FROM user_roles WHERE username = $1 AND role_id IN (SELECT id FROM roles WHERE server_id = $2)',
+            [username, serverId]
+        );
+        
+        await client.query(
+            'DELETE FROM server_members WHERE server_id = $1 AND username = $2',
+            [serverId, username]
+        );
+        
+        await client.query('COMMIT');
+        callback(null);
+    } catch (err) {
+        await client.query('ROLLBACK');
+        callback(err);
+    } finally {
+        client.release();
+    }
+};
+
+const assignRoleToMember = async (username, roleId, callback) => {
+    try {
+        await pool.query(
+            'INSERT INTO user_roles (username, role_id) VALUES ($1, $2) ON CONFLICT (username, role_id) DO NOTHING',
+            [username, roleId]
+        );
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const removeRoleFromMember = async (username, roleId, callback) => {
+    try {
+        await pool.query(
+            'DELETE FROM user_roles WHERE username = $1 AND role_id = $2',
+            [username, roleId]
+        );
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+// Check if user is a member of a server
+const isUserMemberOfServer = async (serverId, username, callback) => {
+    try {
+        const result = await pool.query(
+            `SELECT EXISTS(
+                SELECT 1 FROM server_members 
+                WHERE server_id = $1 AND username = $2
+            ) as is_member`,
+            [serverId, username]
+        );
+        callback(null, result.rows[0].is_member);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 module.exports = {
     addUser,
     findUser,
@@ -1605,6 +1987,7 @@ module.exports = {
     getDefaultServer,
     getChannelById,
     getUserServers,
+    createServer,
     createChannel,
     deleteChannel,
     getChannelMessages,
@@ -1645,5 +2028,19 @@ module.exports = {
     markAnnouncementAsRead,
     getUnreadAnnouncementIds,
     markAllNotificationsRead,
+    createInvite,
+    getInviteByCode,
+    useInvite,
+    getServerInvites,
+    deleteInvite,
+    getServerRoles,
+    updateRole,
+    deleteRole,
+    updateRolePermissions,
+    getServerMembers,
+    kickMember,
+    assignRoleToMember,
+    removeRoleFromMember,
+    isUserMemberOfServer,
     pool
 };
