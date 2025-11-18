@@ -15,6 +15,7 @@ const serverLogger = require("./serverLogger.js");
 const apiRoutes = require("./api-routes.js");
 const apiMiddleware = require("./api-middleware.js");
 const serverRolesRoutes = require("./server-roles-routes.js");
+const serverManagementRoutes = require("./server-management-routes.js");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 
@@ -306,6 +307,7 @@ app.use(maintenanceMiddleware);
 
 app.use("/api/developer", apiRoutes);
 app.use("/api", serverRolesRoutes.router);
+app.use("/api", serverManagementRoutes);
 
 const requireAdmin = (req, res, next) => {
     if (!req.session.user || req.session.user.role !== "admin") {
