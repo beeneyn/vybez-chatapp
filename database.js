@@ -883,6 +883,63 @@ const deleteRoom = async (name, callback) => {
     }
 };
 
+const getAllChannelsForServer = async (serverId, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM channels WHERE server_id = $1 ORDER BY position ASC, created_at ASC',
+            [serverId]
+        );
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getDefaultServer = async (callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM servers ORDER BY created_at ASC LIMIT 1'
+        );
+        if (result.rows.length === 0) {
+            callback(new Error('No servers found'));
+        } else {
+            callback(null, result.rows[0]);
+        }
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getChannelById = async (channelId, callback) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM channels WHERE id = $1',
+            [channelId]
+        );
+        if (result.rows.length === 0) {
+            callback(new Error('Channel not found'));
+        } else {
+            callback(null, result.rows[0]);
+        }
+    } catch (err) {
+        callback(err);
+    }
+};
+
+const getUserServers = async (username, callback) => {
+    try {
+        const result = await pool.query(`
+            SELECT s.* FROM servers s
+            INNER JOIN server_members sm ON s.id = sm.server_id
+            WHERE sm.username = $1
+            ORDER BY s.created_at ASC
+        `, [username]);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
+};
+
 const deleteUserAccount = async (username, callback) => {
     const client = await pool.connect();
     try {
@@ -1466,6 +1523,10 @@ module.exports = {
     createRoom,
     getAllRooms,
     deleteRoom,
+    getAllChannelsForServer,
+    getDefaultServer,
+    getChannelById,
+    getUserServers,
     deleteUserAccount,
     changeUsername,
     addWarning,
