@@ -130,7 +130,7 @@
                 <a href="api-documentation.html" class="text-gray-700 hover:text-[#1ed5ff] font-medium transition-colors">API Docs</a>
                 <a href="about.html" class="text-gray-700 hover:text-[#5b2bff] font-medium transition-colors">About</a>
             </div>
-            <button onclick="handleLaunchChat()" class="px-6 py-2 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold rounded-lg hover:shadow-xl shadow-lg transform hover:scale-105 transition-all">
+            <button id="launchChatBtn" class="px-6 py-2 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold rounded-lg hover:shadow-xl shadow-lg transform hover:scale-105 transition-all">
                 Launch Chat
             </button>
         </div>
@@ -156,7 +156,7 @@
                     <i id="os-icon" class="fab fa-windows"></i> 
                     <span id="os-text">Download for Windows</span>
                 </a>
-                <button onclick="handleLaunchChat()" class="px-10 py-4 border-2 border-white text-white font-bold text-lg rounded-full hover:bg-white hover:text-[#5b2bff] transition-all">
+                <button id="signInBtn" class="px-10 py-4 border-2 border-white text-white font-bold text-lg rounded-full hover:bg-white hover:text-[#5b2bff] transition-all">
                     Sign In on Web
                 </button>
             </div>
@@ -1317,6 +1317,10 @@
                 }
             }
         }
+
+        // Event listeners for launch chat buttons
+        document.getElementById('launchChatBtn').addEventListener('click', handleLaunchChat);
+        document.getElementById('signInBtn').addEventListener('click', handleLaunchChat);
 
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
