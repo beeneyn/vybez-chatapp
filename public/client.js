@@ -204,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             const textSpan = document.createElement("span");
+            textSpan.className = "message-text-content";
             textSpan.innerHTML = textWithMentions;
             item.appendChild(textSpan);
         }
@@ -227,15 +228,33 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        // Add edited indicator
+        if (msg.edited) {
+            const editedSpan = document.createElement("span");
+            editedSpan.className = "text-muted";
+            editedSpan.style.fontSize = "0.75em";
+            editedSpan.style.marginLeft = "6px";
+            editedSpan.textContent = "(edited)";
+            item.appendChild(editedSpan);
+        }
+
         const reactionBtn = document.createElement("button");
         reactionBtn.className = "btn btn-sm btn-link reaction-btn";
         reactionBtn.innerHTML = "😊";
         reactionBtn.onclick = (e) => showEmojiPicker(msg.id, e);
         item.appendChild(reactionBtn);
 
-        // Add delete button for admins or message authors
+        // Add edit and delete buttons for admins or message authors
         const isAdmin = currentUserRole === "admin";
         const isAuthor = username === currentUser;
+        if (isAuthor && !isPrivate) {
+            const editBtn = document.createElement("button");
+            editBtn.className = "btn btn-sm btn-link text-primary";
+            editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+            editBtn.title = "Edit message";
+            editBtn.onclick = () => startEditMessage(msg.id, msg.text || '');
+            item.appendChild(editBtn);
+        }
         if (isAdmin || isAuthor) {
             const deleteBtn = document.createElement("button");
             deleteBtn.className = "btn btn-sm btn-link text-danger";
@@ -287,6 +306,78 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteMessage = (messageId) => {
         if (confirm("Delete this message?")) {
             socket.emit("deleteMessage", { messageId });
+        }
+    };
+
+    const startEditMessage = (messageId, currentText) => {
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (!messageElement) return;
+
+        const messageTextSpan = messageElement.querySelector('.message-text-content');
+        if (!messageTextSpan) return;
+
+        const originalHTML = messageTextSpan.innerHTML;
+        
+        const editContainer = document.createElement('div');
+        editContainer.className = 'edit-message-container mt-2';
+        editContainer.style.cssText = 'display: flex; gap: 8px; align-items: center;';
+        
+        const textarea = document.createElement('textarea');
+        textarea.className = 'form-control form-control-sm';
+        textarea.value = currentText;
+        textarea.style.cssText = 'flex: 1; resize: vertical; min-height: 60px;';
+        textarea.maxLength = 2000;
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'btn btn-sm btn-success';
+        saveBtn.innerHTML = '<i class="bi bi-check-lg"></i> Save';
+        saveBtn.onclick = () => saveEditMessage(messageId, textarea.value.trim(), messageTextSpan, originalHTML, editContainer);
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'btn btn-sm btn-secondary';
+        cancelBtn.innerHTML = '<i class="bi bi-x-lg"></i> Cancel';
+        cancelBtn.onclick = () => cancelEditMessage(messageTextSpan, originalHTML, editContainer);
+        
+        editContainer.appendChild(textarea);
+        editContainer.appendChild(saveBtn);
+        editContainer.appendChild(cancelBtn);
+        
+        messageTextSpan.style.display = 'none';
+        messageElement.appendChild(editContainer);
+        
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveBtn.click();
+            } else if (e.key === 'Escape') {
+                cancelBtn.click();
+            }
+        });
+    };
+
+    const saveEditMessage = (messageId, newContent, messageTextSpan, originalHTML, editContainer) => {
+        if (!newContent) {
+            alert('Message content cannot be empty');
+            return;
+        }
+
+        if (newContent.length > 2000) {
+            alert('Message must be 2000 characters or less');
+            return;
+        }
+
+        socket.emit('editMessage', { messageId, content: newContent });
+        
+        cancelEditMessage(messageTextSpan, originalHTML, editContainer);
+    };
+
+    const cancelEditMessage = (messageTextSpan, originalHTML, editContainer) => {
+        messageTextSpan.style.display = '';
+        if (editContainer && editContainer.parentNode) {
+            editContainer.remove();
         }
     };
 
@@ -1107,6 +1198,49 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             if (messageElement) {
                 messageElement.remove();
+            }
+        });
+
+        socket.on("messageEdited", ({ messageId, content, edited, editedAt }) => {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (!messageElement) return;
+
+            const messageTextSpan = messageElement.querySelector('.message-text-content');
+            if (!messageTextSpan) return;
+
+            const escapeHtml = (text) => {
+                const div = document.createElement("div");
+                div.textContent = text;
+                return div.innerHTML;
+            };
+
+            const escapedText = escapeHtml(content);
+            const textWithMentions = escapedText.replace(
+                /@(\w+)/g,
+                (match, username) => {
+                    if (username === currentUser) {
+                        return `<span style="background-color: #5b2bff; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 600;">@${username}</span>`;
+                    }
+                    return `<span style="background-color: rgba(91, 43, 255, 0.1); color: #5b2bff; padding: 2px 6px; border-radius: 4px; font-weight: 600;">@${username}</span>`;
+                },
+            );
+
+            messageTextSpan.innerHTML = textWithMentions;
+
+            let editedIndicator = messageElement.querySelector('.text-muted');
+            if (!editedIndicator && edited) {
+                editedIndicator = document.createElement("span");
+                editedIndicator.className = "text-muted";
+                editedIndicator.style.fontSize = "0.75em";
+                editedIndicator.style.marginLeft = "6px";
+                editedIndicator.textContent = "(edited)";
+                
+                const insertPosition = messageElement.querySelector('.btn.reaction-btn');
+                if (insertPosition) {
+                    messageElement.insertBefore(editedIndicator, insertPosition);
+                } else {
+                    messageElement.appendChild(editedIndicator);
+                }
             }
         });
 

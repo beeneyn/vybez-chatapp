@@ -18,6 +18,7 @@ const serverRolesRoutes = require("./server-roles-routes.js");
 const serverManagementRoutes = require("./server-management-routes.js");
 const channelRoutes = require("./channel-routes.js");
 const serverDiscoveryRoutes = require("./server-discovery-routes.js");
+const messageEditRoutes = require("./message-edit-routes.js");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 
@@ -316,6 +317,7 @@ app.use("/api", serverRolesRoutes.router);
 app.use("/api", serverManagementRoutes);
 app.use("/api", channelRoutes);
 app.use("/api", serverDiscoveryRoutes);
+app.use("/api", messageEditRoutes);
 
 const requireAdmin = (req, res, next) => {
     if (!req.session.user || req.session.user.role !== "admin") {
@@ -2600,6 +2602,92 @@ io.on("connection", (socket) => {
                     });
                 },
             );
+        });
+
+        socket.on("editMessage", async ({ messageId, content }) => {
+            if (!content || typeof content !== 'string') {
+                return socket.emit("error", {
+                    message: "Content is required",
+                });
+            }
+
+            const trimmedContent = content.trim();
+            if (!trimmedContent || trimmedContent.length === 0) {
+                return socket.emit("error", {
+                    message: "Content cannot be empty",
+                });
+            }
+
+            if (trimmedContent.length > 2000) {
+                return socket.emit("error", {
+                    type: "validation",
+                    message: "Message must be 2000 characters or less",
+                });
+            }
+
+            const client = await db.pool.connect();
+            try {
+                const messageQuery = await client.query(
+                    'SELECT id, username, content, room FROM messages WHERE id = $1',
+                    [messageId]
+                );
+
+                if (!messageQuery.rows.length) {
+                    return socket.emit("error", {
+                        message: "Message not found",
+                    });
+                }
+
+                const message = messageQuery.rows[0];
+                const isAdmin = user.role === "admin";
+                const isAuthor = message.username === user.username;
+
+                if (!isAdmin && !isAuthor) {
+                    return socket.emit("error", {
+                        message: "You can only edit your own messages",
+                    });
+                }
+
+                if (message.content === trimmedContent) {
+                    return socket.emit("error", {
+                        message: "New content is the same as current content",
+                    });
+                }
+
+                await client.query('BEGIN');
+
+                await client.query(
+                    `INSERT INTO message_edits (message_id, original_content, edited_content, edited_by, edited_at)
+                     VALUES ($1, $2, $3, $4, NOW())`,
+                    [messageId, message.content, trimmedContent, user.username]
+                );
+
+                const updateResult = await client.query(
+                    `UPDATE messages 
+                     SET content = $1, edited = true, edited_at = NOW()
+                     WHERE id = $2
+                     RETURNING id, username, content, room, timestamp, edited, edited_at`,
+                    [trimmedContent, messageId]
+                );
+
+                await client.query('COMMIT');
+
+                io.to(message.room).emit("messageEdited", {
+                    messageId: messageId,
+                    content: trimmedContent,
+                    edited: true,
+                    editedAt: updateResult.rows[0].edited_at,
+                });
+
+            } catch (err) {
+                await client.query('ROLLBACK');
+                console.error("Error editing message:", err);
+                socket.emit("error", {
+                    message: "Failed to edit message",
+                });
+            } finally {
+                client.release();
+            }
         });
 
         socket.on("privateMessage", ({ to, text }) => {
