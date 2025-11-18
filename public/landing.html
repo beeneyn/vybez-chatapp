@@ -130,9 +130,9 @@
                 <a href="api-documentation.html" class="text-gray-700 hover:text-[#1ed5ff] font-medium transition-colors">API Docs</a>
                 <a href="about.html" class="text-gray-700 hover:text-[#5b2bff] font-medium transition-colors">About</a>
             </div>
-            <a href="/chat" class="px-6 py-2 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold rounded-lg hover:shadow-xl shadow-lg transform hover:scale-105 transition-all inline-block">
+            <button onclick="handleLaunchChat()" class="px-6 py-2 bg-gradient-to-r from-[#5b2bff] via-[#ff3f8f] to-[#1ed5ff] text-white font-bold rounded-lg hover:shadow-xl shadow-lg transform hover:scale-105 transition-all">
                 Launch Chat
-            </a>
+            </button>
         </div>
     </nav>
     
@@ -156,9 +156,9 @@
                     <i id="os-icon" class="fab fa-windows"></i> 
                     <span id="os-text">Download for Windows</span>
                 </a>
-                <a href="/chat" class="px-10 py-4 border-2 border-white text-white font-bold text-lg rounded-full hover:bg-white hover:text-[#5b2bff] transition-all inline-block">
+                <button onclick="handleLaunchChat()" class="px-10 py-4 border-2 border-white text-white font-bold text-lg rounded-full hover:bg-white hover:text-[#5b2bff] transition-all">
                     Sign In on Web
-                </a>
+                </button>
             </div>
             <div class="mt-12 text-sm opacity-80">
                 <p id="download-subtext"><i class="fas fa-desktop mr-2"></i> Windows 10 and later</p>
@@ -1138,6 +1138,21 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>
     <script>
+        async function handleLaunchChat() {
+            try {
+                const response = await fetch('/check-session');
+                const data = await response.json();
+                
+                if (data.loggedIn) {
+                    window.location.href = '/chat';
+                } else {
+                    openAuthModal();
+                }
+            } catch (err) {
+                openAuthModal();
+            }
+        }
+
         function openAuthModal() {
             document.getElementById('authModal').style.display = 'flex';
         }
