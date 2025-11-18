@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Servers - Vybez</title>
+    <link href="/tailwind.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0F0F23 0%, #1A0B2E 50%, #16001E 100%);
+            min-height: 100vh;
+        }
+        h1, h2, h3 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .server-card {
+            transition: all 0.3s ease;
+        }
+        .server-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(233, 78, 255, 0.3);
+            border-color: rgba(233, 78, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="mb-8">
+            <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-[#E94EFF] to-[#00E5FF] bg-clip-text text-transparent">
+                Discover Servers
+            </h1>
+            <p class="text-gray-400">Find and join public Vybez communities</p>
+        </div>
+
+        <div class="glass-card rounded-xl p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Search</label>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search servers..." 
+                        class="w-full bg-[#0F0F23] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#E94EFF]"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Sort By</label>
+                    <select 
+                        id="sortBySelect" 
+                        class="w-full bg-[#0F0F23] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#E94EFF]"
+                    >
+                        <option value="members">Member Count</option>
+                        <option value="created_at">Newest</option>
+                        <option value="name">Name (A-Z)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Order</label>
+                    <select 
+                        id="sortOrderSelect" 
+                        class="w-full bg-[#0F0F23] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#E94EFF]"
+                    >
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Min Members</label>
+                    <input 
+                        type="number" 
+                        id="minMembersInput" 
+                        placeholder="0" 
+                        min="0" 
+                        class="w-full bg-[#0F0F23] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#E94EFF]"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Max Members</label>
+                    <input 
+                        type="number" 
+                        id="maxMembersInput" 
+                        placeholder="999999" 
+                        min="0" 
+                        class="w-full bg-[#0F0F23] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#E94EFF]"
+                    >
+                </div>
+            </div>
+
+            <button 
+                id="searchButton" 
+                class="mt-4 w-full bg-gradient-to-r from-[#E94EFF] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#E94EFF] text-white font-semibold py-2 px-6 rounded-lg transition-all"
+            >
+                Search
+            </button>
+        </div>
+
+        <div id="resultsContainer">
+            <div class="text-center py-12">
+                <p class="text-gray-400">Loading servers...</p>
+            </div>
+        </div>
+
+        <div id="paginationContainer" class="mt-6 flex justify-center gap-4 hidden">
+            <button 
+                id="prevButton" 
+                class="glass-card px-6 py-2 rounded-lg hover:bg-[#E94EFF] hover:bg-opacity-20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                Previous
+            </button>
+            <span id="pageInfo" class="glass-card px-6 py-2 rounded-lg"></span>
+            <button 
+                id="nextButton" 
+                class="glass-card px-6 py-2 rounded-lg hover:bg-[#E94EFF] hover:bg-opacity-20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                Next
+            </button>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/" class="text-[#00E5FF] hover:underline">← Back to Chat</a>
+        </div>
+    </div>
+
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="glass-card rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-4">
+                <h2 id="modalServerName" class="text-3xl font-bold bg-gradient-to-r from-[#E94EFF] to-[#00E5FF] bg-clip-text text-transparent"></h2>
+                <button id="closeModal" class="text-gray-400 hover:text-white text-2xl">×</button>
+            </div>
+            <p id="modalServerDescription" class="text-gray-300 mb-6"></p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="glass-card p-4 rounded-lg">
+                    <div class="text-sm text-gray-400">Members</div>
+                    <div id="modalMemberCount" class="text-2xl font-bold text-[#E94EFF]">0</div>
+                </div>
+                <div class="glass-card p-4 rounded-lg">
+                    <div class="text-sm text-gray-400">Channels</div>
+                    <div id="modalChannelCount" class="text-2xl font-bold text-[#00E5FF]">0</div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-3">Channels</h3>
+                <div id="modalChannels" class="space-y-2"></div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-3">Roles</h3>
+                <div id="modalRoles" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <button 
+                id="joinServerButton" 
+                class="w-full bg-gradient-to-r from-[#E94EFF] to-[#7C3AED] hover:from-[#7C3AED] hover:to-[#E94EFF] text-white font-semibold py-3 px-6 rounded-lg transition-all"
+            >
+                Join Server
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 0;
+        let currentLimit = 20;
+        let totalResults = 0;
+        let hasMorePages = false;
+        let currentServerId = null;
+
+        function getSearchParams() {
+            return {
+                search: document.getElementById('searchInput').value,
+                sortBy: document.getElementById('sortBySelect').value,
+                sortOrder: document.getElementById('sortOrderSelect').value,
+                minMembers: document.getElementById('minMembersInput').value || 0,
+                maxMembers: document.getElementById('maxMembersInput').value || 999999,
+                limit: currentLimit,
+                offset: currentPage * currentLimit
+            };
+        }
+
+        async function loadServers() {
+            const params = new URLSearchParams(getSearchParams());
+            
+            try {
+                const response = await fetch(`/api/servers/discover?${params}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayServers(data.servers);
+                    updatePagination(data.pagination);
+                } else {
+                    showError(data.message || 'Failed to load servers');
+                }
+            } catch (err) {
+                showError('Network error');
+            }
+        }
+
+        function displayServers(servers) {
+            const container = document.getElementById('resultsContainer');
+            const paginationContainer = document.getElementById('paginationContainer');
+            
+            if (servers.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <p class="text-gray-400 text-xl">No servers found</p>
+                        <p class="text-gray-500 mt-2">Try adjusting your search filters</p>
+                    </div>
+                `;
+                paginationContainer.classList.add('hidden');
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${servers.map(server => `
+                        <div class="server-card glass-card rounded-xl p-6 cursor-pointer" onclick="showServerPreview('${server.id}')">
+                            <div class="flex items-start justify-between mb-4">
+                                ${server.icon ? 
+                                    `<img src="${server.icon}" alt="${server.name}" class="w-16 h-16 rounded-full">` :
+                                    `<div class="w-16 h-16 rounded-full bg-gradient-to-br from-[#E94EFF] to-[#7C3AED] flex items-center justify-center text-2xl font-bold">${server.name.charAt(0).toUpperCase()}</div>`
+                                }
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">${escapeHtml(server.name)}</h3>
+                            <p class="text-gray-400 text-sm mb-4 line-clamp-2">${escapeHtml(server.description || 'No description')}</p>
+                            <div class="flex justify-between text-sm text-gray-300">
+                                <div>
+                                    <span class="text-[#00E5FF]">●</span> ${server.member_count} members
+                                </div>
+                                <div>
+                                    ${server.channel_count} channels
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function updatePagination(pagination) {
+            totalResults = pagination.total;
+            hasMorePages = pagination.hasMore;
+            const paginationContainer = document.getElementById('paginationContainer');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            const pageInfo = document.getElementById('pageInfo');
+
+            if (totalResults === 0) {
+                paginationContainer.classList.add('hidden');
+                return;
+            }
+
+            paginationContainer.classList.remove('hidden');
+
+            const currentPageNum = currentPage + 1;
+            const totalPages = Math.ceil(totalResults / pagination.limit);
+
+            pageInfo.textContent = `Page ${currentPageNum} of ${totalPages}`;
+
+            prevButton.disabled = currentPage === 0;
+            nextButton.disabled = !hasMorePages;
+        }
+
+        async function showServerPreview(serverId) {
+            currentServerId = serverId;
+            
+            try {
+                const response = await fetch(`/api/servers/${serverId}/preview`);
+                const server = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('modalServerName').textContent = server.name;
+                    document.getElementById('modalServerDescription').textContent = server.description || 'No description';
+                    document.getElementById('modalMemberCount').textContent = server.member_count;
+                    document.getElementById('modalChannelCount').textContent = server.channel_count;
+
+                    const channelsContainer = document.getElementById('modalChannels');
+                    channelsContainer.innerHTML = server.channels.map(channel => {
+                        const icon = channel.type === 'text' ? '#' : channel.type === 'voice' ? '🔊' : '📢';
+                        return `
+                            <div class="glass-card p-3 rounded-lg">
+                                <span class="font-mono">${icon}</span> ${escapeHtml(channel.name)}
+                                ${channel.topic ? `<div class="text-sm text-gray-400 mt-1">${escapeHtml(channel.topic)}</div>` : ''}
+                            </div>
+                        `;
+                    }).join('') || '<p class="text-gray-500">No channels</p>';
+
+                    const rolesContainer = document.getElementById('modalRoles');
+                    rolesContainer.innerHTML = server.roles.map(role => `
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: ${role.color}20; border: 1px solid ${role.color}; color: ${role.color}">
+                            ${escapeHtml(role.name)}
+                        </span>
+                    `).join('') || '<p class="text-gray-500">No roles</p>';
+
+                    document.getElementById('previewModal').classList.remove('hidden');
+                } else {
+                    alert(server.message || 'Failed to load server preview');
+                }
+            } catch (err) {
+                alert('Network error');
+            }
+        }
+
+        async function joinServer() {
+            if (!currentServerId) return;
+
+            try {
+                const response = await fetch(`/api/servers/${currentServerId}/join`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(`Successfully joined ${data.server.name}!`);
+                    document.getElementById('previewModal').classList.add('hidden');
+                    window.location.href = '/';
+                } else {
+                    alert(data.message || 'Failed to join server');
+                }
+            } catch (err) {
+                alert('Network error');
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('resultsContainer').innerHTML = `
+                <div class="text-center py-12">
+                    <p class="text-red-400 text-xl">${escapeHtml(message)}</p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('searchButton').addEventListener('click', () => {
+            currentPage = 0;
+            loadServers();
+        });
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                currentPage = 0;
+                loadServers();
+            }
+        });
+
+        document.getElementById('prevButton').addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                loadServers();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        document.getElementById('nextButton').addEventListener('click', () => {
+            if (hasMorePages) {
+                currentPage++;
+                loadServers();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('previewModal').classList.add('hidden');
+        });
+
+        document.getElementById('joinServerButton').addEventListener('click', joinServer);
+
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('previewModal');
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+
+        loadServers();
+    </script>
+</body>
+</html>

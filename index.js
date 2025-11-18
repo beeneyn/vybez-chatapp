@@ -17,6 +17,7 @@ const apiMiddleware = require("./api-middleware.js");
 const serverRolesRoutes = require("./server-roles-routes.js");
 const serverManagementRoutes = require("./server-management-routes.js");
 const channelRoutes = require("./channel-routes.js");
+const serverDiscoveryRoutes = require("./server-discovery-routes.js");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 
@@ -314,6 +315,7 @@ app.use("/api/developer", apiRoutes);
 app.use("/api", serverRolesRoutes.router);
 app.use("/api", serverManagementRoutes);
 app.use("/api", channelRoutes);
+app.use("/api", serverDiscoveryRoutes);
 
 const requireAdmin = (req, res, next) => {
     if (!req.session.user || req.session.user.role !== "admin") {
