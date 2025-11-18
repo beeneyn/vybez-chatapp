@@ -117,10 +117,20 @@ router.post('/servers', requireAuth, async (req, res) => {
             [server.id, 'Admin', '#E94EFF', 100, true]
         );
 
-        await client.query(
-            'INSERT INTO role_permissions (role_id, permission_name) VALUES ($1, $2)',
-            [adminRole.rows[0].id, 'administrator']
-        );
+        const adminPermissions = [
+            'administrator',
+            'create_channels',
+            'manage_channels',
+            'delete_channels',
+            'manage_server',
+            'manage_roles'
+        ];
+        for (const permission of adminPermissions) {
+            await client.query(
+                'INSERT INTO role_permissions (role_id, permission_name) VALUES ($1, $2)',
+                [adminRole.rows[0].id, permission]
+            );
+        }
 
         await client.query(
             'INSERT INTO user_roles (username, role_id) VALUES ($1, $2)',
