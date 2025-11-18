@@ -9,7 +9,15 @@ I prefer detailed explanations and an iterative development approach. Ask before
 ## System Architecture
 
 ### UI/UX Decisions
-The application features a "Neon Nightlife" aesthetic with a "BREAK FREE" slogan. The color palette includes Midnight, Deep Violet, Electric Magenta, Cyber Cyan, and Warm accent. Typography uses Space Grotesk (headings) and Inter (body). The design incorporates glassmorphism, gradients, a unified 4-column footer, and a custom modal system, all built with Tailwind CSS v4. Dark theme is the default for new users, with a light theme option available. UI elements dynamically change colors based on the selected theme.
+The application features a "Neon Nightlife" aesthetic with a "BREAK FREE" slogan. The color palette includes Midnight (#0f0f1e), Midnight Light (#1a1a2e), Midnight Lighter (#2a2a3e), Deep Violet, Electric Magenta, Cyber Cyan, and Warm accent. Typography uses Space Grotesk (headings) and Inter (body). The design incorporates glassmorphism, gradients, a unified 4-column footer, and a custom modal system, all built with Tailwind CSS v4. Dark theme is the default for new users, with a light theme option available. UI elements dynamically change colors based on the selected theme.
+
+**Phase 2 Discord-Style UI (Nov 2025):** The chat interface now features a 4-column Discord-inspired layout:
+- **Server Switcher (72px):** Left sidebar with server icons (gradient "V" for Vybez Community) with hover animations
+- **Channels Sidebar (240px):** Channel list organized by categories (TEXT CHANNELS) with # icons, delete buttons for custom channels
+- **Main Chat Area (flex):** Message display, input, and controls
+- **Members List (240px):** Online users with roles and status
+
+Custom modals for server settings (Overview, Roles, Members, Channels tabs) and channel creation with improved UX. Client bridge pattern (`window.vybezClientBridge`) enables safe state sharing between client.js and discord-ui.js using getters/setters and custom events.
 
 ### Technical Implementations
 Vybez is a Node.js application using Express.js for the backend and Socket.IO for real-time communication. User authentication uses bcrypt and `express-session`. PostgreSQL, hosted on Replit's Neon database, is the primary data store. The frontend uses vanilla JavaScript and Tailwind CSS v4.
