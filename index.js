@@ -667,6 +667,17 @@ app.post("/api/support/tickets", async (req, res) => {
             .json({ message: "Subject and message are required" });
     }
 
+    // Validate input lengths
+    if (subject.length > 120) {
+        return res.status(400).json({ message: "Subject must be 120 characters or less" });
+    }
+    if (message.length > 5000) {
+        return res.status(400).json({ message: "Message must be 5000 characters or less" });
+    }
+    if (email && email.length > 255) {
+        return res.status(400).json({ message: "Email must be 255 characters or less" });
+    }
+
     try {
         const result = await db.pool.query(
             "INSERT INTO support_tickets (username, email, subject, message, priority) VALUES ($1, $2, $3, $4, $5) RETURNING id",
@@ -715,6 +726,11 @@ app.post("/api/support/tickets", async (req, res) => {
 app.put("/api/support/tickets/:id", requireAdminAPI, async (req, res) => {
     const { id } = req.params;
     const { status, adminResponse } = req.body;
+
+    // Validate admin response length
+    if (adminResponse && adminResponse.length > 5000) {
+        return res.status(400).json({ message: "Admin response must be 5000 characters or less" });
+    }
 
     try {
         const ticketResult = await db.pool.query(
@@ -814,6 +830,14 @@ app.post("/api/admin/announcements", requireAdminAPI, (req, res) => {
         return res
             .status(400)
             .json({ message: "Title and content are required" });
+    }
+
+    // Validate input lengths
+    if (title.length > 200) {
+        return res.status(400).json({ message: "Title must be 200 characters or less" });
+    }
+    if (content.length > 8000) {
+        return res.status(400).json({ message: "Content must be 8000 characters or less" });
     }
 
     db.createAnnouncement(title, content, postedBy, (err, announcement) => {
