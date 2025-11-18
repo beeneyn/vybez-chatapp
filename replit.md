@@ -37,6 +37,25 @@ Vybez is a Node.js application using Express.js for the backend and Socket.IO fo
 ### System Design Choices
 The application separates server-side logic (`index.js`, `database.js`), client-side logic (`public/client.js`), and Electron components. The main server file is `index.js` with `server.js` as a symbolic link for deployment compatibility. Database interactions use `pg` for PostgreSQL. A file-based session store manages user sessions (migrating to Replit key-value store). Frontend styles are compiled with `@tailwindcss/cli`. Database schema uses username-based relationships with transactional integrity for user actions. Custom error handling middleware serves branded 404 and 401 pages while preserving API JSON responses.
 
+### Version 1.2 Database Schema (Completed 2025-11-18)
+The Version 1.2 schema transforms Vybez from flat chat rooms to Discord-style servers with channels, roles, and permissions. **Production-ready** with complete data integrity enforcement.
+
+**New Tables:**
+-   **servers**: Main organization units with name, description, icon, public/private status, and owner
+-   **channels**: Channels within servers (text/voice/announcements) with name, topic, type, and ordering
+-   **server_members**: Server membership tracking with join dates and nicknames
+-   **roles**: Server-specific roles with name, color, position, and mentionable flag
+-   **role_permissions**: Permission assignments to roles (read_messages, send_messages, manage_channels, etc.)
+-   **user_roles**: Links users to roles (trigger-enforced: user must be server member)
+-   **message_edits**: Message edit history with original content, edited content, edit timestamps
+
+**Data Integrity Features:**
+-   All foreign keys are NOT NULL (server_id, role_id, message_id, username)
+-   Database trigger `check_user_role_membership()` prevents role assignments to non-members
+-   Automatic cleanup of orphaned data during migrations
+-   Idempotent migrations handle both fresh and existing databases
+-   Proper indexes on all foreign keys for performance
+
 ## External Dependencies
 -   **Node.js**: Backend runtime.
 -   **Express.js**: Web application framework.
