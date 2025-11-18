@@ -2324,17 +2324,21 @@ app.delete("/rooms/:name", async (req, res) => {
 // Middleware to check server membership
 function checkServerMembership(req, res, next) {
     if (!req.session.user) {
+        console.log("checkServerMembership: No user session");
         return res.status(401).json({ message: "Unauthorized" });
     }
     
     const serverId = req.params.serverId;
     const username = req.session.user.username;
     
+    console.log(`checkServerMembership: Checking membership for user ${username} in server ${serverId}`);
+    
     db.isUserMemberOfServer(serverId, username, (err, isMember) => {
         if (err) {
             console.error("Error checking server membership:", err);
             return res.status(500).json({ message: "Failed to verify membership" });
         }
+        console.log(`checkServerMembership: User ${username} is member of server ${serverId}: ${isMember}`);
         if (!isMember) {
             return res.status(403).json({ message: "You are not a member of this server" });
         }
