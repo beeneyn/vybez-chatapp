@@ -972,60 +972,56 @@ const createServer = async (name, description, owner_username, callback) => {
             [server.id, owner_username]
         );
         
+        // Create @everyone role
         const everyoneRole = await client.query(
-            'INSERT INTO roles (server_id, name, color, position, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [server.id, 'everyone', '#99AAB5', 0, 0]
+            'INSERT INTO roles (server_id, name, color, position, mentionable) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [server.id, '@everyone', '#99AAB5', 0, false]
         );
         
-        const everyonePermissions = ['send_messages', 'read_messages'];
+        const everyonePermissions = ['send_messages', 'read_messages', 'read_history', 'add_reactions'];
         for (const permission of everyonePermissions) {
             await client.query(
-                'INSERT INTO role_permissions (role_id, permission) VALUES ($1, $2)',
+                'INSERT INTO role_permissions (role_id, permission_name) VALUES ($1, $2)',
                 [everyoneRole.rows[0].id, permission]
             );
         }
         
-        const moderatorRole = await client.query(
-            'INSERT INTO roles (server_id, name, color, position, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [server.id, 'Moderator', '#5865F2', 1, 0]
+        // Assign @everyone role to owner
+        await client.query(
+            'INSERT INTO user_roles (username, role_id) VALUES ($1, $2)',
+            [owner_username, everyoneRole.rows[0].id]
         );
         
-        const moderatorPermissions = [
-            'manage_messages', 'kick_members', 'send_messages', 'read_messages'
-        ];
-        for (const permission of moderatorPermissions) {
-            await client.query(
-                'INSERT INTO role_permissions (role_id, permission) VALUES ($1, $2)',
-                [moderatorRole.rows[0].id, permission]
-            );
-        }
-        
+        // Create Admin role
         const adminRole = await client.query(
-            'INSERT INTO roles (server_id, name, color, position, permissions) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [server.id, 'Admin', '#ED4245', 2, 0]
+            'INSERT INTO roles (server_id, name, color, position, mentionable) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [server.id, 'Admin', '#E94EFF', 100, true]
         );
         
         const adminPermissions = [
             'administrator', 'manage_server', 'manage_roles', 'manage_channels',
-            'kick_members', 'ban_members', 'create_invite', 'manage_messages',
-            'send_messages', 'read_messages', 'mention_everyone', 'view_audit_log'
+            'create_channels', 'delete_channels', 'kick_members', 'ban_members',
+            'invite_members', 'manage_messages', 'send_messages', 'read_messages',
+            'mention_everyone', 'read_history', 'add_reactions', 'attach_files'
         ];
         
         for (const permission of adminPermissions) {
             await client.query(
-                'INSERT INTO role_permissions (role_id, permission) VALUES ($1, $2)',
+                'INSERT INTO role_permissions (role_id, permission_name) VALUES ($1, $2)',
                 [adminRole.rows[0].id, permission]
             );
         }
         
+        // Assign Admin role to owner
         await client.query(
             'INSERT INTO user_roles (username, role_id) VALUES ($1, $2)',
             [owner_username, adminRole.rows[0].id]
         );
         
+        // Create general channel
         await client.query(
-            'INSERT INTO channels (server_id, name, type, description, position) VALUES ($1, $2, $3, $4, $5)',
-            [server.id, 'general', 'text', 'General discussion channel', 0]
+            'INSERT INTO channels (server_id, name, type, position) VALUES ($1, $2, $3, $4)',
+            [server.id, 'general', 'text', 0]
         );
         
         await client.query('COMMIT');
