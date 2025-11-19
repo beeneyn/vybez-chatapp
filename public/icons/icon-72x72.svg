@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E94EFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00E5FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="36" cy="36" r="36" fill="url(#grad)"/>
+  
+  <!-- V letter -->
+  <path d="M 21.599999999999998 18 L 36 46.800000000000004 L 50.4 18" 
+        stroke="white" 
+        stroke-width="5.76" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"/>
+  
+  <!-- Lightning bolt accent -->
+  <path d="M 39.6 28.8 L 32.4 39.6 L 37.44 39.6 L 34.56 50.4" 
+        stroke="#00E5FF" 
+        stroke-width="3.6" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"/>
+</svg>

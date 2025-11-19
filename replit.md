@@ -41,6 +41,7 @@ Vybez is a Node.js application using Express.js for the backend and Socket.IO fo
 -   **Moderation System:** Three-tier enforcement (warnings, mutes, bans) with evidence tracking.
 -   **Custom Error Pages:** Branded 404 and 401 pages.
 -   **Electron Desktop Client:** Offers desktop notifications, system tray integration, badge counts, global shortcuts, native dark mode, offline detection, auto-updater, auto-launch, native file picker, borderless window, and secure IPC.
+-   **Progressive Web App (PWA):** Full PWA support with offline caching, installable on mobile and desktop, service worker for performance, app manifest, and custom icons. Works on iOS, Android, Windows, Mac, and Linux.
 
 ### System Design Choices
 The application separates server-side logic (`index.js`, `database.js`), client-side logic (`public/client.js`), and Electron components. The main server file is `index.js`. Database interactions use `pg` for PostgreSQL. A file-based session store manages user sessions (migrating to Replit key-value store). Frontend styles are compiled with `@tailwindcss/cli`. Database schema uses username-based relationships with transactional integrity. Custom error handling middleware serves branded 404 and 401 pages.
